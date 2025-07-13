@@ -45,8 +45,8 @@ public class MemberModel extends BaseEntity {
             throw new IllegalArgumentException("아이디가 존재하지 않습니다.");
         }
 
-        if (!loginId.matches("^[a-zA-Z0-9]{5,10}$")) {
-            throw new IllegalArgumentException("아이디는 [영문 + 숫자] 5자 이상,10자 이하여야 합니다.");
+        if (!loginId.matches("^[a-zA-Z0-9]{1,10}$")) {
+            throw new IllegalArgumentException("아이디는 [영문 + 숫자] 10자 이하여야 합니다.");
         }
 
         return loginId;
