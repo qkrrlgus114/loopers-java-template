@@ -4,14 +4,12 @@ import com.loopers.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "member")
-@Getter
 public class MemberModel extends BaseEntity {
 
     @Column(name = "login_id", nullable = false, length = 10)
@@ -33,6 +31,10 @@ public class MemberModel extends BaseEntity {
     }
 
     public MemberModel(String loginId, String password, String email, String name, String birth) {
+        registerMember(loginId, password, email, name, birth);
+    }
+
+    private void registerMember(String loginId, String password, String email, String name, String birth) {
         this.loginId = validateLoginId(loginId);
         this.password = password;
         this.email = validateEmail(email);
@@ -84,5 +86,25 @@ public class MemberModel extends BaseEntity {
         } catch (Exception e) {
             throw new IllegalArgumentException("생년월일 형식에 문제가 발생했습니다.");
         }
+    }
+
+    public String getLoginId() {
+        return loginId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public LocalDate getBirth() {
+        return birth;
     }
 }
