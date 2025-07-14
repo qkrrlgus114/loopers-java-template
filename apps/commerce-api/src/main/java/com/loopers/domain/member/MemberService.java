@@ -1,7 +1,7 @@
 package com.loopers.domain.member;
 
 import com.loopers.application.member.MemberRegisterInfo;
-import com.loopers.application.member.dto.request.MemberRegisterReqDTO;
+import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.MemberErrorType;
 import lombok.RequiredArgsConstructor;
