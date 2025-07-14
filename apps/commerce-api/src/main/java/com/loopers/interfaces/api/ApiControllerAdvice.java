@@ -9,6 +9,7 @@ import com.loopers.support.error.CoreException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -36,6 +37,12 @@ public class ApiControllerAdvice {
         String type = e.getRequiredType() != null ? e.getRequiredType().getSimpleName() : "unknown";
         String value = e.getValue() != null ? e.getValue().toString() : "null";
         String message = String.format("요청 파라미터 '%s' (타입: %s)의 값 '%s'이(가) 잘못되었습니다.", name, type, value);
+        return failureResponse(CommonErrorType.BAD_REQUEST, message);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ApiResponse<?>> handelBadRequest(MethodArgumentNotValidException e) {
+        String message = e.getMessage() != null ? e.getMessage() : "잘못된 요청입니다.";
         return failureResponse(CommonErrorType.BAD_REQUEST, message);
     }
 
