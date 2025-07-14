@@ -19,7 +19,7 @@
 //    @GetMapping("/{exampleId}")
 //    @Override
 //    public ApiResponse<ExampleV1Dto.ExampleResponse> getExample(
-//        @PathVariable(value = "exampleId") Long exampleId
+//            @PathVariable(value = "exampleId") Long exampleId
 //    ) {
 //        ExampleInfo info = exampleFacade.getExample(exampleId);
 //        ExampleV1Dto.ExampleResponse response = ExampleV1Dto.ExampleResponse.from(info);
