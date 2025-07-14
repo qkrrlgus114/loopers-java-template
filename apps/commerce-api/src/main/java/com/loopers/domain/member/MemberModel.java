@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 @Table(name = "member")
 public class MemberModel extends BaseEntity {
 
-    @Column(name = "login_id", nullable = false, length = 10)
+    @Column(name = "login_id", nullable = false, length = 10, unique = true)
     private String loginId;
 
     @Column(name = "password", nullable = false)
