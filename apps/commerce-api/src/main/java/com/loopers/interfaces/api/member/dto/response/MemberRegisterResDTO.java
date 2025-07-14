@@ -7,6 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class MemberRegisterResDTO {
 
     private String loginId;
@@ -17,12 +18,15 @@ public class MemberRegisterResDTO {
 
     private String birth;
 
+    private String gender;
+
     public static MemberRegisterResDTO from(MemberRegisterInfo info) {
         return MemberRegisterResDTO.builder()
                 .loginId(info.loginId())
                 .email(info.email())
                 .name(info.name())
                 .birth(info.birth())
+                .gender(info.gender())
                 .build();
     }
 }

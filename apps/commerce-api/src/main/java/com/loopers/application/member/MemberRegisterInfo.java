@@ -7,7 +7,8 @@ public record MemberRegisterInfo(
         String loginId,
         String email,
         String name,
-        String birth) {
+        String birth,
+        String gender) {
 
     public static MemberRegisterInfo from(MemberModel member) {
         String birthStr = member.getBirth() != null ? member.getBirth().toString() : null;
@@ -17,7 +18,8 @@ public record MemberRegisterInfo(
                 member.getLoginId(),
                 member.getEmail(),
                 member.getName(),
-                birthStr
+                birthStr,
+                member.getGender()
         );
     }
 }

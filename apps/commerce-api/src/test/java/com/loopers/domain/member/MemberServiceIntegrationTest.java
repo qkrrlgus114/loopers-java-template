@@ -41,6 +41,7 @@ class MemberServiceIntegrationTest {
                     .password("test")
                     .email("test@naver.com")
                     .name("박기현")
+                    .gender("M")
                     .birth("1997-12-04").build();
 
             // when
@@ -62,12 +63,14 @@ class MemberServiceIntegrationTest {
                     .password("test")
                     .email("test@naver.com")
                     .name("박기현")
+                    .gender("M")
                     .birth("1997-12-04").build();
             MemberRegisterReqDTO memberRegisterReqDTO2 = MemberRegisterReqDTO.builder()
                     .loginId("test")
                     .password("1234")
                     .email("1234@naver.com")
                     .name("박기현")
+                    .gender("M")
                     .birth("1997-12-04").build();
             MemberRegisterInfo firstSaved = memberService.register(memberRegisterReqDTO1);
 

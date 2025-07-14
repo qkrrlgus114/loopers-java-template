@@ -22,7 +22,8 @@ public class MemberService {
                 reqDTO.getPassword(),
                 reqDTO.getEmail(),
                 reqDTO.getName(),
-                reqDTO.getBirth()
+                reqDTO.getBirth(),
+                reqDTO.getGender()
         );
 
         MemberModel saved = memberRepository.register(memberModel).orElseThrow(() -> {

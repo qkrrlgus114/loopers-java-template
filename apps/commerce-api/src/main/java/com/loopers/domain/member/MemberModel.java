@@ -27,19 +27,23 @@ public class MemberModel extends BaseEntity {
     @Column(name = "birth", nullable = false)
     private LocalDate birth;
 
+    @Column(name = "gender", nullable = false)
+    private String gender;
+
     protected MemberModel() {
     }
 
-    public MemberModel(String loginId, String password, String email, String name, String birth) {
-        registerMember(loginId, password, email, name, birth);
+    public MemberModel(String loginId, String password, String email, String name, String birth, String gender) {
+        registerMember(loginId, password, email, name, birth, gender);
     }
 
-    private void registerMember(String loginId, String password, String email, String name, String birth) {
+    private void registerMember(String loginId, String password, String email, String name, String birth, String gender) {
         this.loginId = validateLoginId(loginId);
         this.password = password;
         this.email = validateEmail(email);
         this.name = name;
         this.birth = validateBirth(birth);
+        this.gender = gender;
     }
 
     private String validateLoginId(String loginId) {
@@ -106,5 +110,9 @@ public class MemberModel extends BaseEntity {
 
     public LocalDate getBirth() {
         return birth;
+    }
+
+    public String getGender() {
+        return gender;
     }
 }
