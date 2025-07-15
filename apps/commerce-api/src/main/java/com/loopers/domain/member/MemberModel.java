@@ -30,6 +30,9 @@ public class MemberModel extends BaseEntity {
     @Column(name = "gender", nullable = false)
     private String gender;
 
+    @Column(name = "point", nullable = false)
+    private Long point = 0L;
+
     protected MemberModel() {
     }
 
@@ -114,5 +117,9 @@ public class MemberModel extends BaseEntity {
 
     public String getGender() {
         return gender;
+    }
+
+    public long getPoint() {
+        return point;
     }
 }
