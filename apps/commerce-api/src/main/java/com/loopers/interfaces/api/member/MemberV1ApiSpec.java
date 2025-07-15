@@ -2,10 +2,15 @@ package com.loopers.interfaces.api.member;
 
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
+import com.loopers.interfaces.api.member.dto.response.MemberInfoResDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberRegisterResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Member V1 API", description = "사용자 API 버전 1입니다.")
 public interface MemberV1ApiSpec {
@@ -16,6 +21,15 @@ public interface MemberV1ApiSpec {
     )
     ApiResponse<MemberRegisterResDTO> registerMember(
             @Schema(name = "회원가입 정보", description = "회원가입을 위한 정보")
-            MemberRegisterReqDTO reqDTO
+            @Valid @RequestBody MemberRegisterReqDTO reqDTO
+    );
+
+    @Operation(
+            summary = "사용자 정보 조회",
+            description = "로그인한 사용자의 정보를 조회합니다."
+    )
+    ApiResponse<MemberInfoResDTO> getMyMemberInfo(
+            @Schema(name = "회원 ID", description = "조회할 회원의 ID")
+            @NotNull @RequestParam String memberId
     );
 }

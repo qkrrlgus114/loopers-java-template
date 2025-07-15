@@ -21,4 +21,10 @@ public class MemberRepositoryImpl implements MemberRepository {
             return Optional.empty();
         }
     }
+
+    @Override
+    public Optional<MemberModel> findById(Long memberId) {
+        return memberJpaRepository.findById(memberId);
+    }
+
 }

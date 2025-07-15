@@ -10,6 +10,8 @@ import lombok.*;
 @ToString
 public class MemberRegisterResDTO {
 
+    private Long id;
+
     private String loginId;
 
     private String email;
@@ -22,6 +24,7 @@ public class MemberRegisterResDTO {
 
     public static MemberRegisterResDTO from(MemberRegisterInfo info) {
         return MemberRegisterResDTO.builder()
+                .id(info.id())
                 .loginId(info.loginId())
                 .email(info.email())
                 .name(info.name())

@@ -10,8 +10,8 @@ import java.util.Optional;
 @Repository
 public interface MemberRepository {
 
-    /**
-     * 회원가입
-     */
+
     Optional<MemberModel> register(MemberModel memberModel);
+
+    Optional<MemberModel> findById(Long memberId);
 }
