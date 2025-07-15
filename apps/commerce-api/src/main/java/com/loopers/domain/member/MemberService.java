@@ -1,6 +1,7 @@
 package com.loopers.domain.member;
 
 import com.loopers.application.member.MemberMyInfo;
+import com.loopers.application.member.MemberPointInfo;
 import com.loopers.application.member.MemberRegisterInfo;
 import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
 import com.loopers.support.error.CoreException;
@@ -55,5 +56,22 @@ public class MemberService {
         }
 
         return MemberMyInfo.from(findMember.get());
+    }
+
+    /*
+     * 사용자 포인트 조회
+     * */
+    public MemberPointInfo getMemberPoint(String memberId) {
+        long id = Long.parseLong(memberId);
+
+        Optional<MemberModel> findMember = memberRepository.findById(id);
+
+        if (findMember.isEmpty()) {
+            return null;
+        }
+
+        MemberModel member = findMember.get();
+
+        return MemberPointInfo.from(member.getId(), member.getPoint());
     }
 }

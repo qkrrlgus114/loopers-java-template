@@ -3,6 +3,7 @@ package com.loopers.interfaces.api.member;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberInfoResDTO;
+import com.loopers.interfaces.api.member.dto.response.MemberPointResDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberRegisterResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Member V1 API", description = "사용자 API 버전 1입니다.")
@@ -31,5 +33,16 @@ public interface MemberV1ApiSpec {
     ApiResponse<MemberInfoResDTO> getMyMemberInfo(
             @Schema(name = "회원 ID", description = "조회할 회원의 ID")
             @NotNull @RequestParam String memberId
+    );
+
+    @Operation(
+            summary = "사용자 포인트 조회",
+            description = "대상 사용자의 포인트를 조회합니다."
+    )
+    ApiResponse<MemberPointResDTO> getMemberPoint(
+            @Schema(name = "회원 ID", description = "조회할 회원의 ID")
+            @NotNull @RequestParam String memberId,
+            @Schema(name = "유저 헤더", description = "인증 유저 헤더")
+            @RequestHeader(name = "X-USER-ID") String headerId
     );
 }
