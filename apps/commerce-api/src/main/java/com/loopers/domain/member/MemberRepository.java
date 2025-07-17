@@ -9,9 +9,9 @@ import java.util.Optional;
  */
 @Repository
 public interface MemberRepository {
-
-
+    
     Optional<MemberModel> register(MemberModel memberModel);
 
     Optional<MemberModel> findById(Long memberId);
+
 }

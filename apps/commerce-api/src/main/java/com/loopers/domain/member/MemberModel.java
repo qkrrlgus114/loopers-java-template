@@ -1,6 +1,8 @@
 package com.loopers.domain.member;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.MemberErrorType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -121,5 +123,14 @@ public class MemberModel extends BaseEntity {
 
     public long getPoint() {
         return point;
+    }
+
+    // 포인트 충전
+    public void chargePoint(Long amount) {
+        if (amount == null || amount <= 0) {
+            throw new CoreException(MemberErrorType.INVALID_POINT, "충전할 포인트가 유효하지 않습니다.");
+        }
+
+        this.point += amount;
     }
 }

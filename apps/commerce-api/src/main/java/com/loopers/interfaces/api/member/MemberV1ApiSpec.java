@@ -2,6 +2,7 @@ package com.loopers.interfaces.api.member;
 
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
+import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberInfoResDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberPointResDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberRegisterResDTO;
@@ -44,5 +45,16 @@ public interface MemberV1ApiSpec {
             @NotNull @RequestParam String memberId,
             @Schema(name = "유저 헤더", description = "인증 유저 헤더")
             @RequestHeader(name = "X-USER-ID") String headerId
+    );
+
+    @Operation(
+            summary = "사용자 포인트 충천",
+            description = "대상 사용자의 포인트를 충전합니다. 이후 현재 포인트를 반환합니다."
+    )
+    ApiResponse<MemberPointResDTO> chargeMemberPoint(
+            @Schema(name = "유저 헤더", description = "인증 유저 헤더")
+            @RequestHeader(name = "X-USER-ID") String headerId,
+            @Schema(name = "충전 정보", description = "포인트 충전을 위한 정보")
+            @Valid @RequestBody PointChargeReqDTO reqDTO
     );
 }

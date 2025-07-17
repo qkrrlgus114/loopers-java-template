@@ -4,6 +4,7 @@ import com.loopers.application.member.MemberMyInfo;
 import com.loopers.application.member.MemberPointInfo;
 import com.loopers.application.member.MemberRegisterInfo;
 import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
+import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.MemberErrorType;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +62,7 @@ public class MemberService {
     /*
      * 사용자 포인트 조회
      * */
+    @Transactional(readOnly = true)
     public MemberPointInfo getMemberPoint(String memberId) {
         long id = Long.parseLong(memberId);
 
@@ -73,5 +75,25 @@ public class MemberService {
         MemberModel member = findMember.get();
 
         return MemberPointInfo.from(member.getId(), member.getPoint());
+    }
+
+    /*
+     * 사용자 포인트 충전
+     * */
+    @Transactional
+    public MemberPointInfo chargeMemberPoint(PointChargeReqDTO reqDTO) {
+        long id = Long.parseLong(reqDTO.getMemberId());
+
+        MemberModel memberModel = memberRepository.findById(id).orElseThrow(() -> {
+            throw new CoreException(MemberErrorType.NOT_FOUND_MEMBER, "유저를 찾을 수 없습니다.");
+        });
+
+        if (memberModel == null) {
+            return null;
+        }
+
+        memberModel.chargePoint(reqDTO.getAmount());
+
+        return MemberPointInfo.from(id, memberModel.getPoint());
     }
 }

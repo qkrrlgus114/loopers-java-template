@@ -6,6 +6,7 @@ import com.loopers.application.member.MemberRegisterInfo;
 import com.loopers.domain.member.MemberService;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
+import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberInfoResDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberPointResDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberRegisterResDTO;
@@ -69,7 +70,19 @@ public class MemberV1Controller implements MemberV1ApiSpec {
             throw new CoreException(MemberErrorType.NOT_FOUND_MEMBER, "회원 정보를 찾을 수 없습니다. 회원 ID: " + memberId);
         }
 
-        MemberPointResDTO resDTO = MemberPointResDTO.from(memberPoint.memberId(), memberPoint.point());
+        MemberPointResDTO resDTO = MemberPointResDTO.from(memberPoint.memberId(), Long.valueOf(memberPoint.point()));
+
+        return ApiResponse.success(resDTO);
+    }
+
+    @Override
+    @PostMapping("/points")
+    public ApiResponse<MemberPointResDTO> chargeMemberPoint(
+            @RequestHeader(name = "X-USER-ID") String headerId,
+            @RequestBody PointChargeReqDTO reqDTO) {
+
+        MemberPointInfo memberPointInfo = memberService.chargeMemberPoint(reqDTO);
+        MemberPointResDTO resDTO = MemberPointResDTO.from(memberPointInfo.memberId(), Long.valueOf(memberPointInfo.point()));
 
         return ApiResponse.success(resDTO);
     }

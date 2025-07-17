@@ -13,9 +13,9 @@ public class MemberPointResDTO {
 
     private String memberId;
 
-    private String point;
+    private Long point;
 
-    public static MemberPointResDTO from(String memberId, String point) {
+    public static MemberPointResDTO from(String memberId, Long point) {
         return MemberPointResDTO.builder()
                 .memberId(memberId)
                 .point(point)
