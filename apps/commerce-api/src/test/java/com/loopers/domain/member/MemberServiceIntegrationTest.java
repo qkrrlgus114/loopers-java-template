@@ -3,7 +3,7 @@ package com.loopers.domain.member;
 import com.loopers.application.member.MemberMyInfo;
 import com.loopers.application.member.MemberPointInfo;
 import com.loopers.application.member.MemberRegisterInfo;
-import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
+import com.loopers.interfaces.api.member.dto.MemberDTO;
 import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
@@ -23,11 +23,11 @@ class MemberServiceIntegrationTest {
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
 
-    private MemberRegisterReqDTO setUpMemberReqDTO;
+    private MemberDTO.RegisterRequest setUpMemberReqDTO;
 
     @BeforeEach
     void setUp() {
-        setUpMemberReqDTO = MemberRegisterReqDTO.builder()
+        setUpMemberReqDTO = MemberDTO.RegisterRequest.builder()
                 .loginId("test")
                 .password("test")
                 .email("test@naver.com")
@@ -62,7 +62,7 @@ class MemberServiceIntegrationTest {
         @Test
         void fail_conflictLoginIdRegister() {
             // given
-            MemberRegisterReqDTO memberRegisterReqDTO = MemberRegisterReqDTO.builder()
+            MemberDTO.RegisterRequest memberRegisterReqDTO = MemberDTO.RegisterRequest.builder()
                     .loginId("test")
                     .password("1234")
                     .email("1234@naver.com")

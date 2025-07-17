@@ -3,7 +3,7 @@ package com.loopers.domain.member;
 import com.loopers.application.member.MemberMyInfo;
 import com.loopers.application.member.MemberPointInfo;
 import com.loopers.application.member.MemberRegisterInfo;
-import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
+import com.loopers.interfaces.api.member.dto.MemberDTO;
 import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.MemberErrorType;
@@ -25,7 +25,7 @@ public class MemberService {
      * 회원가입
      * */
     @Transactional
-    public MemberRegisterInfo register(MemberRegisterReqDTO reqDTO) {
+    public MemberRegisterInfo register(MemberDTO.RegisterRequest reqDTO) {
         MemberModel memberModel = MemberModel.registerMember(
                 reqDTO.getLoginId(),
                 reqDTO.getPassword(),

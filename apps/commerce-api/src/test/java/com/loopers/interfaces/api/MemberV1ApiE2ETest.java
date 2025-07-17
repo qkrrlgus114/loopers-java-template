@@ -2,11 +2,10 @@ package com.loopers.interfaces.api;
 
 import com.loopers.domain.member.MemberModel;
 import com.loopers.domain.member.MemberRepository;
-import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
+import com.loopers.interfaces.api.member.dto.MemberDTO;
 import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberInfoResDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberPointResDTO;
-import com.loopers.interfaces.api.member.dto.response.MemberRegisterResDTO;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +35,13 @@ public class MemberV1ApiE2ETest {
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
 
-    private MemberRegisterReqDTO setUpMemberReqDTO;
+    private MemberDTO.RegisterRequest setUpMemberReqDTO;
 
     private MemberModel setUpMemberModel;
 
     @BeforeEach
     void setUp() {
-        setUpMemberReqDTO = MemberRegisterReqDTO.builder()
+        setUpMemberReqDTO = MemberDTO.RegisterRequest.builder()
                 .loginId("testUser")
                 .password("testPassword")
                 .email("test@naver.com")
@@ -73,14 +72,14 @@ public class MemberV1ApiE2ETest {
         @Test
         void returnMemberRegisterResDTO_whenRegisterMemberSuccessful() {
             // when
-            ResponseEntity<ApiResponse<MemberRegisterResDTO>> response = testRestTemplate.exchange("/api/v1/users", HttpMethod.POST,
-                    new HttpEntity<>(setUpMemberReqDTO), new ParameterizedTypeReference<ApiResponse<MemberRegisterResDTO>>() {
+            ResponseEntity<ApiResponse<MemberDTO.RegisterResponse>> response = testRestTemplate.exchange("/api/v1/users", HttpMethod.POST,
+                    new HttpEntity<>(setUpMemberReqDTO), new ParameterizedTypeReference<>() {
                     });
 
 
             // then
-            ApiResponse<MemberRegisterResDTO> body = response.getBody();
-            MemberRegisterResDTO memberRegisterResDTO = body.data() != null ? body.data() : null;
+            ApiResponse<MemberDTO.RegisterResponse> body = response.getBody();
+            MemberDTO.RegisterResponse memberRegisterResDTO = body.data() != null ? body.data() : null;
             assertAll(
                     () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                     () -> assertThat(body).isNotNull(),
@@ -97,7 +96,7 @@ public class MemberV1ApiE2ETest {
         @Test
         void returnBadRequest_whenGenderIsMissing() {
             // given
-            MemberRegisterReqDTO reqDTO = MemberRegisterReqDTO.builder()
+            MemberDTO.RegisterRequest reqDTO = MemberDTO.RegisterRequest.builder()
                     .loginId("testUser")
                     .password("testPassword")
                     .email("test@naver.com")
@@ -107,8 +106,8 @@ public class MemberV1ApiE2ETest {
                     .build();
 
             // when
-            ResponseEntity<ApiResponse<MemberRegisterResDTO>> response = testRestTemplate.exchange("/api/v1/users", HttpMethod.POST, new HttpEntity<>(reqDTO),
-                    new ParameterizedTypeReference<ApiResponse<MemberRegisterResDTO>>() {
+            ResponseEntity<ApiResponse<MemberDTO.RegisterResponse>> response = testRestTemplate.exchange("/api/v1/users", HttpMethod.POST, new HttpEntity<>(reqDTO),
+                    new ParameterizedTypeReference<>() {
                     });
 
             // then

@@ -1,11 +1,10 @@
 package com.loopers.interfaces.api.member;
 
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
+import com.loopers.interfaces.api.member.dto.MemberDTO;
 import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberInfoResDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberPointResDTO;
-import com.loopers.interfaces.api.member.dto.response.MemberRegisterResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,9 +21,9 @@ public interface MemberV1ApiSpec {
             summary = "사용자 회원가입",
             description = "사용자를 회원가입합니다."
     )
-    ApiResponse<MemberRegisterResDTO> registerMember(
+    ApiResponse<MemberDTO.RegisterResponse> registerMember(
             @Schema(name = "회원가입 정보", description = "회원가입을 위한 정보")
-            @Valid @RequestBody MemberRegisterReqDTO reqDTO
+            @Valid @RequestBody MemberDTO.RegisterRequest reqDTO
     );
 
     @Operation(

@@ -5,11 +5,10 @@ import com.loopers.application.member.MemberPointInfo;
 import com.loopers.application.member.MemberRegisterInfo;
 import com.loopers.domain.member.MemberService;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
+import com.loopers.interfaces.api.member.dto.MemberDTO;
 import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberInfoResDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberPointResDTO;
-import com.loopers.interfaces.api.member.dto.response.MemberRegisterResDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.MemberErrorType;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +30,9 @@ public class MemberV1Controller implements MemberV1ApiSpec {
      * */
     @Override
     @PostMapping("/users")
-    public ApiResponse<MemberRegisterResDTO> registerMember(MemberRegisterReqDTO reqDTO) {
+    public ApiResponse<MemberDTO.RegisterResponse> registerMember(MemberDTO.RegisterRequest reqDTO) {
         MemberRegisterInfo memberRegisterInfo = memberService.register(reqDTO);
-        MemberRegisterResDTO resDTO = MemberRegisterResDTO.from(memberRegisterInfo);
+        MemberDTO.RegisterResponse resDTO = MemberDTO.RegisterResponse.from(memberRegisterInfo);
 
         return ApiResponse.success(resDTO);
     }
