@@ -4,6 +4,7 @@ import com.loopers.application.member.MemberMyInfo;
 import com.loopers.application.member.MemberPointInfo;
 import com.loopers.application.member.MemberRegisterInfo;
 import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
+import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
@@ -68,7 +69,7 @@ class MemberServiceIntegrationTest {
                     .name("박기현")
                     .gender("M")
                     .birth("1997-12-04").build();
-            MemberRegisterInfo firstSaved = memberService.register(setUpMemberReqDTO);
+            memberService.register(setUpMemberReqDTO);
 
             assertThrows(CoreException.class, () -> {
                 memberService.register(memberRegisterReqDTO);
@@ -135,7 +136,7 @@ class MemberServiceIntegrationTest {
             // then
             assertAll(
                     () -> assertThat(memberPointInfo).isNotNull(),
-                    () -> assertThat(memberPointInfo.point()).isEqualTo("0")
+                    () -> assertThat(memberPointInfo.point()).isEqualTo(0)
             );
         }
 
@@ -151,5 +152,22 @@ class MemberServiceIntegrationTest {
             // then
             assertNull(memberPointInfo);
         }
+    }
+
+    @DisplayName("존재하지 않는 유저 ID 로 충전을 시도한 경우, 실패한다.")
+    @Test
+    void fail_whenChargePointWithNonExistentUserId() {
+        // given
+        String memberId = "9999";
+        PointChargeReqDTO reqDTO = PointChargeReqDTO.builder()
+                .memberId(memberId)
+                .amount(1000L)
+                .build();
+
+
+        // when & then
+        assertThrows(CoreException.class, () -> {
+            memberService.chargeMemberPoint(reqDTO);
+        });
     }
 }
