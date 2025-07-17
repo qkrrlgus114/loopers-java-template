@@ -1,5 +1,7 @@
 package com.loopers.domain.member;
 
+import com.loopers.support.error.CoreException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -58,6 +60,21 @@ public class MemberModelTest {
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("생년월일 형식에 문제가 발생했습니다.");
         }
+    }
+
+    @DisplayName("0 이하의 정수로 포인트를 충전 시 실패한다.")
+    @Test
+    void fail_whenChargePointZeroOrLess() {
+        // given
+        MemberModel memberModel = new MemberModel(
+                "id", "password", "test@naver.com", "name", "1997-12-04", "M"
+        );
+        Long amount = 0L;
+
+        // when && then
+        Assertions.assertThrows(CoreException.class, () -> {
+            memberModel.chargePoint(amount);
+        });
     }
 
 }
