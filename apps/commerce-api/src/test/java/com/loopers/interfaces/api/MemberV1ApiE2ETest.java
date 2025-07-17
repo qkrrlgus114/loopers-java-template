@@ -1,6 +1,9 @@
 package com.loopers.interfaces.api;
 
+import com.loopers.domain.member.MemberModel;
+import com.loopers.domain.member.MemberRepository;
 import com.loopers.interfaces.api.member.dto.request.MemberRegisterReqDTO;
+import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberInfoResDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberPointResDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberRegisterResDTO;
@@ -28,9 +31,14 @@ public class MemberV1ApiE2ETest {
     private TestRestTemplate testRestTemplate;
 
     @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
     private DatabaseCleanUp databaseCleanUp;
 
     private MemberRegisterReqDTO setUpMemberReqDTO;
+
+    private MemberModel setUpMemberModel;
 
     @BeforeEach
     void setUp() {
@@ -41,6 +49,14 @@ public class MemberV1ApiE2ETest {
                 .birth("1997-12-04")
                 .name("박기현")
                 .gender("M").build();
+
+        setUpMemberModel = new MemberModel(
+                setUpMemberReqDTO.getLoginId(),
+                setUpMemberReqDTO.getPassword(),
+                setUpMemberReqDTO.getEmail(),
+                setUpMemberReqDTO.getName(),
+                setUpMemberReqDTO.getBirth(),
+                setUpMemberReqDTO.getGender());
     }
 
 
@@ -115,13 +131,11 @@ public class MemberV1ApiE2ETest {
         @Test
         void returnMemberInfo_whenGetMyInfoSuccessful() {
             // given
-            ResponseEntity<ApiResponse<MemberRegisterResDTO>> registerResponse = testRestTemplate.
-                    exchange("/api/v1/users", HttpMethod.POST, new HttpEntity<>(setUpMemberReqDTO), new ParameterizedTypeReference<>() {
-                    });
+            MemberModel saved = memberRepository.register(setUpMemberModel).get();
 
             // when
             ResponseEntity<ApiResponse<MemberInfoResDTO>> response = testRestTemplate.exchange(
-                    "/api/v1/users/me?memberId=" + registerResponse.getBody().data().getId(),
+                    "/api/v1/users/me?memberId=" + saved.getId(),
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<>() {
@@ -179,15 +193,12 @@ public class MemberV1ApiE2ETest {
         @Test
         void returnMemberPoint_whenGetMemberPointSuccessful() {
             // given
-            ResponseEntity<ApiResponse<MemberRegisterResDTO>> saved =
-                    testRestTemplate.exchange("/api/v1/users", HttpMethod.POST, new HttpEntity<>(setUpMemberReqDTO),
-                            new ParameterizedTypeReference<>() {
-                            });
+            MemberModel saved = memberRepository.register(setUpMemberModel).get();
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-USER-ID", "test");
 
             // when
-            ResponseEntity<ApiResponse<MemberPointResDTO>> response = testRestTemplate.exchange("/api/v1/points?memberId=" + saved.getBody().data().getId(),
+            ResponseEntity<ApiResponse<MemberPointResDTO>> response = testRestTemplate.exchange("/api/v1/points?memberId=" + saved.getId(),
                     HttpMethod.GET, new HttpEntity<>(headers), new ParameterizedTypeReference<>() {
                     });
 
@@ -214,6 +225,67 @@ public class MemberV1ApiE2ETest {
                     () -> assertThat(response.getBody()).isNotNull(),
                     () -> assertThat(response.getBody().meta()).isNotNull()
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /api/v1/points")
+    class ChargePoint {
+
+        /*
+         * - [ ]  존재하는 유저가 1000원을 충전할 경우, 충전된 보유 총량을 응답으로 반환한다.
+         * - [ ]  존재하지 않는 유저로 요청할 경우, `404 Not Found` 응답을 반환한다.
+         * */
+
+        @DisplayName("존재하는 유저가 1000원을 충전할 경우, 충전된 보유 총량을 응답으로 반환한다.")
+        @Test
+        void returnChargedPoint_whenChargePointSuccessful() {
+            // given
+            MemberModel saved = memberRepository.register(setUpMemberModel).get();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("X-USER-ID", String.valueOf(saved.getId()));
+            PointChargeReqDTO reqDTO = PointChargeReqDTO.builder()
+                    .memberId(String.valueOf(saved.getId()))
+                    .amount(1000L).build();
+            HttpEntity<PointChargeReqDTO> requestEntity = new HttpEntity<>(reqDTO, headers);
+
+            // when
+            ResponseEntity<ApiResponse<MemberPointResDTO>> response = testRestTemplate.exchange("/api/v1/points",
+                    HttpMethod.POST, requestEntity, new ParameterizedTypeReference<>() {
+                    });
+
+            // then
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                    () -> assertThat(response.getBody()).isNotNull(),
+                    () -> assertThat(response.getBody().data()).isNotNull(),
+                    () -> assertThat(response.getBody().data().getPoint()).isEqualTo(1000)
+            );
+        }
+
+        @DisplayName("존재하지 않는 유저로 요청할 경우, `404 Not Found` 응답을 반환한다.")
+        @Test
+        void returnNotFound_whenMemberIdDoesNotExist() {
+            // given
+            PointChargeReqDTO reqDTO = PointChargeReqDTO.builder()
+                    .memberId("1")
+                    .amount(1000L).build();
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("X-USER-ID", "test");
+            HttpEntity httpEntity = new HttpEntity(reqDTO, headers);
+
+            // when
+            ResponseEntity<ApiResponse<MemberPointResDTO>> response =
+                    testRestTemplate.exchange("/api/v1/points", HttpMethod.POST, httpEntity,
+                            new ParameterizedTypeReference<ApiResponse<MemberPointResDTO>>() {
+                            });
+
+            // then
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND)
+            );
+
         }
     }
 }
