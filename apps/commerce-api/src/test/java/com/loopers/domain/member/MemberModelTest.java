@@ -24,7 +24,7 @@ public class MemberModelTest {
             String gender = "M";
 
             assertThatThrownBy(() ->
-                    new MemberModel(loginId, password, email, name, birth, gender))
+                    MemberModel.registerMember(loginId, password, email, name, birth, gender))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("아이디는 [영문 + 숫자] 10자 이하여야 합니다.");
         }
@@ -40,7 +40,7 @@ public class MemberModelTest {
             String gender = "M";
 
             assertThatThrownBy(() ->
-                    new MemberModel(loginId, password, email, name, birth, gender))
+                    MemberModel.registerMember(loginId, password, email, name, birth, gender))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("이메일 형식이 일치하지 않습니다.");
         }
@@ -56,7 +56,7 @@ public class MemberModelTest {
             String gender = "M";
 
             assertThatThrownBy(() ->
-                    new MemberModel(loginId, password, email, name, birth, gender))
+                    MemberModel.registerMember(loginId, password, email, name, birth, gender))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("생년월일 형식에 문제가 발생했습니다.");
         }
@@ -66,9 +66,7 @@ public class MemberModelTest {
     @Test
     void fail_whenChargePointZeroOrLess() {
         // given
-        MemberModel memberModel = new MemberModel(
-                "id", "password", "test@naver.com", "name", "1997-12-04", "M"
-        );
+        MemberModel memberModel = MemberModel.registerMember("test1234", "12341234", "test@naver.com", "박기현", "1997-12-04", "M");
         Long amount = 0L;
 
         // when && then

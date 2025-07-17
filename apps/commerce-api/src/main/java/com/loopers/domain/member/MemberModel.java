@@ -38,17 +38,17 @@ public class MemberModel extends BaseEntity {
     protected MemberModel() {
     }
 
-    public MemberModel(String loginId, String password, String email, String name, String birth, String gender) {
-        registerMember(loginId, password, email, name, birth, gender);
-    }
-
-    private void registerMember(String loginId, String password, String email, String name, String birth, String gender) {
+    private MemberModel(String loginId, String password, String email, String name, String birth, String gender) {
         this.loginId = validateLoginId(loginId);
         this.password = password;
         this.email = validateEmail(email);
         this.name = name;
         this.birth = validateBirth(birth);
         this.gender = gender;
+    }
+
+    public static MemberModel registerMember(String loginId, String password, String email, String name, String birth, String gender) {
+        return new MemberModel(loginId, password, email, name, birth, gender);
     }
 
     private String validateLoginId(String loginId) {

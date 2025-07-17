@@ -26,7 +26,7 @@ public class MemberService {
      * */
     @Transactional
     public MemberRegisterInfo register(MemberRegisterReqDTO reqDTO) {
-        MemberModel memberModel = new MemberModel(
+        MemberModel memberModel = MemberModel.registerMember(
                 reqDTO.getLoginId(),
                 reqDTO.getPassword(),
                 reqDTO.getEmail(),
@@ -35,9 +35,8 @@ public class MemberService {
                 reqDTO.getGender()
         );
 
-        MemberModel saved = memberRepository.register(memberModel).orElseThrow(() -> {
-            return new CoreException(MemberErrorType.FAIL_REGISTER, "회원가입에 실패했습니다. 로그인 ID: " + reqDTO.getLoginId());
-        });
+        MemberModel saved = memberRepository.register(memberModel).orElseThrow(()
+                -> new CoreException(MemberErrorType.FAIL_REGISTER, "회원가입에 실패했습니다. 로그인 ID: " + reqDTO.getLoginId()));
 
         return MemberRegisterInfo.from(saved);
     }

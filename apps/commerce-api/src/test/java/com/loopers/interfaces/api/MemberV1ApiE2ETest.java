@@ -50,7 +50,7 @@ public class MemberV1ApiE2ETest {
                 .name("박기현")
                 .gender("M").build();
 
-        setUpMemberModel = new MemberModel(
+        setUpMemberModel = MemberModel.registerMember(
                 setUpMemberReqDTO.getLoginId(),
                 setUpMemberReqDTO.getPassword(),
                 setUpMemberReqDTO.getEmail(),
