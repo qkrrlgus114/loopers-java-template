@@ -1,9 +1,9 @@
 package com.loopers.application.member;
 
-import com.loopers.application.member.dto.MemberMyInfo;
-import com.loopers.application.member.dto.MemberPointInfo;
-import com.loopers.application.member.dto.MemberRegisterCommand;
-import com.loopers.application.member.dto.MemberRegisterInfo;
+import com.loopers.application.member.command.MemberRegisterCommand;
+import com.loopers.application.member.result.MemberInfoResult;
+import com.loopers.application.member.result.MemberPointResult;
+import com.loopers.application.member.result.MemberRegisterResult;
 import com.loopers.domain.member.MemberModel;
 import com.loopers.domain.member.MemberRepository;
 import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
@@ -27,7 +27,7 @@ public class MemberService {
      * 회원가입
      * */
     @Transactional
-    public MemberRegisterInfo register(MemberRegisterCommand command) {
+    public MemberRegisterResult register(MemberRegisterCommand command) {
         MemberModel memberModel = MemberModel.registerMember(
                 command.loginId(),
                 command.password(),
@@ -40,14 +40,14 @@ public class MemberService {
         MemberModel saved = memberRepository.register(memberModel).orElseThrow(()
                 -> new CoreException(MemberErrorType.FAIL_REGISTER, "회원가입에 실패했습니다. 로그인 ID: " + command.loginId()));
 
-        return MemberRegisterInfo.from(saved);
+        return MemberRegisterResult.from(saved);
     }
 
     /*
      * 내 정보 조회
      * */
     @Transactional(readOnly = true)
-    public MemberMyInfo getMyMemberInfo(String memberId) {
+    public MemberInfoResult getMemberInfo(String memberId) {
         long id = Long.parseLong(memberId);
 
         Optional<MemberModel> findMember = memberRepository.findById(id);
@@ -57,14 +57,14 @@ public class MemberService {
             return null;
         }
 
-        return MemberMyInfo.from(findMember.get());
+        return MemberInfoResult.from(findMember.get());
     }
 
     /*
      * 사용자 포인트 조회
      * */
     @Transactional(readOnly = true)
-    public MemberPointInfo getMemberPoint(String memberId) {
+    public MemberPointResult getMemberPoint(String memberId) {
         long id = Long.parseLong(memberId);
 
         Optional<MemberModel> findMember = memberRepository.findById(id);
@@ -75,14 +75,14 @@ public class MemberService {
 
         MemberModel member = findMember.get();
 
-        return MemberPointInfo.from(member.getId(), member.getPoint());
+        return MemberPointResult.from(member.getId(), member.getPoint());
     }
 
     /*
      * 사용자 포인트 충전
      * */
     @Transactional
-    public MemberPointInfo chargeMemberPoint(PointChargeReqDTO reqDTO) {
+    public MemberPointResult chargeMemberPoint(PointChargeReqDTO reqDTO) {
         long id = Long.parseLong(reqDTO.getMemberId());
 
         MemberModel memberModel = memberRepository.findById(id).orElseThrow(() -> {
@@ -95,6 +95,6 @@ public class MemberService {
 
         memberModel.chargePoint(reqDTO.getAmount());
 
-        return MemberPointInfo.from(id, memberModel.getPoint());
+        return MemberPointResult.from(id, memberModel.getPoint());
     }
 }

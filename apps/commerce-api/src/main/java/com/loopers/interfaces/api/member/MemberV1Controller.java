@@ -1,10 +1,10 @@
 package com.loopers.interfaces.api.member;
 
 import com.loopers.application.member.MemberService;
-import com.loopers.application.member.dto.MemberMyInfo;
-import com.loopers.application.member.dto.MemberPointInfo;
-import com.loopers.application.member.dto.MemberRegisterCommand;
-import com.loopers.application.member.dto.MemberRegisterInfo;
+import com.loopers.application.member.command.MemberRegisterCommand;
+import com.loopers.application.member.result.MemberInfoResult;
+import com.loopers.application.member.result.MemberPointResult;
+import com.loopers.application.member.result.MemberRegisterResult;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.member.dto.MemberDTO;
 import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
@@ -13,6 +13,7 @@ import com.loopers.interfaces.api.member.dto.response.MemberPointResDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.MemberErrorType;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -42,9 +43,9 @@ public class MemberV1Controller implements MemberV1ApiSpec {
                 reqDTO.getBirth(),
                 reqDTO.getGender()
         );
-        MemberRegisterInfo memberRegisterInfo = memberService.register(command);
+        MemberRegisterResult memberRegisterResult = memberService.register(command);
 
-        MemberDTO.RegisterResponse resDTO = MemberDTO.RegisterResponse.from(memberRegisterInfo);
+        MemberDTO.RegisterResponse resDTO = MemberDTO.RegisterResponse.from(memberRegisterResult);
 
         return ApiResponse.success(resDTO);
     }
@@ -53,16 +54,17 @@ public class MemberV1Controller implements MemberV1ApiSpec {
      * 사용자 정보 조회
      * */
     @Override
-    @GetMapping("/users/me")
-    public ApiResponse<MemberInfoResDTO> getMyMemberInfo(
-            @RequestParam String memberId) {
-        MemberMyInfo myMemberInfo = memberService.getMyMemberInfo(memberId);
+    @GetMapping("/users/{memberId}")
+    public ApiResponse<MemberInfoResDTO> getMemberInfo(
+            @PathVariable @NotNull String memberId,
+            @RequestHeader(name = "X-USER-ID") String headerId) {
+        MemberInfoResult memberInfoResult = memberService.getMemberInfo(memberId);
 
-        if (myMemberInfo == null) {
+        if (memberInfoResult == null) {
             throw new CoreException(MemberErrorType.NOT_FOUND_MEMBER, "회원 정보를 찾을 수 없습니다. 회원 ID: " + memberId);
         }
 
-        MemberInfoResDTO resDTO = MemberInfoResDTO.from(myMemberInfo);
+        MemberInfoResDTO resDTO = MemberInfoResDTO.from(memberInfoResult);
 
         return ApiResponse.success(resDTO);
     }
@@ -75,13 +77,13 @@ public class MemberV1Controller implements MemberV1ApiSpec {
     public ApiResponse<MemberPointResDTO> getMemberPoint(
             @RequestParam String memberId,
             @RequestHeader(name = "X-USER-ID") String headerId) {
-        MemberPointInfo memberPoint = memberService.getMemberPoint(memberId);
+        MemberPointResult memberPoint = memberService.getMemberPoint(memberId);
 
         if (memberPoint == null) {
             throw new CoreException(MemberErrorType.NOT_FOUND_MEMBER, "회원 정보를 찾을 수 없습니다. 회원 ID: " + memberId);
         }
 
-        MemberPointResDTO resDTO = MemberPointResDTO.from(memberPoint.memberId(), Long.valueOf(memberPoint.point()));
+        MemberPointResDTO resDTO = MemberPointResDTO.from(memberPoint.memberId(), memberPoint.point());
 
         return ApiResponse.success(resDTO);
     }
@@ -92,8 +94,8 @@ public class MemberV1Controller implements MemberV1ApiSpec {
             @RequestHeader(name = "X-USER-ID") String headerId,
             @RequestBody PointChargeReqDTO reqDTO) {
 
-        MemberPointInfo memberPointInfo = memberService.chargeMemberPoint(reqDTO);
-        MemberPointResDTO resDTO = MemberPointResDTO.from(memberPointInfo.memberId(), Long.valueOf(memberPointInfo.point()));
+        MemberPointResult memberPointResult = memberService.chargeMemberPoint(reqDTO);
+        MemberPointResDTO resDTO = MemberPointResDTO.from(memberPointResult.memberId(), Long.valueOf(memberPointResult.point()));
 
         return ApiResponse.success(resDTO);
     }

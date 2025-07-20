@@ -1,6 +1,6 @@
 package com.loopers.interfaces.api.member.dto;
 
-import com.loopers.application.member.dto.MemberRegisterInfo;
+import com.loopers.application.member.result.MemberRegisterResult;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -44,7 +44,7 @@ public class MemberDTO {
         private String birth;
         private String gender;
 
-        public static RegisterResponse from(MemberRegisterInfo info) {
+        public static RegisterResponse from(MemberRegisterResult info) {
             return RegisterResponse.builder()
                     .id(info.id())
                     .loginId(info.loginId())

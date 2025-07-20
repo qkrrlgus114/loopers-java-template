@@ -8,11 +8,6 @@ import com.loopers.interfaces.api.member.dto.response.MemberPointResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Member V1 API", description = "사용자 API 버전 1입니다.")
 public interface MemberV1ApiSpec {
@@ -23,16 +18,18 @@ public interface MemberV1ApiSpec {
     )
     ApiResponse<MemberDTO.RegisterResponse> registerMember(
             @Schema(name = "회원가입 정보", description = "회원가입을 위한 정보")
-            @Valid @RequestBody MemberDTO.RegisterRequest reqDTO
+            MemberDTO.RegisterRequest reqDTO
     );
 
     @Operation(
             summary = "사용자 정보 조회",
             description = "로그인한 사용자의 정보를 조회합니다."
     )
-    ApiResponse<MemberInfoResDTO> getMyMemberInfo(
+    ApiResponse<MemberInfoResDTO> getMemberInfo(
             @Schema(name = "회원 ID", description = "조회할 회원의 ID")
-            @NotNull @RequestParam String memberId
+            String memberId,
+            @Schema(name = "유저 헤더", description = "인증 유저 헤더")
+            String headerId
     );
 
     @Operation(
@@ -41,9 +38,9 @@ public interface MemberV1ApiSpec {
     )
     ApiResponse<MemberPointResDTO> getMemberPoint(
             @Schema(name = "회원 ID", description = "조회할 회원의 ID")
-            @NotNull @RequestParam String memberId,
+            String memberId,
             @Schema(name = "유저 헤더", description = "인증 유저 헤더")
-            @RequestHeader(name = "X-USER-ID") String headerId
+            String headerId
     );
 
     @Operation(
@@ -52,8 +49,8 @@ public interface MemberV1ApiSpec {
     )
     ApiResponse<MemberPointResDTO> chargeMemberPoint(
             @Schema(name = "유저 헤더", description = "인증 유저 헤더")
-            @RequestHeader(name = "X-USER-ID") String headerId,
+            String headerId,
             @Schema(name = "충전 정보", description = "포인트 충전을 위한 정보")
-            @Valid @RequestBody PointChargeReqDTO reqDTO
+            PointChargeReqDTO reqDTO
     );
 }

@@ -15,6 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(userIdHeaderInterceptor)
-                .addPathPatterns("/api/v1/points/**");
+                .addPathPatterns("/api/v1/points/**")
+                .addPathPatterns("/api/v1/users/**");
     }
 }

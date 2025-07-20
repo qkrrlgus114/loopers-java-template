@@ -118,7 +118,7 @@ public class MemberV1ApiE2ETest {
     }
 
     @Nested
-    @DisplayName("GET /api/v1/users/me")
+    @DisplayName("GET /api/v1/users/")
     class GetMyInfo {
 
         /*
@@ -131,12 +131,14 @@ public class MemberV1ApiE2ETest {
         void returnMemberInfo_whenGetMyInfoSuccessful() {
             // given
             MemberModel saved = memberRepository.register(setUpMemberModel).get();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("X-USER-ID", String.valueOf(saved.getId()));
 
             // when
             ResponseEntity<ApiResponse<MemberInfoResDTO>> response = testRestTemplate.exchange(
-                    "/api/v1/users/me?memberId=" + saved.getId(),
+                    "/api/v1/users/" + saved.getId(),
                     HttpMethod.GET,
-                    null,
+                    new HttpEntity<>(headers),
                     new ParameterizedTypeReference<>() {
                     }
             );

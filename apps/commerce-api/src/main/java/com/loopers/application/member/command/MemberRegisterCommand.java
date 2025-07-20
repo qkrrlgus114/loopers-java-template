@@ -1,4 +1,4 @@
-package com.loopers.application.member.dto;
+package com.loopers.application.member.command;
 
 public record MemberRegisterCommand(
         String loginId,

@@ -1,10 +1,10 @@
-package com.loopers.application.member.dto;
+package com.loopers.application.member.result;
 
 import com.loopers.domain.member.MemberModel;
 
 import java.time.LocalDate;
 
-public record MemberMyInfo(
+public record MemberInfoResult(
         Long id,
         String loginId,
         String email,
@@ -12,9 +12,9 @@ public record MemberMyInfo(
         LocalDate birth,
         String gender) {
 
-    public static MemberMyInfo from(MemberModel member) {
+    public static MemberInfoResult from(MemberModel member) {
 
-        return new MemberMyInfo(
+        return new MemberInfoResult(
                 member.getId(),
                 member.getLoginId(),
                 member.getEmail(),
