@@ -3,9 +3,6 @@ package com.loopers.interfaces.api;
 import com.loopers.domain.member.MemberModel;
 import com.loopers.domain.member.MemberRepository;
 import com.loopers.interfaces.api.member.dto.MemberDTO;
-import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
-import com.loopers.interfaces.api.member.dto.response.MemberInfoResDTO;
-import com.loopers.interfaces.api.member.dto.response.MemberPointResDTO;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -54,7 +53,7 @@ public class MemberV1ApiE2ETest {
                 setUpMemberReqDTO.getPassword(),
                 setUpMemberReqDTO.getEmail(),
                 setUpMemberReqDTO.getName(),
-                setUpMemberReqDTO.getBirth(),
+                LocalDate.parse(setUpMemberReqDTO.getBirth()),
                 setUpMemberReqDTO.getGender());
     }
 
@@ -118,7 +117,7 @@ public class MemberV1ApiE2ETest {
     }
 
     @Nested
-    @DisplayName("GET /api/v1/users/me")
+    @DisplayName("GET /api/v1/users/")
     class GetMyInfo {
 
         /*
@@ -131,12 +130,14 @@ public class MemberV1ApiE2ETest {
         void returnMemberInfo_whenGetMyInfoSuccessful() {
             // given
             MemberModel saved = memberRepository.register(setUpMemberModel).get();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("X-USER-ID", String.valueOf(saved.getId()));
 
             // when
-            ResponseEntity<ApiResponse<MemberInfoResDTO>> response = testRestTemplate.exchange(
-                    "/api/v1/users/me?memberId=" + saved.getId(),
+            ResponseEntity<ApiResponse<MemberDTO.MemberInfoResponse>> response = testRestTemplate.exchange(
+                    "/api/v1/users/" + saved.getId(),
                     HttpMethod.GET,
-                    null,
+                    new HttpEntity<>(headers),
                     new ParameterizedTypeReference<>() {
                     }
             );
@@ -146,7 +147,7 @@ public class MemberV1ApiE2ETest {
                     () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                     () -> assertThat(response.getBody()).isNotNull(),
                     () -> {
-                        MemberInfoResDTO memberInfo = response.getBody().data();
+                        MemberDTO.MemberInfoResponse memberInfo = response.getBody().data();
                         assertThat(memberInfo.getLoginId()).isEqualTo(setUpMemberReqDTO.getLoginId());
                         assertThat(memberInfo.getEmail()).isEqualTo(setUpMemberReqDTO.getEmail());
                         assertThat(memberInfo.getName()).isEqualTo(setUpMemberReqDTO.getName());
@@ -161,10 +162,13 @@ public class MemberV1ApiE2ETest {
         void returnNotFound_whenMemberIdDoesNotExist() {
             // given
             String memberId = "9999";
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("X-USER-ID", "1");
+
 
             // when
-            ResponseEntity<ApiResponse<MemberInfoResDTO>> response =
-                    testRestTemplate.exchange("/api/v1/users/me?memberId=" + memberId, HttpMethod.GET, null,
+            ResponseEntity<ApiResponse<MemberDTO.MemberInfoResponse>> response =
+                    testRestTemplate.exchange("/api/v1/users/" + memberId, HttpMethod.GET, new HttpEntity<>(headers),
                             new ParameterizedTypeReference<>() {
                             });
 
@@ -197,7 +201,7 @@ public class MemberV1ApiE2ETest {
             headers.set("X-USER-ID", "test");
 
             // when
-            ResponseEntity<ApiResponse<MemberPointResDTO>> response = testRestTemplate.exchange("/api/v1/points?memberId=" + saved.getId(),
+            ResponseEntity<ApiResponse<MemberDTO.MemberPointInfoResponse>> response = testRestTemplate.exchange("/api/v1/points?memberId=" + saved.getId(),
                     HttpMethod.GET, new HttpEntity<>(headers), new ParameterizedTypeReference<>() {
                     });
 
@@ -214,7 +218,7 @@ public class MemberV1ApiE2ETest {
         @Test
         void returnBadRequest_whenXUserIdHeaderIsMissing() {
             // when
-            ResponseEntity<ApiResponse<MemberPointResDTO>> response = testRestTemplate.exchange("/api/v1/points",
+            ResponseEntity<ApiResponse<MemberDTO.MemberPointInfoResponse>> response = testRestTemplate.exchange("/api/v1/points",
                     HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                     });
 
@@ -244,13 +248,13 @@ public class MemberV1ApiE2ETest {
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-USER-ID", String.valueOf(saved.getId()));
-            PointChargeReqDTO reqDTO = PointChargeReqDTO.builder()
+            MemberDTO.PointChargeRequest reqDTO = MemberDTO.PointChargeRequest.builder()
                     .memberId(String.valueOf(saved.getId()))
                     .amount(1000L).build();
-            HttpEntity<PointChargeReqDTO> requestEntity = new HttpEntity<>(reqDTO, headers);
+            HttpEntity<MemberDTO.PointChargeRequest> requestEntity = new HttpEntity<>(reqDTO, headers);
 
             // when
-            ResponseEntity<ApiResponse<MemberPointResDTO>> response = testRestTemplate.exchange("/api/v1/points",
+            ResponseEntity<ApiResponse<MemberDTO.MemberPointInfoResponse>> response = testRestTemplate.exchange("/api/v1/points",
                     HttpMethod.POST, requestEntity, new ParameterizedTypeReference<>() {
                     });
 
@@ -267,7 +271,7 @@ public class MemberV1ApiE2ETest {
         @Test
         void returnNotFound_whenMemberIdDoesNotExist() {
             // given
-            PointChargeReqDTO reqDTO = PointChargeReqDTO.builder()
+            MemberDTO.PointChargeRequest reqDTO = MemberDTO.PointChargeRequest.builder()
                     .memberId("1")
                     .amount(1000L).build();
             HttpHeaders headers = new HttpHeaders();
@@ -275,9 +279,9 @@ public class MemberV1ApiE2ETest {
             HttpEntity httpEntity = new HttpEntity(reqDTO, headers);
 
             // when
-            ResponseEntity<ApiResponse<MemberPointResDTO>> response =
+            ResponseEntity<ApiResponse<MemberDTO.MemberPointInfoResponse>> response =
                     testRestTemplate.exchange("/api/v1/points", HttpMethod.POST, httpEntity,
-                            new ParameterizedTypeReference<ApiResponse<MemberPointResDTO>>() {
+                            new ParameterizedTypeReference<>() {
                             });
 
             // then

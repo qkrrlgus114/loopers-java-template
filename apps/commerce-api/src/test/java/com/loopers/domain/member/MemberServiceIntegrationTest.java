@@ -1,15 +1,19 @@
 package com.loopers.domain.member;
 
-import com.loopers.application.member.MemberMyInfo;
-import com.loopers.application.member.MemberPointInfo;
-import com.loopers.application.member.MemberRegisterInfo;
+import com.loopers.application.member.MemberService;
+import com.loopers.application.member.command.MemberRegisterCommand;
+import com.loopers.application.member.command.PointChargeCommand;
+import com.loopers.application.member.result.MemberInfoResult;
+import com.loopers.application.member.result.MemberPointResult;
+import com.loopers.application.member.result.MemberRegisterResult;
 import com.loopers.interfaces.api.member.dto.MemberDTO;
-import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,17 +27,26 @@ class MemberServiceIntegrationTest {
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
 
-    private MemberDTO.RegisterRequest setUpMemberReqDTO;
+    private MemberRegisterCommand memberRegisterCommand;
 
     @BeforeEach
     void setUp() {
-        setUpMemberReqDTO = MemberDTO.RegisterRequest.builder()
+        MemberDTO.RegisterRequest setUpMemberReqDTO = MemberDTO.RegisterRequest.builder()
                 .loginId("test")
                 .password("test")
                 .email("test@naver.com")
                 .name("박기현")
                 .gender("M")
                 .birth("1997-12-04").build();
+
+        memberRegisterCommand = MemberRegisterCommand.of(
+                setUpMemberReqDTO.getLoginId(),
+                setUpMemberReqDTO.getPassword(),
+                setUpMemberReqDTO.getEmail(),
+                setUpMemberReqDTO.getName(),
+                setUpMemberReqDTO.getBirth(),
+                setUpMemberReqDTO.getGender()
+        );
     }
 
     @AfterEach
@@ -49,13 +62,17 @@ class MemberServiceIntegrationTest {
         @Test
         void success_whenRegisterCollectDate() {
             // when
-            MemberRegisterInfo saved = memberService.register(setUpMemberReqDTO);
+            MemberRegisterResult saved = memberService.register(memberRegisterCommand);
 
             // then
-            assertEquals(saved.loginId(), setUpMemberReqDTO.getLoginId());
-            assertEquals(saved.email(), setUpMemberReqDTO.getEmail());
-            assertEquals(saved.name(), setUpMemberReqDTO.getName());
-            assertEquals(saved.birth(), setUpMemberReqDTO.getBirth());
+            assertAll(
+                    () -> assertThat(saved).isNotNull(),
+                    () -> assertThat(saved.id()).isNotNull(),
+                    () -> assertThat(saved.loginId()).isEqualTo(memberRegisterCommand.loginId()),
+                    () -> assertThat(saved.email()).isEqualTo(memberRegisterCommand.email()),
+                    () -> assertThat(saved.name()).isEqualTo(memberRegisterCommand.name()),
+                    () -> assertThat(LocalDate.parse(saved.birth())).isEqualTo(memberRegisterCommand.birth())
+            );
         }
 
         @DisplayName("이미 가입된 아이디로 가입하면, 회원가입을 실패한다.")
@@ -69,10 +86,18 @@ class MemberServiceIntegrationTest {
                     .name("박기현")
                     .gender("M")
                     .birth("1997-12-04").build();
-            memberService.register(setUpMemberReqDTO);
+            MemberRegisterCommand memberRegisterCommand1 = MemberRegisterCommand.of(
+                    memberRegisterReqDTO.getLoginId(),
+                    memberRegisterReqDTO.getPassword(),
+                    memberRegisterReqDTO.getEmail(),
+                    memberRegisterReqDTO.getName(),
+                    memberRegisterReqDTO.getBirth(),
+                    memberRegisterReqDTO.getGender()
+            );
+            memberService.register(memberRegisterCommand);
 
             assertThrows(CoreException.class, () -> {
-                memberService.register(memberRegisterReqDTO);
+                memberService.register(memberRegisterCommand1);
             });
         }
 
@@ -85,20 +110,20 @@ class MemberServiceIntegrationTest {
         @DisplayName("존재할 경우, 회원 정보가 반환된다.")
         @Test
         void returnMemberInfo_whenMemberExists() {
-            MemberRegisterInfo saved = memberService.register(setUpMemberReqDTO);
+            MemberRegisterResult saved = memberService.register(memberRegisterCommand);
 
             String memberId = String.valueOf(saved.id());
             // when
-            MemberMyInfo myMemberInfo = memberService.getMyMemberInfo(memberId);
+            MemberInfoResult memberInfoResult = memberService.getMemberInfo(memberId);
 
             // then
             assertAll(
-                    () -> assertThat(myMemberInfo).isNotNull(),
-                    () -> assertThat(myMemberInfo.loginId()).isEqualTo(setUpMemberReqDTO.getLoginId()),
-                    () -> assertThat(myMemberInfo.email()).isEqualTo(setUpMemberReqDTO.getEmail()),
-                    () -> assertThat(myMemberInfo.name()).isEqualTo(setUpMemberReqDTO.getName()),
-                    () -> assertThat(myMemberInfo.birth()).isEqualTo(setUpMemberReqDTO.getBirth()),
-                    () -> assertThat(myMemberInfo.gender()).isEqualTo(setUpMemberReqDTO.getGender())
+                    () -> assertThat(memberInfoResult).isNotNull(),
+                    () -> assertThat(memberInfoResult.loginId()).isEqualTo(memberRegisterCommand.loginId()),
+                    () -> assertThat(memberInfoResult.email()).isEqualTo(memberRegisterCommand.email()),
+                    () -> assertThat(memberInfoResult.name()).isEqualTo(memberRegisterCommand.name()),
+                    () -> assertThat(memberInfoResult.birth()).isEqualTo(memberRegisterCommand.birth()),
+                    () -> assertThat(memberInfoResult.gender()).isEqualTo(memberRegisterCommand.gender())
             );
         }
 
@@ -109,10 +134,10 @@ class MemberServiceIntegrationTest {
             String memberId = "9999";
 
             // when
-            MemberMyInfo myMemberInfo = memberService.getMyMemberInfo(memberId);
+            MemberInfoResult memberInfoResult = memberService.getMemberInfo(memberId);
 
             // then
-            assertNull(myMemberInfo);
+            assertNull(memberInfoResult);
         }
     }
 
@@ -128,15 +153,16 @@ class MemberServiceIntegrationTest {
         @Test
         void returnMemberPoint_whenMemberExists() {
             // given
-            MemberRegisterInfo saved = memberService.register(setUpMemberReqDTO);
+            MemberRegisterResult saved = memberService.register(memberRegisterCommand);
 
             // when
-            MemberPointInfo memberPointInfo = memberService.getMemberPoint(String.valueOf(saved.id()));
+            MemberPointResult memberPointResult = memberService.getMemberPoint(String.valueOf(saved.id()));
 
             // then
             assertAll(
-                    () -> assertThat(memberPointInfo).isNotNull(),
-                    () -> assertThat(memberPointInfo.point()).isEqualTo(0)
+                    () -> assertThat(memberPointResult).isNotNull(),
+                    () -> assertThat(memberPointResult.memberId()).isEqualTo(saved.id()),
+                    () -> assertThat(memberPointResult.point()).isEqualTo(0)
             );
         }
 
@@ -147,10 +173,10 @@ class MemberServiceIntegrationTest {
             String memberId = "9999";
 
             // when
-            MemberPointInfo memberPointInfo = memberService.getMemberPoint(memberId);
+            MemberPointResult memberPointResult = memberService.getMemberPoint(memberId);
 
             // then
-            assertNull(memberPointInfo);
+            assertNull(memberPointResult);
         }
     }
 
@@ -158,16 +184,15 @@ class MemberServiceIntegrationTest {
     @Test
     void fail_whenChargePointWithNonExistentUserId() {
         // given
-        String memberId = "9999";
-        PointChargeReqDTO reqDTO = PointChargeReqDTO.builder()
-                .memberId(memberId)
-                .amount(1000L)
-                .build();
+        PointChargeCommand pointChargeCommand = new PointChargeCommand(
+                1L,
+                10000L
+        );
 
 
         // when & then
         assertThrows(CoreException.class, () -> {
-            memberService.chargeMemberPoint(reqDTO);
+            memberService.chargeMemberPoint(pointChargeCommand);
         });
     }
 }

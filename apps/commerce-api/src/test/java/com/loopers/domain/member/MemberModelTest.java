@@ -1,64 +1,108 @@
 package com.loopers.domain.member;
 
-import com.loopers.support.error.CoreException;
-import org.junit.jupiter.api.Assertions;
+import com.loopers.application.member.command.MemberRegisterCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MemberModelTest {
 
     @DisplayName("회원가입을 진행할 때, ")
     @Nested
     class Register {
+
         @DisplayName("ID 가 영문 및 숫자 10자 이내 형식에 맞지 않으면, User 객체 생성에 실패한다.")
-        @Test
-        void failRegister_whenIdNotMatchPattern() {
-            String loginId = "12312321521321";
+        @ParameterizedTest
+        @ValueSource(strings = {
+                "12345678901",
+                "1234asdf#",
+                "!@#$%!@#%!@#$@!",
+                "qkrrlgus114",
+                "qkrrlgus114##"
+        })
+        void failRegister_whenIdNotMatchPattern(String loginId) {
             String password = "12341234";
             String email = "test@naver.com";
             String name = "박기현";
-            String birth = "1997-12-04";
+            LocalDate birth = LocalDate.parse("1997-12-04");
             String gender = "M";
 
-            assertThatThrownBy(() ->
-                    MemberModel.registerMember(loginId, password, email, name, birth, gender))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("아이디는 [영문 + 숫자] 10자 이하여야 합니다.");
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
+            );
         }
 
         @DisplayName("이메일이 xx@yy.zz 형식에 맞지 않으면, User 객체 생성에 실패한다.")
-        @Test
-        void failRegister_whenEmailNotMatchPattern() {
+        @ParameterizedTest
+        @ValueSource(strings = {
+                "testnaver.com",
+                "test@navercom",
+                "test@naver..com",
+                "test@.com",
+                "@naver.com",
+                "test@naver.c"
+        })
+        void failRegister_whenEmailNotMatchPattern(String email) {
             String loginId = "test1234";
             String password = "12341234";
-            String email = "testnaver.com";
             String name = "박기현";
-            String birth = "1997-12-04";
+            LocalDate birth = LocalDate.parse("1997-12-04");
             String gender = "M";
 
-            assertThatThrownBy(() ->
-                    MemberModel.registerMember(loginId, password, email, name, birth, gender))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("이메일 형식이 일치하지 않습니다.");
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
+            );
         }
 
-        @DisplayName("생년월일이 yyyy-MM-dd 형식에 맞지 않으면, User 객체 생성에 실패한다.")
-        @Test
-        void failRegister_whenBirthNotMatchPattern() {
+        @DisplayName("생년월일이 yyyy-MM-dd 형식에 맞지 않으면, Command 생성에 실패한다.")
+        @ParameterizedTest
+        @ValueSource(strings = {
+                "1997/12/04",
+                "1997.12.04",
+                "1997-12-4",
+                "1997-12-40",
+                "1997-13-04",
+                "1997-00-04",
+                "1997-12-32"
+        })
+        void failCreateCommand_whenBirthNotMatchPattern(String birthStr) {
             String loginId = "test1234";
             String password = "12341234";
             String email = "test@naver.com";
             String name = "박기현";
-            String birth = "19927-12-04";
             String gender = "M";
 
-            assertThatThrownBy(() ->
-                    MemberModel.registerMember(loginId, password, email, name, birth, gender))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("생년월일 형식에 문제가 발생했습니다.");
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> MemberRegisterCommand.of(loginId, password, email, name, birthStr, gender)
+            );
+        }
+
+        @DisplayName("성별이 M 또는 F가 아니면, User 객체 생성에 실패한다.")
+        @ParameterizedTest
+        @ValueSource(strings = {
+                "M1",
+                "F2",
+        })
+        void failRegister_whenGenderNotMatchPattern(String gender) {
+            String loginId = "test1234";
+            String password = "12341234";
+            String email = "test@naver.com";
+            String name = "박기현";
+            LocalDate birth = LocalDate.parse("1997-12-04");
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
+            );
         }
     }
 
@@ -66,11 +110,11 @@ public class MemberModelTest {
     @Test
     void fail_whenChargePointZeroOrLess() {
         // given
-        MemberModel memberModel = MemberModel.registerMember("test1234", "12341234", "test@naver.com", "박기현", "1997-12-04", "M");
+        MemberModel memberModel = MemberModel.registerMember("test1234", "12341234", "test@naver.com", "박기현", LocalDate.parse("1997-12-04"), "M");
         Long amount = 0L;
 
         // when && then
-        Assertions.assertThrows(CoreException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             memberModel.chargePoint(amount);
         });
     }

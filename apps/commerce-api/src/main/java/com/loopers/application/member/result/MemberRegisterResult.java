@@ -1,8 +1,8 @@
-package com.loopers.application.member;
+package com.loopers.application.member.result;
 
 import com.loopers.domain.member.MemberModel;
 
-public record MemberRegisterInfo(
+public record MemberRegisterResult(
         Long id,
         String loginId,
         String email,
@@ -10,10 +10,10 @@ public record MemberRegisterInfo(
         String birth,
         String gender) {
 
-    public static MemberRegisterInfo from(MemberModel member) {
+    public static MemberRegisterResult from(MemberModel member) {
         String birthStr = member.getBirth() != null ? member.getBirth().toString() : null;
 
-        return new MemberRegisterInfo(
+        return new MemberRegisterResult(
                 member.getId(),
                 member.getLoginId(),
                 member.getEmail(),

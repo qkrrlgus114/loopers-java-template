@@ -1,24 +1,25 @@
-package com.loopers.application.member;
+package com.loopers.application.member.result;
 
 import com.loopers.domain.member.MemberModel;
 
-public record MemberMyInfo(
+import java.time.LocalDate;
+
+public record MemberInfoResult(
         Long id,
         String loginId,
         String email,
         String name,
-        String birth,
+        LocalDate birth,
         String gender) {
 
-    public static MemberMyInfo from(MemberModel member) {
-        String birthStr = member.getBirth() != null ? member.getBirth().toString() : null;
+    public static MemberInfoResult from(MemberModel member) {
 
-        return new MemberMyInfo(
+        return new MemberInfoResult(
                 member.getId(),
                 member.getLoginId(),
                 member.getEmail(),
                 member.getName(),
-                birthStr,
+                member.getBirth(),
                 member.getGender()
         );
     }

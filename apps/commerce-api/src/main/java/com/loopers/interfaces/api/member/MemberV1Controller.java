@@ -1,16 +1,17 @@
 package com.loopers.interfaces.api.member;
 
-import com.loopers.application.member.MemberMyInfo;
-import com.loopers.application.member.MemberPointInfo;
-import com.loopers.application.member.MemberRegisterInfo;
-import com.loopers.domain.member.MemberService;
+import com.loopers.application.member.MemberService;
+import com.loopers.application.member.command.MemberRegisterCommand;
+import com.loopers.application.member.command.PointChargeCommand;
+import com.loopers.application.member.result.MemberInfoResult;
+import com.loopers.application.member.result.MemberPointResult;
+import com.loopers.application.member.result.MemberRegisterResult;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.member.dto.MemberDTO;
-import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
-import com.loopers.interfaces.api.member.dto.response.MemberInfoResDTO;
-import com.loopers.interfaces.api.member.dto.response.MemberPointResDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.MemberErrorType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -21,18 +22,28 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 @Validated
-public class MemberV1Controller implements MemberV1ApiSpec {
+public class MemberV1Controller {
 
     private final MemberService memberService;
 
     /*
      * 사용자 회원가입
      * */
-    @Override
     @PostMapping("/users")
-    public ApiResponse<MemberDTO.RegisterResponse> registerMember(MemberDTO.RegisterRequest reqDTO) {
-        MemberRegisterInfo memberRegisterInfo = memberService.register(reqDTO);
-        MemberDTO.RegisterResponse resDTO = MemberDTO.RegisterResponse.from(memberRegisterInfo);
+    public ApiResponse<MemberDTO.RegisterResponse> registerMember(
+            @RequestBody @Valid MemberDTO.RegisterRequest reqDTO) {
+        MemberRegisterCommand command = MemberRegisterCommand.of(
+                reqDTO.getLoginId(),
+                reqDTO.getPassword(),
+                reqDTO.getEmail(),
+                reqDTO.getName(),
+                reqDTO.getBirth(),
+                reqDTO.getGender()
+        );
+
+        MemberRegisterResult memberRegisterResult = memberService.register(command);
+
+        MemberDTO.RegisterResponse resDTO = MemberDTO.RegisterResponse.from(memberRegisterResult);
 
         return ApiResponse.success(resDTO);
     }
@@ -40,48 +51,55 @@ public class MemberV1Controller implements MemberV1ApiSpec {
     /*
      * 사용자 정보 조회
      * */
-    @Override
-    @GetMapping("/users/me")
-    public ApiResponse<MemberInfoResDTO> getMyMemberInfo(
-            @RequestParam String memberId) {
-        MemberMyInfo myMemberInfo = memberService.getMyMemberInfo(memberId);
+    @GetMapping("/users/{memberId}")
+    public ApiResponse<MemberDTO.MemberInfoResponse> getMemberInfo(
+            @PathVariable @NotNull String memberId,
+            @RequestHeader(name = "X-USER-ID") String headerId) {
+        MemberInfoResult memberInfoResult = memberService.getMemberInfo(memberId);
 
-        if (myMemberInfo == null) {
+        if (memberInfoResult == null) {
             throw new CoreException(MemberErrorType.NOT_FOUND_MEMBER, "회원 정보를 찾을 수 없습니다. 회원 ID: " + memberId);
         }
 
-        MemberInfoResDTO resDTO = MemberInfoResDTO.from(myMemberInfo);
+        MemberDTO.MemberInfoResponse resDTO = MemberDTO.MemberInfoResponse.from(memberInfoResult);
 
         return ApiResponse.success(resDTO);
     }
 
     /*
-     * 사용자 포인트 조회
+     * 현재 사용자 포인트 조회
      * */
-    @Override
     @GetMapping("/points")
-    public ApiResponse<MemberPointResDTO> getMemberPoint(
+    public ApiResponse<MemberDTO.MemberPointInfoResponse> getMemberPoint(
             @RequestParam String memberId,
             @RequestHeader(name = "X-USER-ID") String headerId) {
-        MemberPointInfo memberPoint = memberService.getMemberPoint(memberId);
+        MemberPointResult memberPointResult = memberService.getMemberPoint(memberId);
 
-        if (memberPoint == null) {
+        if (memberPointResult == null) {
             throw new CoreException(MemberErrorType.NOT_FOUND_MEMBER, "회원 정보를 찾을 수 없습니다. 회원 ID: " + memberId);
         }
 
-        MemberPointResDTO resDTO = MemberPointResDTO.from(memberPoint.memberId(), Long.valueOf(memberPoint.point()));
+        MemberDTO.MemberPointInfoResponse resDTO = MemberDTO.MemberPointInfoResponse.from(memberPointResult);
 
         return ApiResponse.success(resDTO);
     }
 
-    @Override
+    /*
+     * 포인트 충전
+     * */
     @PostMapping("/points")
-    public ApiResponse<MemberPointResDTO> chargeMemberPoint(
+    public ApiResponse<MemberDTO.MemberPointInfoResponse> chargeMemberPoint(
             @RequestHeader(name = "X-USER-ID") String headerId,
-            @RequestBody PointChargeReqDTO reqDTO) {
+            @RequestBody MemberDTO.PointChargeRequest reqDTO) {
 
-        MemberPointInfo memberPointInfo = memberService.chargeMemberPoint(reqDTO);
-        MemberPointResDTO resDTO = MemberPointResDTO.from(memberPointInfo.memberId(), Long.valueOf(memberPointInfo.point()));
+        PointChargeCommand pointChargeCommand = new PointChargeCommand(
+                Long.valueOf(reqDTO.getMemberId()),
+                reqDTO.getAmount()
+        );
+
+        MemberPointResult memberPointResult = memberService.chargeMemberPoint(pointChargeCommand);
+
+        MemberDTO.MemberPointInfoResponse resDTO = MemberDTO.MemberPointInfoResponse.from(memberPointResult);
 
         return ApiResponse.success(resDTO);
     }

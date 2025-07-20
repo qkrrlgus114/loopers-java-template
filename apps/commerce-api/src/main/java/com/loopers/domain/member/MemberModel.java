@@ -1,14 +1,11 @@
 package com.loopers.domain.member;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.MemberErrorType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "member")
@@ -38,16 +35,17 @@ public class MemberModel extends BaseEntity {
     protected MemberModel() {
     }
 
-    private MemberModel(String loginId, String password, String email, String name, String birth, String gender) {
+    private MemberModel(String loginId, String password, String email, String name, LocalDate birth, String gender) {
         this.loginId = validateLoginId(loginId);
         this.password = password;
         this.email = validateEmail(email);
         this.name = name;
         this.birth = validateBirth(birth);
-        this.gender = gender;
+        this.gender = validateGender(gender);
     }
 
-    public static MemberModel registerMember(String loginId, String password, String email, String name, String birth, String gender) {
+
+    public static MemberModel registerMember(String loginId, String password, String email, String name, LocalDate birth, String gender) {
         return new MemberModel(loginId, password, email, name, birth, gender);
     }
 
@@ -63,38 +61,49 @@ public class MemberModel extends BaseEntity {
         return loginId;
     }
 
+    private String validateGender(String gender) {
+        if (gender == null || gender.trim().isEmpty()) {
+            throw new IllegalArgumentException("성별이 존재하지 않습니다.");
+        }
+
+        if (!gender.equals("M") && !gender.equals("F")) {
+            throw new IllegalArgumentException("성별은 'M' 또는 'F'만 허용됩니다.");
+        }
+
+        return gender;
+    }
+
     private String validateEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("이메일이 존재하지 않습니다.");
         }
 
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9]+(?:\\.[A-Za-z0-9]+)*\\.[A-Za-z]{2,}$")) {
             throw new IllegalArgumentException("이메일 형식이 일치하지 않습니다.");
         }
 
         return email;
     }
 
-    private LocalDate validateBirth(String birth) {
+    private LocalDate validateBirth(LocalDate birth) {
         if (birth == null) {
             throw new IllegalArgumentException("생년월일이 존재하지 않습니다.");
         }
 
-        try {
-            LocalDate birthDate = LocalDate.parse(birth, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-            if (birthDate.isAfter(LocalDate.now())) {
-                throw new IllegalArgumentException("현재 날짜보다 앞선 날짜입니다.");
-            }
-
-            if (birthDate.isBefore(LocalDate.now().minusYears(150))) {
-                throw new IllegalArgumentException("잘못된 생년월일입니다.");
-            }
-
-            return birthDate;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("생년월일 형식에 문제가 발생했습니다.");
+        // birth가 1997-12-04 형식이 아니면 예외
+        if (birth.toString().length() != 10 || !birth.toString().matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new IllegalArgumentException("생년월일 형식이 일치하지 않습니다. yyyy-MM-dd 형식이어야 합니다.");
         }
+
+        if (birth.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("현재 날짜보다 앞선 날짜입니다.");
+        }
+
+        if (birth.isBefore(LocalDate.now().minusYears(150))) {
+            throw new IllegalArgumentException("잘못된 생년월일입니다.");
+        }
+
+        return birth;
     }
 
     public String getLoginId() {
@@ -128,7 +137,7 @@ public class MemberModel extends BaseEntity {
     // 포인트 충전
     public void chargePoint(Long amount) {
         if (amount == null || amount <= 0) {
-            throw new CoreException(MemberErrorType.INVALID_POINT, "충전할 포인트가 유효하지 않습니다.");
+            throw new IllegalArgumentException("충전할 포인트는 0보다 커야 합니다.");
         }
 
         this.point += amount;
