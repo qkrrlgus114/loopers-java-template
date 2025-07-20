@@ -1,9 +1,11 @@
-package com.loopers.domain.member;
+package com.loopers.application.member;
 
-import com.loopers.application.member.MemberMyInfo;
-import com.loopers.application.member.MemberPointInfo;
-import com.loopers.application.member.MemberRegisterInfo;
-import com.loopers.interfaces.api.member.dto.MemberDTO;
+import com.loopers.application.member.dto.MemberMyInfo;
+import com.loopers.application.member.dto.MemberPointInfo;
+import com.loopers.application.member.dto.MemberRegisterCommand;
+import com.loopers.application.member.dto.MemberRegisterInfo;
+import com.loopers.domain.member.MemberModel;
+import com.loopers.domain.member.MemberRepository;
 import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.MemberErrorType;
@@ -25,18 +27,18 @@ public class MemberService {
      * 회원가입
      * */
     @Transactional
-    public MemberRegisterInfo register(MemberDTO.RegisterRequest reqDTO) {
+    public MemberRegisterInfo register(MemberRegisterCommand command) {
         MemberModel memberModel = MemberModel.registerMember(
-                reqDTO.getLoginId(),
-                reqDTO.getPassword(),
-                reqDTO.getEmail(),
-                reqDTO.getName(),
-                reqDTO.getBirth(),
-                reqDTO.getGender()
+                command.loginId(),
+                command.password(),
+                command.email(),
+                command.name(),
+                command.birth(),
+                command.gender()
         );
 
         MemberModel saved = memberRepository.register(memberModel).orElseThrow(()
-                -> new CoreException(MemberErrorType.FAIL_REGISTER, "회원가입에 실패했습니다. 로그인 ID: " + reqDTO.getLoginId()));
+                -> new CoreException(MemberErrorType.FAIL_REGISTER, "회원가입에 실패했습니다. 로그인 ID: " + command.loginId()));
 
         return MemberRegisterInfo.from(saved);
     }

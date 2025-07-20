@@ -1,8 +1,9 @@
 package com.loopers.domain.member;
 
-import com.loopers.application.member.MemberMyInfo;
-import com.loopers.application.member.MemberPointInfo;
-import com.loopers.application.member.MemberRegisterInfo;
+import com.loopers.application.member.MemberService;
+import com.loopers.application.member.dto.MemberMyInfo;
+import com.loopers.application.member.dto.MemberPointInfo;
+import com.loopers.application.member.dto.MemberRegisterInfo;
 import com.loopers.interfaces.api.member.dto.MemberDTO;
 import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.support.error.CoreException;

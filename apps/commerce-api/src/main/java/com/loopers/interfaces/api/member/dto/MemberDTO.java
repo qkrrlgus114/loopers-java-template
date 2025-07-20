@@ -1,6 +1,6 @@
 package com.loopers.interfaces.api.member.dto;
 
-import com.loopers.application.member.MemberRegisterInfo;
+import com.loopers.application.member.dto.MemberRegisterInfo;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

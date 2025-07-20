@@ -1,8 +1,6 @@
 package com.loopers.domain.member;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.MemberErrorType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -44,8 +42,9 @@ public class MemberModel extends BaseEntity {
         this.email = validateEmail(email);
         this.name = name;
         this.birth = validateBirth(birth);
-        this.gender = gender;
+        this.gender = validateGender(gender);
     }
+
 
     public static MemberModel registerMember(String loginId, String password, String email, String name, String birth, String gender) {
         return new MemberModel(loginId, password, email, name, birth, gender);
@@ -63,12 +62,24 @@ public class MemberModel extends BaseEntity {
         return loginId;
     }
 
+    private String validateGender(String gender) {
+        if (gender == null || gender.trim().isEmpty()) {
+            throw new IllegalArgumentException("성별이 존재하지 않습니다.");
+        }
+
+        if (!gender.equals("M") && !gender.equals("F")) {
+            throw new IllegalArgumentException("성별은 'M' 또는 'F'만 허용됩니다.");
+        }
+
+        return gender;
+    }
+
     private String validateEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("이메일이 존재하지 않습니다.");
         }
 
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9]+(?:\\.[A-Za-z0-9]+)*\\.[A-Za-z]{2,}$")) {
             throw new IllegalArgumentException("이메일 형식이 일치하지 않습니다.");
         }
 
@@ -128,7 +139,7 @@ public class MemberModel extends BaseEntity {
     // 포인트 충전
     public void chargePoint(Long amount) {
         if (amount == null || amount <= 0) {
-            throw new CoreException(MemberErrorType.INVALID_POINT, "충전할 포인트가 유효하지 않습니다.");
+            throw new IllegalArgumentException("충전할 포인트는 0보다 커야 합니다.");
         }
 
         this.point += amount;

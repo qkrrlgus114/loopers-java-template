@@ -1,4 +1,4 @@
-package com.loopers.application.member;
+package com.loopers.application.member.dto;
 
 import com.loopers.domain.member.MemberModel;
 

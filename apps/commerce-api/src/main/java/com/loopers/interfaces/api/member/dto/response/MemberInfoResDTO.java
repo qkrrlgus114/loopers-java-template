@@ -1,7 +1,9 @@
 package com.loopers.interfaces.api.member.dto.response;
 
-import com.loopers.application.member.MemberMyInfo;
+import com.loopers.application.member.dto.MemberMyInfo;
 import lombok.*;
+
+import java.util.Objects;
 
 @Getter
 @AllArgsConstructor
@@ -23,12 +25,13 @@ public class MemberInfoResDTO {
     private String gender;
 
     public static MemberInfoResDTO from(MemberMyInfo memberMyInfo) {
+
         return MemberInfoResDTO.builder()
                 .id(memberMyInfo.id())
                 .loginId(memberMyInfo.loginId())
                 .email(memberMyInfo.email())
                 .name(memberMyInfo.name())
-                .birth(memberMyInfo.birth())
+                .birth(Objects.requireNonNull(memberMyInfo.birth().toString()))
                 .gender(memberMyInfo.gender()).build();
     }
 }

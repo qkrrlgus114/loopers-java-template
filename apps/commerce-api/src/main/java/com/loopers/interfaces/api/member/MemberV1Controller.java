@@ -1,9 +1,10 @@
 package com.loopers.interfaces.api.member;
 
-import com.loopers.application.member.MemberMyInfo;
-import com.loopers.application.member.MemberPointInfo;
-import com.loopers.application.member.MemberRegisterInfo;
-import com.loopers.domain.member.MemberService;
+import com.loopers.application.member.MemberService;
+import com.loopers.application.member.dto.MemberMyInfo;
+import com.loopers.application.member.dto.MemberPointInfo;
+import com.loopers.application.member.dto.MemberRegisterCommand;
+import com.loopers.application.member.dto.MemberRegisterInfo;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.member.dto.MemberDTO;
 import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
@@ -11,6 +12,7 @@ import com.loopers.interfaces.api.member.dto.response.MemberInfoResDTO;
 import com.loopers.interfaces.api.member.dto.response.MemberPointResDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.MemberErrorType;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -30,8 +32,18 @@ public class MemberV1Controller implements MemberV1ApiSpec {
      * */
     @Override
     @PostMapping("/users")
-    public ApiResponse<MemberDTO.RegisterResponse> registerMember(MemberDTO.RegisterRequest reqDTO) {
-        MemberRegisterInfo memberRegisterInfo = memberService.register(reqDTO);
+    public ApiResponse<MemberDTO.RegisterResponse> registerMember(
+            @RequestBody @Valid MemberDTO.RegisterRequest reqDTO) {
+        MemberRegisterCommand command = new MemberRegisterCommand(
+                reqDTO.getLoginId(),
+                reqDTO.getPassword(),
+                reqDTO.getEmail(),
+                reqDTO.getName(),
+                reqDTO.getBirth(),
+                reqDTO.getGender()
+        );
+        MemberRegisterInfo memberRegisterInfo = memberService.register(command);
+
         MemberDTO.RegisterResponse resDTO = MemberDTO.RegisterResponse.from(memberRegisterInfo);
 
         return ApiResponse.success(resDTO);
