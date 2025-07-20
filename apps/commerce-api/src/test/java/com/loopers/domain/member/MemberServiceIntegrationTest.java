@@ -13,6 +13,8 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,7 +39,7 @@ class MemberServiceIntegrationTest {
                 .gender("M")
                 .birth("1997-12-04").build();
 
-        memberRegisterCommand = new MemberRegisterCommand(
+        memberRegisterCommand = MemberRegisterCommand.of(
                 setUpMemberReqDTO.getLoginId(),
                 setUpMemberReqDTO.getPassword(),
                 setUpMemberReqDTO.getEmail(),
@@ -69,7 +71,7 @@ class MemberServiceIntegrationTest {
                     () -> assertThat(saved.loginId()).isEqualTo(memberRegisterCommand.loginId()),
                     () -> assertThat(saved.email()).isEqualTo(memberRegisterCommand.email()),
                     () -> assertThat(saved.name()).isEqualTo(memberRegisterCommand.name()),
-                    () -> assertThat(saved.birth()).isEqualTo(memberRegisterCommand.birth())
+                    () -> assertThat(LocalDate.parse(saved.birth())).isEqualTo(memberRegisterCommand.birth())
             );
         }
 
@@ -84,7 +86,7 @@ class MemberServiceIntegrationTest {
                     .name("박기현")
                     .gender("M")
                     .birth("1997-12-04").build();
-            MemberRegisterCommand memberRegisterCommand1 = new MemberRegisterCommand(
+            MemberRegisterCommand memberRegisterCommand1 = MemberRegisterCommand.of(
                     memberRegisterReqDTO.getLoginId(),
                     memberRegisterReqDTO.getPassword(),
                     memberRegisterReqDTO.getEmail(),

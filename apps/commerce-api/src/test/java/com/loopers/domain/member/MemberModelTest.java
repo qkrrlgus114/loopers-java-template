@@ -1,10 +1,13 @@
 package com.loopers.domain.member;
 
+import com.loopers.application.member.command.MemberRegisterCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -27,7 +30,7 @@ public class MemberModelTest {
             String password = "12341234";
             String email = "test@naver.com";
             String name = "박기현";
-            String birth = "1997-12-04";
+            LocalDate birth = LocalDate.parse("1997-12-04");
             String gender = "M";
 
             assertThrows(
@@ -50,7 +53,7 @@ public class MemberModelTest {
             String loginId = "test1234";
             String password = "12341234";
             String name = "박기현";
-            String birth = "1997-12-04";
+            LocalDate birth = LocalDate.parse("1997-12-04");
             String gender = "M";
 
             assertThrows(
@@ -59,7 +62,7 @@ public class MemberModelTest {
             );
         }
 
-        @DisplayName("생년월일이 yyyy-MM-dd 형식에 맞지 않으면, User 객체 생성에 실패한다.")
+        @DisplayName("생년월일이 yyyy-MM-dd 형식에 맞지 않으면, Command 생성에 실패한다.")
         @ParameterizedTest
         @ValueSource(strings = {
                 "1997/12/04",
@@ -70,7 +73,7 @@ public class MemberModelTest {
                 "1997-00-04",
                 "1997-12-32"
         })
-        void failRegister_whenBirthNotMatchPattern(String birth) {
+        void failCreateCommand_whenBirthNotMatchPattern(String birthStr) {
             String loginId = "test1234";
             String password = "12341234";
             String email = "test@naver.com";
@@ -79,7 +82,7 @@ public class MemberModelTest {
 
             assertThrows(
                     IllegalArgumentException.class,
-                    () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
+                    () -> MemberRegisterCommand.of(loginId, password, email, name, birthStr, gender)
             );
         }
 
@@ -94,7 +97,7 @@ public class MemberModelTest {
             String password = "12341234";
             String email = "test@naver.com";
             String name = "박기현";
-            String birth = "1997-12-04";
+            LocalDate birth = LocalDate.parse("1997-12-04");
 
             assertThrows(
                     IllegalArgumentException.class,
@@ -107,7 +110,7 @@ public class MemberModelTest {
     @Test
     void fail_whenChargePointZeroOrLess() {
         // given
-        MemberModel memberModel = MemberModel.registerMember("test1234", "12341234", "test@naver.com", "박기현", "1997-12-04", "M");
+        MemberModel memberModel = MemberModel.registerMember("test1234", "12341234", "test@naver.com", "박기현", LocalDate.parse("1997-12-04"), "M");
         Long amount = 0L;
 
         // when && then

@@ -11,6 +11,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
+import java.time.LocalDate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -51,7 +53,7 @@ public class MemberV1ApiE2ETest {
                 setUpMemberReqDTO.getPassword(),
                 setUpMemberReqDTO.getEmail(),
                 setUpMemberReqDTO.getName(),
-                setUpMemberReqDTO.getBirth(),
+                LocalDate.parse(setUpMemberReqDTO.getBirth()),
                 setUpMemberReqDTO.getGender());
     }
 

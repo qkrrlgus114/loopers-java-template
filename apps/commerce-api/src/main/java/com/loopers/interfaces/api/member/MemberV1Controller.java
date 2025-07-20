@@ -32,7 +32,7 @@ public class MemberV1Controller {
     @PostMapping("/users")
     public ApiResponse<MemberDTO.RegisterResponse> registerMember(
             @RequestBody @Valid MemberDTO.RegisterRequest reqDTO) {
-        MemberRegisterCommand command = new MemberRegisterCommand(
+        MemberRegisterCommand command = MemberRegisterCommand.of(
                 reqDTO.getLoginId(),
                 reqDTO.getPassword(),
                 reqDTO.getEmail(),
@@ -40,6 +40,7 @@ public class MemberV1Controller {
                 reqDTO.getBirth(),
                 reqDTO.getGender()
         );
+
         MemberRegisterResult memberRegisterResult = memberService.register(command);
 
         MemberDTO.RegisterResponse resDTO = MemberDTO.RegisterResponse.from(memberRegisterResult);

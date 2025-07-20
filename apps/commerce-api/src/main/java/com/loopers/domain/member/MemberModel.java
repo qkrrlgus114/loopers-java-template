@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "member")
@@ -36,7 +35,7 @@ public class MemberModel extends BaseEntity {
     protected MemberModel() {
     }
 
-    private MemberModel(String loginId, String password, String email, String name, String birth, String gender) {
+    private MemberModel(String loginId, String password, String email, String name, LocalDate birth, String gender) {
         this.loginId = validateLoginId(loginId);
         this.password = password;
         this.email = validateEmail(email);
@@ -46,7 +45,7 @@ public class MemberModel extends BaseEntity {
     }
 
 
-    public static MemberModel registerMember(String loginId, String password, String email, String name, String birth, String gender) {
+    public static MemberModel registerMember(String loginId, String password, String email, String name, LocalDate birth, String gender) {
         return new MemberModel(loginId, password, email, name, birth, gender);
     }
 
@@ -86,26 +85,25 @@ public class MemberModel extends BaseEntity {
         return email;
     }
 
-    private LocalDate validateBirth(String birth) {
+    private LocalDate validateBirth(LocalDate birth) {
         if (birth == null) {
             throw new IllegalArgumentException("생년월일이 존재하지 않습니다.");
         }
 
-        try {
-            LocalDate birthDate = LocalDate.parse(birth, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-            if (birthDate.isAfter(LocalDate.now())) {
-                throw new IllegalArgumentException("현재 날짜보다 앞선 날짜입니다.");
-            }
-
-            if (birthDate.isBefore(LocalDate.now().minusYears(150))) {
-                throw new IllegalArgumentException("잘못된 생년월일입니다.");
-            }
-
-            return birthDate;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("생년월일 형식에 문제가 발생했습니다.");
+        // birth가 1997-12-04 형식이 아니면 예외
+        if (birth.toString().length() != 10 || !birth.toString().matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new IllegalArgumentException("생년월일 형식이 일치하지 않습니다. yyyy-MM-dd 형식이어야 합니다.");
         }
+
+        if (birth.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("현재 날짜보다 앞선 날짜입니다.");
+        }
+
+        if (birth.isBefore(LocalDate.now().minusYears(150))) {
+            throw new IllegalArgumentException("잘못된 생년월일입니다.");
+        }
+
+        return birth;
     }
 
     public String getLoginId() {
