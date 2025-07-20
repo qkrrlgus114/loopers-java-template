@@ -2,11 +2,11 @@ package com.loopers.domain.member;
 
 import com.loopers.application.member.MemberService;
 import com.loopers.application.member.command.MemberRegisterCommand;
+import com.loopers.application.member.command.PointChargeCommand;
 import com.loopers.application.member.result.MemberInfoResult;
 import com.loopers.application.member.result.MemberPointResult;
 import com.loopers.application.member.result.MemberRegisterResult;
 import com.loopers.interfaces.api.member.dto.MemberDTO;
-import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
@@ -182,16 +182,15 @@ class MemberServiceIntegrationTest {
     @Test
     void fail_whenChargePointWithNonExistentUserId() {
         // given
-        String memberId = "9999";
-        PointChargeReqDTO reqDTO = PointChargeReqDTO.builder()
-                .memberId(memberId)
-                .amount(1000L)
-                .build();
+        PointChargeCommand pointChargeCommand = new PointChargeCommand(
+                1L,
+                10000L
+        );
 
 
         // when & then
         assertThrows(CoreException.class, () -> {
-            memberService.chargeMemberPoint(reqDTO);
+            memberService.chargeMemberPoint(pointChargeCommand);
         });
     }
 }

@@ -1,12 +1,12 @@
 package com.loopers.application.member;
 
 import com.loopers.application.member.command.MemberRegisterCommand;
+import com.loopers.application.member.command.PointChargeCommand;
 import com.loopers.application.member.result.MemberInfoResult;
 import com.loopers.application.member.result.MemberPointResult;
 import com.loopers.application.member.result.MemberRegisterResult;
 import com.loopers.domain.member.MemberModel;
 import com.loopers.domain.member.MemberRepository;
-import com.loopers.interfaces.api.member.dto.request.PointChargeReqDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.MemberErrorType;
 import lombok.RequiredArgsConstructor;
@@ -75,26 +75,23 @@ public class MemberService {
 
         MemberModel member = findMember.get();
 
-        return MemberPointResult.from(member.getId(), member.getPoint());
+        return MemberPointResult.fromGetPoint(member);
     }
 
     /*
      * 사용자 포인트 충전
      * */
     @Transactional
-    public MemberPointResult chargeMemberPoint(PointChargeReqDTO reqDTO) {
-        long id = Long.parseLong(reqDTO.getMemberId());
-
-        MemberModel memberModel = memberRepository.findById(id).orElseThrow(() -> {
-            throw new CoreException(MemberErrorType.NOT_FOUND_MEMBER, "유저를 찾을 수 없습니다.");
-        });
+    public MemberPointResult chargeMemberPoint(PointChargeCommand pointChargeCommand) {
+        MemberModel memberModel = memberRepository.findById(pointChargeCommand.memberId()).orElseThrow(
+                () -> new CoreException(MemberErrorType.NOT_FOUND_MEMBER, "유저를 찾을 수 없습니다."));
 
         if (memberModel == null) {
             return null;
         }
 
-        memberModel.chargePoint(reqDTO.getAmount());
+        memberModel.chargePoint(pointChargeCommand.amount());
 
-        return MemberPointResult.from(id, memberModel.getPoint());
+        return MemberPointResult.fromChargePoint(pointChargeCommand);
     }
 }

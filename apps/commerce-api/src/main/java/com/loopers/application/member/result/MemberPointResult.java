@@ -1,12 +1,21 @@
 package com.loopers.application.member.result;
 
+import com.loopers.application.member.command.PointChargeCommand;
+import com.loopers.domain.member.MemberModel;
+
 public record MemberPointResult(
         Long memberId,
         Long point
 ) {
-    public static MemberPointResult from(Long memberId, Long point) {
+    public static MemberPointResult fromChargePoint(PointChargeCommand pointChargeCommand) {
         return new MemberPointResult(
-                memberId,
-                point);
+                pointChargeCommand.memberId(),
+                pointChargeCommand.amount());
+    }
+
+    public static MemberPointResult fromGetPoint(MemberModel model) {
+        return new MemberPointResult(
+                model.getId(),
+                model.getPoint());
     }
 }
