@@ -1,15 +1,15 @@
 package com.loopers.domain.brand;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.Image;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "brand")
 public class BrandModel extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 20)
@@ -18,30 +18,30 @@ public class BrandModel extends BaseEntity {
     @Column(nullable = false, length = 255)
     private String description;
 
-    @Embedded
-    private Image image;
 
-    private BrandModel(String name, String description, Image image) {
+    private Long memberId;
+
+    private BrandModel(String name, String description, Long memberId) {
         this.name = name;
         this.description = description;
-        this.image = image;
+        this.memberId = memberId;
     }
 
-    public static BrandModel registerBrand(String name, String description, Image image) {
-        validate(name, description, image);
+    public static BrandModel registerBrand(String name, String description, Long memberId) {
+        validate(name, description, memberId);
 
-        return new BrandModel(name, description, image);
+        return new BrandModel(name, description, memberId);
     }
 
-    private static void validate(String name, String description, Image image) {
+    private static void validate(String name, String description, Long memberId) {
         if (name == null || name.isBlank() || name.length() > 20) {
             throw new IllegalArgumentException("브랜드 이름은 1자 이상 20자 이하로 입력해야 합니다.");
         }
         if (description == null || description.isBlank() || description.length() > 255 || description.length() < 10) {
-            throw new IllegalArgumentException("브랜드 설명은 1자 이상 255자 이하로 입력해야 합니다.");
+            throw new IllegalArgumentException("브랜드 설명은 10자 이상 255자 이하로 입력해야 합니다.");
         }
-        if (image == null) {
-            throw new IllegalArgumentException("브랜드 이미지는 필수 입력 사항입니다.");
+        if (memberId == null || memberId <= 0) {
+            throw new IllegalArgumentException("브랜드 소유자의 ID는 유효한 값이어야 합니다.");
         }
     }
 
@@ -53,7 +53,14 @@ public class BrandModel extends BaseEntity {
         return description;
     }
 
-    public Image getImage() {
-        return image;
+    public Long getMemberId() {
+        return memberId;
+    }
+
+    public void updateBrandInfo(String name, String description, Long memberId) {
+        validate(name, description, memberId);
+
+        this.name = name;
+        this.description = description;
     }
 }

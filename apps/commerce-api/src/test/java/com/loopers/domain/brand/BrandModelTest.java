@@ -1,7 +1,5 @@
 package com.loopers.domain.brand;
 
-import com.loopers.domain.Image;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,16 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BrandModelTest {
 
-    private Image image;
-
     @DisplayName("브랜드 등록을 진행할 때, ")
     @Nested
     class Register {
-
-        @BeforeEach
-        void setUp() {
-            image = new Image("http://example.com/image.jpg", "http://example.com/thumbnail.jpg");
-        }
 
         @DisplayName("이름 규칙에 맞지 않으면 Brand 객체 생성에 실패한다.")
         @ParameterizedTest
@@ -33,10 +24,11 @@ public class BrandModelTest {
         })
         void failRegister_whenNameNotMatchPattern(String name) {
             String description = "테스트 브랜드 설명";
+            Long memberId = 1L;
 
             assertThrows(
                     IllegalArgumentException.class,
-                    () -> BrandModel.registerBrand(name, description, image)
+                    () -> BrandModel.registerBrand(name, description, memberId)
             );
         }
 
@@ -65,23 +57,11 @@ public class BrandModelTest {
         })
         void failRegister_whenDescriptionNotMatchPattern(String description) {
             String name = "테스트브랜드";
+            Long memberId = 1L;
 
             assertThrows(
                     IllegalArgumentException.class,
-                    () -> BrandModel.registerBrand(name, description, image)
-            );
-        }
-
-        @DisplayName("이미지가 null이면 Brand 객체 생성에 실패한다.")
-        @Test
-        void failRegister_whenImageIsNull() {
-            String name = "테스트브랜드";
-            String description = "테스트 브랜드 설명";
-            image = null;
-
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> BrandModel.registerBrand(name, description, image)
+                    () -> BrandModel.registerBrand(name, description, memberId)
             );
         }
 
@@ -90,12 +70,12 @@ public class BrandModelTest {
         void successRegister_whenAllValuesAreValid() {
             String name = "테스트브랜드";
             String description = "테스트 브랜드 설명";
+            Long memberId = 1L;
 
-            BrandModel brandModel = BrandModel.registerBrand(name, description, image);
+            BrandModel brandModel = BrandModel.registerBrand(name, description, memberId);
 
             assertEquals(name, brandModel.getName());
             assertEquals(description, brandModel.getDescription());
-            assertEquals(image, brandModel.getImage());
         }
     }
 

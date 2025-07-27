@@ -1,6 +1,5 @@
-package com.loopers.domain.member;
+package com.loopers.application.member;
 
-import com.loopers.application.member.MemberService;
 import com.loopers.application.member.command.MemberRegisterCommand;
 import com.loopers.application.member.command.PointChargeCommand;
 import com.loopers.application.member.result.MemberInfoResult;
