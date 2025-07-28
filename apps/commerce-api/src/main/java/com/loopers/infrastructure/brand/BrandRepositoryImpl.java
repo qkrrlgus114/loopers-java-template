@@ -5,6 +5,7 @@ import com.loopers.domain.brand.BrandRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -28,12 +29,8 @@ public class BrandRepositoryImpl implements BrandRepository {
     }
 
     @Override
-    public Optional<BrandModel> findByName(String name) {
-        try {
-            return brandJpaRepository.findByName(name);
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+    public List<BrandModel> findAll() {
+        return brandJpaRepository.findAll();
     }
 
 

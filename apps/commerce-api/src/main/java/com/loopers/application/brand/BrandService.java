@@ -2,14 +2,17 @@ package com.loopers.application.brand;
 
 import com.loopers.application.brand.command.BrandRegisterCommand;
 import com.loopers.application.brand.command.BrandUpdateCommand;
+import com.loopers.application.brand.result.BrandListResult;
 import com.loopers.application.brand.result.BrandRegisterResult;
 import com.loopers.application.brand.result.BrandUpdateResult;
 import com.loopers.domain.brand.BrandModel;
 import com.loopers.domain.brand.BrandRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -46,4 +49,13 @@ public class BrandService {
         return BrandUpdateResult.of(findBrand);
     }
 
+    /*
+     * 브랜드 목록을 조회한다.
+     * */
+    @Transactional(readOnly = true)
+    public List<BrandListResult> getBrandList() {
+        return brandRepository.findAll().stream()
+                .map(BrandListResult::toResult)
+                .toList();
+    }
 }

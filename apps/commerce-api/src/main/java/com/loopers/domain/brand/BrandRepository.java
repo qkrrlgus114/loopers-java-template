@@ -2,6 +2,7 @@ package com.loopers.domain.brand;
 
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -25,13 +26,7 @@ public interface BrandRepository {
      * @return 등록된 브랜드 모델
      */
     Optional<BrandModel> register(BrandModel brandModel);
+    
 
-    /**
-     * 브랜드 이름으로 브랜드를 조회합니다.
-     *
-     * @param name 조회할 브랜드 이름
-     * @return 조회된 브랜드 모델, 없으면 null
-     */
-    Optional<BrandModel> findByName(String name);
-
+    List<BrandModel> findAll();
 }

@@ -2,6 +2,7 @@ package com.loopers.application.brand;
 
 import com.loopers.application.brand.command.BrandRegisterCommand;
 import com.loopers.application.brand.command.BrandUpdateCommand;
+import com.loopers.application.brand.result.BrandListResult;
 import com.loopers.application.brand.result.BrandRegisterResult;
 import com.loopers.application.brand.result.BrandUpdateResult;
 import com.loopers.utils.DatabaseCleanUp;
@@ -11,6 +12,8 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -142,4 +145,16 @@ class BrandServiceIntegrationTest {
             );
         }
     }
+
+    @DisplayName("브랜드 목록 조회를 실패하면 빈 리스트를 반환한다.")
+    @Test
+    void fail_whenGetBrandList() {
+        // when
+        List<BrandListResult> brandList = brandService.getBrandList();
+
+        // then
+        assertThat(brandList).isEmpty();
+    }
+
+
 }
