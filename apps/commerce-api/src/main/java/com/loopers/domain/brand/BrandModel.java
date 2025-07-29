@@ -18,7 +18,6 @@ public class BrandModel extends BaseEntity {
     @Column(nullable = false, length = 255)
     private String description;
 
-
     private Long memberId;
 
     private BrandModel(String name, String description, Long memberId) {
@@ -27,7 +26,7 @@ public class BrandModel extends BaseEntity {
         this.memberId = memberId;
     }
 
-    public static BrandModel registerBrand(String name, String description, Long memberId) {
+    public static BrandModel create(String name, String description, Long memberId) {
         validate(name, description, memberId);
 
         return new BrandModel(name, description, memberId);

@@ -26,7 +26,7 @@ public class BrandService {
      * */
     @Transactional
     public BrandRegisterResult registerBrand(BrandRegisterCommand command) {
-        BrandModel brandModel = BrandModel.registerBrand(command.name(), command.description(), command.memberId());
+        BrandModel brandModel = BrandModel.create(command.name(), command.description(), command.memberId());
 
         BrandModel savedModel = brandRepository.register(brandModel).orElseThrow(() -> {
             return new RuntimeException("브랜드 등록에 실패했습니다.");

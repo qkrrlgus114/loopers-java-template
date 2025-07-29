@@ -28,7 +28,7 @@ public class BrandModelTest {
 
             assertThrows(
                     IllegalArgumentException.class,
-                    () -> BrandModel.registerBrand(name, description, memberId)
+                    () -> BrandModel.create(name, description, memberId)
             );
         }
 
@@ -61,7 +61,7 @@ public class BrandModelTest {
 
             assertThrows(
                     IllegalArgumentException.class,
-                    () -> BrandModel.registerBrand(name, description, memberId)
+                    () -> BrandModel.create(name, description, memberId)
             );
         }
 
@@ -72,7 +72,7 @@ public class BrandModelTest {
             String description = "테스트 브랜드 설명";
             Long memberId = 1L;
 
-            BrandModel brandModel = BrandModel.registerBrand(name, description, memberId);
+            BrandModel brandModel = BrandModel.create(name, description, memberId);
 
             assertEquals(name, brandModel.getName());
             assertEquals(description, brandModel.getDescription());

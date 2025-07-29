@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.math.BigDecimal;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
@@ -28,10 +29,11 @@ public class ProductModelTest {
             String description = "상품 설명";
             Long brandId = 1L;
             Long memberId = 1L;
+            BigDecimal price = BigDecimal.valueOf(1000);
 
             assertThrows(
                     IllegalArgumentException.class,
-                    () -> ProductModel.create(name, description, brandId, memberId)
+                    () -> ProductModel.create(name, description, brandId, memberId, price)
             );
         }
 
@@ -42,10 +44,11 @@ public class ProductModelTest {
             String name = "상품 이름";
             Long brandId = 1L;
             Long memberId = 1L;
+            BigDecimal price = BigDecimal.valueOf(1000);
 
             assertThrows(
                     IllegalArgumentException.class,
-                    () -> ProductModel.create(name, description, brandId, memberId)
+                    () -> ProductModel.create(name, description, brandId, memberId, price)
             );
         }
 
@@ -64,10 +67,11 @@ public class ProductModelTest {
             String name = "상품 이름";
             String description = "상품 설명";
             Long memberId = 1L;
+            BigDecimal price = BigDecimal.valueOf(1000);
 
             assertThrows(
                     IllegalArgumentException.class,
-                    () -> ProductModel.create(name, description, brandId, memberId)
+                    () -> ProductModel.create(name, description, brandId, memberId, price)
             );
         }
 
@@ -82,15 +86,39 @@ public class ProductModelTest {
             String name = "상품 이름";
             String description = "상품 설명";
             Long brandId = 1L;
+            BigDecimal price = BigDecimal.valueOf(1000);
 
             assertThrows(
                     IllegalArgumentException.class,
-                    () -> ProductModel.create(name, description, brandId, memberId)
+                    () -> ProductModel.create(name, description, brandId, memberId, price)
             );
         }
 
         static Stream<Long> invalidMemberIds() {
             return Stream.of(null, 0L, -1L, -100L);
+        }
+
+        @DisplayName("상품 가격이 0 이하이면 Product 객체 생성에 실패한다.")
+        @ParameterizedTest
+        @MethodSource("invalidPrices")
+        void failRegister_whenPriceNotValid(BigDecimal price) {
+            String name = "상품 이름";
+            String description = "상품 설명";
+            Long brandId = 1L;
+            Long memberId = 1L;
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> ProductModel.create(name, description, brandId, memberId, price)
+            );
+        }
+
+        static Stream<BigDecimal> invalidPrices() {
+            return Stream.of(
+                    BigDecimal.ZERO,
+                    BigDecimal.valueOf(-1),
+                    BigDecimal.valueOf(-100)
+            );
         }
 
         @DisplayName("모든 조건이 만족되면 Product 객체가 생성된다.")
@@ -100,14 +128,16 @@ public class ProductModelTest {
             String description = "상품 설명은 20자여야 합니다.상품 설명은 20자여야 합니다.상품 설명은 20자여야 합니다.상품 설명은 20자여야 합니다.";
             Long brandId = 1L;
             Long memberId = 1L;
+            BigDecimal price = BigDecimal.valueOf(1000);
 
-            ProductModel productModel = ProductModel.create(name, description, brandId, memberId);
+            ProductModel productModel = ProductModel.create(name, description, brandId, memberId, price);
 
             assertNotNull(productModel);
             assertEquals(name, productModel.getName());
             assertEquals(description, productModel.getDescription());
             assertEquals(brandId, productModel.getBrandId());
             assertEquals(memberId, productModel.getMemberId());
+            assertEquals(price, productModel.getPrice());
         }
     }
 
