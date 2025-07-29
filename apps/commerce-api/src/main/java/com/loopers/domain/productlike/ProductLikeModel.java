@@ -1,6 +1,8 @@
 package com.loopers.domain.productlike;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.support.error.CommonErrorType;
+import com.loopers.support.error.CoreException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
@@ -22,10 +24,10 @@ public class ProductLikeModel extends BaseEntity {
 
     public static ProductLikeModel create(Long productId, Long memberId) {
         if (productId == null || productId <= 0) {
-            throw new IllegalArgumentException("유효한 상품 ID가 필요합니다.");
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 상품 ID가 필요합니다.");
         }
         if (memberId == null || memberId <= 0) {
-            throw new IllegalArgumentException("유효한 회원 ID가 필요합니다.");
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 회원 ID가 필요합니다.");
         }
         return new ProductLikeModel(productId, memberId);
     }

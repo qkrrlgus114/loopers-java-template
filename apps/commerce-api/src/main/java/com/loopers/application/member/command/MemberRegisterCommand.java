@@ -1,5 +1,8 @@
 package com.loopers.application.member.command;
 
+import com.loopers.support.error.CommonErrorType;
+import com.loopers.support.error.CoreException;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
@@ -20,7 +23,7 @@ public record MemberRegisterCommand(
         try {
             birth = LocalDate.parse(birthStr);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("생년월일 형식이 올바르지 않습니다. (yyyy-MM-dd)", e);
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "생년월일 형식이 올바르지 않습니다. (yyyy-MM-dd)");
         }
 
         return new MemberRegisterCommand(loginId, password, email, name, birth, gender);

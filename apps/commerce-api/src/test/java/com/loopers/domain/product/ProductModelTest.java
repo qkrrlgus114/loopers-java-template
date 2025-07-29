@@ -1,5 +1,6 @@
 package com.loopers.domain.product;
 
+import com.loopers.support.error.CoreException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class ProductModelTest {
             BigDecimal price = BigDecimal.valueOf(1000);
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoreException.class,
                     () -> ProductModel.create(name, description, brandId, memberId, price)
             );
         }
@@ -47,7 +48,7 @@ public class ProductModelTest {
             BigDecimal price = BigDecimal.valueOf(1000);
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoreException.class,
                     () -> ProductModel.create(name, description, brandId, memberId, price)
             );
         }
@@ -70,7 +71,7 @@ public class ProductModelTest {
             BigDecimal price = BigDecimal.valueOf(1000);
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoreException.class,
                     () -> ProductModel.create(name, description, brandId, memberId, price)
             );
         }
@@ -89,7 +90,7 @@ public class ProductModelTest {
             BigDecimal price = BigDecimal.valueOf(1000);
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoreException.class,
                     () -> ProductModel.create(name, description, brandId, memberId, price)
             );
         }
@@ -108,7 +109,7 @@ public class ProductModelTest {
             Long memberId = 1L;
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoreException.class,
                     () -> ProductModel.create(name, description, brandId, memberId, price)
             );
         }

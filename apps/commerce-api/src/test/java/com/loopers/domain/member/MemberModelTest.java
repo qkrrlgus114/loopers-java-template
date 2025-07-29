@@ -1,6 +1,7 @@
 package com.loopers.domain.member;
 
 import com.loopers.application.member.command.MemberRegisterCommand;
+import com.loopers.support.error.CoreException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ public class MemberModelTest {
             String gender = "M";
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoreException.class,
                     () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
             );
         }
@@ -57,7 +58,7 @@ public class MemberModelTest {
             String gender = "M";
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoreException.class,
                     () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
             );
         }
@@ -81,7 +82,7 @@ public class MemberModelTest {
             String gender = "M";
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoreException.class,
                     () -> MemberRegisterCommand.of(loginId, password, email, name, birthStr, gender)
             );
         }
@@ -100,7 +101,7 @@ public class MemberModelTest {
             LocalDate birth = LocalDate.parse("1997-12-04");
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoreException.class,
                     () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
             );
         }
@@ -114,7 +115,7 @@ public class MemberModelTest {
         Long amount = 0L;
 
         // when && then
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(CoreException.class, () -> {
             memberModel.chargePoint(amount);
         });
     }

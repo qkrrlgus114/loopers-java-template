@@ -1,5 +1,6 @@
 package com.loopers.domain.brand;
 
+import com.loopers.support.error.CoreException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ public class BrandModelTest {
             Long memberId = 1L;
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoreException.class,
                     () -> BrandModel.create(name, description, memberId)
             );
         }
@@ -60,7 +61,7 @@ public class BrandModelTest {
             Long memberId = 1L;
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoreException.class,
                     () -> BrandModel.create(name, description, memberId)
             );
         }

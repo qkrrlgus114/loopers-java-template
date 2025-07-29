@@ -1,6 +1,8 @@
 package com.loopers.domain.brand;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.support.error.CommonErrorType;
+import com.loopers.support.error.CoreException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -34,13 +36,13 @@ public class BrandModel extends BaseEntity {
 
     private static void validate(String name, String description, Long memberId) {
         if (name == null || name.isBlank() || name.length() > 20) {
-            throw new IllegalArgumentException("브랜드 이름은 1자 이상 20자 이하로 입력해야 합니다.");
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "브랜드 이름은 1자 이상 20자 이하로 입력해야 합니다.");
         }
         if (description == null || description.isBlank() || description.length() > 255 || description.length() < 10) {
-            throw new IllegalArgumentException("브랜드 설명은 10자 이상 255자 이하로 입력해야 합니다.");
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "브랜드 설명은 10자 이상 255자 이하로 입력해야 합니다.");
         }
         if (memberId == null || memberId <= 0) {
-            throw new IllegalArgumentException("브랜드 소유자의 ID는 유효한 값이어야 합니다.");
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "브랜드 소유자의 ID는 유효한 값이어야 합니다.");
         }
     }
 

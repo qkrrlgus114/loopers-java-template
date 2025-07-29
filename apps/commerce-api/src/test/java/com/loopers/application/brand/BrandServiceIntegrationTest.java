@@ -5,6 +5,7 @@ import com.loopers.application.brand.command.BrandUpdateCommand;
 import com.loopers.application.brand.result.BrandListResult;
 import com.loopers.application.brand.result.BrandRegisterResult;
 import com.loopers.application.brand.result.BrandUpdateResult;
+import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -74,7 +75,7 @@ class BrandServiceIntegrationTest {
                     1L
             );
 
-            Assertions.assertThrows(IllegalArgumentException.class,
+            Assertions.assertThrows(CoreException.class,
                     () -> brandService.registerBrand(invalidCommand));
         }
 
@@ -108,7 +109,7 @@ class BrandServiceIntegrationTest {
                     1L
             );
 
-            Assertions.assertThrows(IllegalArgumentException.class,
+            Assertions.assertThrows(CoreException.class,
                     () -> brandService.registerBrand(invalidCommand));
         }
 
