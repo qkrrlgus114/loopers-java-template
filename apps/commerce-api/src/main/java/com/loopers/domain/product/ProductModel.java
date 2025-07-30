@@ -3,6 +3,7 @@ package com.loopers.domain.product;
 import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CommonErrorType;
 import com.loopers.support.error.CoreException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
@@ -12,31 +13,40 @@ import java.math.BigDecimal;
 @Table(name = "product")
 public class ProductModel extends BaseEntity {
 
+    @Column(length = 20, nullable = false)
     private String name;
 
+    @Column(length = 200, nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private Long brandId;
 
+    @Column(nullable = false)
     private Long memberId;
 
+    @Column(nullable = false)
     private BigDecimal price;
+
+    @Column(nullable = false)
+    private ProductStatus status;
 
     protected ProductModel() {
     }
 
-    public ProductModel(String name, String description, Long brandId, Long memberId, BigDecimal price) {
+    public ProductModel(String name, String description, Long brandId, Long memberId, BigDecimal price, ProductStatus status) {
         this.name = name;
         this.description = description;
         this.brandId = brandId;
         this.memberId = memberId;
         this.price = price;
+        this.status = status;
     }
 
     public static ProductModel create(String name, String description, Long brandId, Long memberId, BigDecimal price) {
         validated(name, description, brandId, memberId, price);
 
-        return new ProductModel(name, description, brandId, memberId, price);
+        return new ProductModel(name, description, brandId, memberId, price, ProductStatus.REGISTERED);
     }
 
     private static void validated(String name, String description, Long brandId, Long memberId, BigDecimal price) {
@@ -76,5 +86,9 @@ public class ProductModel extends BaseEntity {
 
     public BigDecimal getPrice() {
         return price;
+    }
+
+    public ProductStatus getStatus() {
+        return status;
     }
 }

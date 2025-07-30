@@ -1,8 +1,8 @@
 package com.loopers.interfaces.api.brand;
 
-import com.loopers.application.brand.BrandService;
 import com.loopers.application.brand.command.BrandRegisterCommand;
 import com.loopers.application.brand.result.BrandRegisterResult;
+import com.loopers.application.brand.service.BrandService;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.brand.dto.BrandDTO;
 import jakarta.validation.Valid;

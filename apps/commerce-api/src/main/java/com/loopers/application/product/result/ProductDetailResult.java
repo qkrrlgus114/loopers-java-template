@@ -1,7 +1,7 @@
 package com.loopers.application.product.result;
 
 import com.loopers.domain.brand.BrandModel;
-import com.loopers.domain.product.ProductModel;
+import com.loopers.domain.product.projection.ProductLikeView;
 
 import java.math.BigDecimal;
 
@@ -13,19 +13,21 @@ public record ProductDetailResult(
         Long memberId,
         Long brandId,
         String brandName,
-        int likeCount
+        Long likeCount,
+        Boolean isLiked
 ) {
 
-    public static ProductDetailResult of(ProductModel product, BrandModel brand, int likeCount) {
+    public static ProductDetailResult of(ProductLikeView productLikeView, BrandModel brand) {
         return new ProductDetailResult(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getMemberId(),
+                productLikeView.product().getId(),
+                productLikeView.product().getName(),
+                productLikeView.product().getDescription(),
+                productLikeView.product().getPrice(),
+                productLikeView.product().getMemberId(),
                 brand.getId(),
                 brand.getName(),
-                likeCount
+                productLikeView.likeCount(),
+                productLikeView.likedByMe()
         );
     }
 

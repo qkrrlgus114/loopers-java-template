@@ -5,6 +5,7 @@ import com.loopers.application.brand.command.BrandUpdateCommand;
 import com.loopers.application.brand.result.BrandListResult;
 import com.loopers.application.brand.result.BrandRegisterResult;
 import com.loopers.application.brand.result.BrandUpdateResult;
+import com.loopers.application.brand.service.BrandService;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;

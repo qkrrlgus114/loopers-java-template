@@ -1,11 +1,13 @@
 package com.loopers.application.product;
 
 import com.loopers.application.product.command.ProductDetailCommand;
+import com.loopers.application.product.facade.ProductDetailFacade;
 import com.loopers.application.product.result.ProductDetailResult;
 import com.loopers.domain.brand.BrandModel;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.product.ProductModel;
 import com.loopers.domain.product.ProductRepository;
+import com.loopers.domain.product.ProductStatus;
 import com.loopers.domain.productlike.ProductLikeModel;
 import com.loopers.domain.productlike.ProductLikeRepository;
 import com.loopers.support.error.CoreException;
@@ -16,13 +18,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 class ProductServiceIntegrationTest {
 
     @Autowired
-    private ProductService productService;
+    private ProductDetailFacade productDetailFacade;
 
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
@@ -75,7 +79,7 @@ class ProductServiceIntegrationTest {
 
 
             // When
-            ProductDetailResult result = productService.getProductDetail(command);
+            ProductDetailResult result = productDetailFacade.getProductDetail(command);
 
             // Then
             assertAll(
@@ -87,7 +91,9 @@ class ProductServiceIntegrationTest {
                     , () -> assertEquals(product.getMemberId(), result.memberId())
                     , () -> assertEquals(brand.getId(), result.brandId())
                     , () -> assertEquals(brand.getName(), result.brandName())
-                    , () -> assertEquals(1, result.likeCount())
+                    , () -> assertEquals(1L, result.likeCount().longValue())
+                    , () -> assertEquals(true, result.isLiked())
+                    , () -> assertEquals(product.getStatus(), ProductStatus.REGISTERED)
             );
         }
 
@@ -98,7 +104,7 @@ class ProductServiceIntegrationTest {
             ProductDetailCommand command = new ProductDetailCommand(-1L, 1L);
 
             Assertions.assertThrows(CoreException.class, () -> {
-                productService.getProductDetail(command);
+                productDetailFacade.getProductDetail(command);
             });
         }
 
@@ -108,7 +114,7 @@ class ProductServiceIntegrationTest {
             ProductDetailCommand command = new ProductDetailCommand(1L, -1L);
 
             Assertions.assertThrows(CoreException.class, () -> {
-                productService.getProductDetail(command);
+                productDetailFacade.getProductDetail(command);
             });
         }
 
