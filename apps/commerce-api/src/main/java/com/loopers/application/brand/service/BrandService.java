@@ -1,4 +1,4 @@
-package com.loopers.application.brand;
+package com.loopers.application.brand.service;
 
 import com.loopers.application.brand.command.BrandRegisterCommand;
 import com.loopers.application.brand.command.BrandUpdateCommand;
@@ -7,6 +7,8 @@ import com.loopers.application.brand.result.BrandRegisterResult;
 import com.loopers.application.brand.result.BrandUpdateResult;
 import com.loopers.domain.brand.BrandModel;
 import com.loopers.domain.brand.BrandRepository;
+import com.loopers.support.error.BrandErrorType;
+import com.loopers.support.error.CoreException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -57,5 +59,15 @@ public class BrandService {
         return brandRepository.findAll().stream()
                 .map(BrandListResult::toResult)
                 .toList();
+    }
+
+    /*
+     * 브랜드 상세 정보를 조회한다.
+     * */
+    @Transactional(readOnly = true)
+    public BrandModel getBrandDetail(Long brandId) {
+        return brandRepository.findById(brandId).orElseThrow(() ->
+                new CoreException(BrandErrorType.BRAND_NOT_FOUND, "상품의 브랜드를 찾을 수 없습니다. brandId: " + brandId)
+        );
     }
 }

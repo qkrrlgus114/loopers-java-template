@@ -1,4 +1,4 @@
-package com.loopers.application.member;
+package com.loopers.application.member.service;
 
 import com.loopers.application.member.command.MemberRegisterCommand;
 import com.loopers.application.member.command.PointChargeCommand;
