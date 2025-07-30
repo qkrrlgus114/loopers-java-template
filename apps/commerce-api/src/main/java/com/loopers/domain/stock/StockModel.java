@@ -18,7 +18,7 @@ public class StockModel extends BaseEntity {
     protected StockModel() {
     }
 
-    public StockModel(Long productId, int quantity) {
+    private StockModel(Long productId, int quantity) {
         this.productId = productId;
         this.quantity = quantity;
     }
@@ -39,5 +39,15 @@ public class StockModel extends BaseEntity {
 
     public int getQuantity() {
         return quantity;
+    }
+
+    public void decreaseQuantity(int amount) {
+        if (amount <= 0) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "감소할 수량은 1 이상이어야 합니다.");
+        }
+        if (quantity < amount) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "재고가 부족합니다.");
+        }
+        this.quantity -= amount;
     }
 }

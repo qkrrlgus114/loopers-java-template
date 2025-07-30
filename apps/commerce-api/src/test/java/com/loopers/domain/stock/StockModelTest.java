@@ -48,4 +48,42 @@ class StockModelTest {
             assertEquals(quantity, stock.getQuantity());
         }
     }
+
+    @DisplayName("재고 수량을 감소시킬 때, ")
+    @Nested
+    class DecreaseQuantity {
+
+        @DisplayName("감소할 수량이 0 이하인 경우 실패한다.")
+        @Test
+        void fail_decreaseQuantityZeroOrLess() {
+            Long productId = 1L;
+            int quantity = 10;
+            StockModel stock = StockModel.create(productId, quantity);
+
+            Assertions.assertThrows(CoreException.class,
+                    () -> stock.decreaseQuantity(0));
+        }
+
+        @DisplayName("재고 수량이 부족한 경우 실패한다.")
+        @Test
+        void fail_insufficientStock() {
+            Long productId = 1L;
+            int quantity = 10;
+            StockModel stock = StockModel.create(productId, quantity);
+
+            Assertions.assertThrows(CoreException.class,
+                    () -> stock.decreaseQuantity(11));
+        }
+
+        @DisplayName("유효한 수량으로 재고를 감소시킬 수 있다.")
+        @Test
+        void success_decreaseQuantity() {
+            Long productId = 1L;
+            int quantity = 10;
+            StockModel stock = StockModel.create(productId, quantity);
+
+            stock.decreaseQuantity(5);
+            assertEquals(5, stock.getQuantity());
+        }
+    }
 }
