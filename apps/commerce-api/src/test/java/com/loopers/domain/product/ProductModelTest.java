@@ -139,6 +139,7 @@ public class ProductModelTest {
             assertEquals(brandId, productModel.getBrandId());
             assertEquals(memberId, productModel.getMemberId());
             assertEquals(price, productModel.getPrice());
+            assertEquals(ProductStatus.REGISTERED, productModel.getStatus());
         }
     }
 
