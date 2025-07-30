@@ -1,6 +1,6 @@
 package com.loopers.application.brand.result;
 
-import com.loopers.domain.brand.BrandModel;
+import com.loopers.domain.brand.Brand;
 
 public record BrandRegisterResult(
         Long id,
@@ -8,7 +8,7 @@ public record BrandRegisterResult(
         String description,
         Long memberId
 ) {
-    public static BrandRegisterResult of(BrandModel model) {
+    public static BrandRegisterResult of(Brand model) {
 
         return new BrandRegisterResult(
                 model.getId(),

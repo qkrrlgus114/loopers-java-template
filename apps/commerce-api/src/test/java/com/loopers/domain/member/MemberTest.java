@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class MemberModelTest {
+public class MemberTest {
 
     @DisplayName("회원가입을 진행할 때, ")
     @Nested
@@ -36,7 +36,7 @@ public class MemberModelTest {
 
             assertThrows(
                     CoreException.class,
-                    () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
+                    () -> Member.registerMember(loginId, password, email, name, birth, gender)
             );
         }
 
@@ -59,7 +59,7 @@ public class MemberModelTest {
 
             assertThrows(
                     CoreException.class,
-                    () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
+                    () -> Member.registerMember(loginId, password, email, name, birth, gender)
             );
         }
 
@@ -102,7 +102,7 @@ public class MemberModelTest {
 
             assertThrows(
                     CoreException.class,
-                    () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
+                    () -> Member.registerMember(loginId, password, email, name, birth, gender)
             );
         }
     }
@@ -111,12 +111,12 @@ public class MemberModelTest {
     @Test
     void fail_whenChargePointZeroOrLess() {
         // given
-        MemberModel memberModel = MemberModel.registerMember("test1234", "12341234", "test@naver.com", "박기현", LocalDate.parse("1997-12-04"), "M");
+        Member member = Member.registerMember("test1234", "12341234", "test@naver.com", "박기현", LocalDate.parse("1997-12-04"), "M");
         Long amount = 0L;
 
         // when && then
         assertThrows(CoreException.class, () -> {
-            memberModel.chargePoint(amount);
+            member.chargePoint(amount);
         });
     }
 

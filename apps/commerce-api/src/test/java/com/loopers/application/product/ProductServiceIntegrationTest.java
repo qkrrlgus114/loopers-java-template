@@ -3,12 +3,12 @@ package com.loopers.application.product;
 import com.loopers.application.product.command.ProductDetailCommand;
 import com.loopers.application.product.facade.ProductDetailFacade;
 import com.loopers.application.product.result.ProductDetailResult;
-import com.loopers.domain.brand.BrandModel;
+import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
-import com.loopers.domain.product.ProductModel;
+import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.product.ProductStatus;
-import com.loopers.domain.productlike.ProductLikeModel;
+import com.loopers.domain.productlike.ProductLike;
 import com.loopers.domain.productlike.ProductLikeRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
@@ -53,27 +53,27 @@ class ProductServiceIntegrationTest {
         @Test
         void successGetProductDetail() {
             // Given
-            BrandModel brandModel = BrandModel.create(
+            Brand brandModel = Brand.create(
                     "브랜드 이름",
                     "브랜드 설명입니다아아아"
                     , 1L
             );
-            BrandModel brand = brandRepository.register(brandModel).get();
+            Brand brand = brandRepository.register(brandModel).get();
 
-            ProductModel productModel = ProductModel.create(
+            Product productModel = Product.create(
                     "상품 이름",
                     "상품 설명입니다아아아아상품 설명입니다아아아아상품 설명입니다아아아아상품 설명입니다아아아아",
                     brand.getId(),
                     1L,
                     BigDecimal.valueOf(10000)
             );
-            ProductModel product = productRepository.register(productModel).get();
+            Product product = productRepository.register(productModel).get();
 
-            ProductLikeModel productLikeModel = ProductLikeModel.create(
+            ProductLike productLike = ProductLike.create(
                     product.getId(),
                     1L
             );
-            productLikeRepository.register(productLikeModel);
+            productLikeRepository.register(productLike);
 
             ProductDetailCommand command = new ProductDetailCommand(product.getId(), 1L);
 

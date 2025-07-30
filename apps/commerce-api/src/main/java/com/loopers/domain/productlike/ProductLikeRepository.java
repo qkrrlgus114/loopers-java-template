@@ -12,6 +12,6 @@ public interface ProductLikeRepository {
 
     int getProductLikeCount(Long productId, Long memberId);
 
-    Optional<ProductLikeModel> register(ProductLikeModel productLikeModel);
+    Optional<ProductLike> register(ProductLike productLike);
 
 }

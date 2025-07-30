@@ -1,6 +1,6 @@
 package com.loopers.infrastructure.productlike;
 
-import com.loopers.domain.productlike.ProductLikeModel;
+import com.loopers.domain.productlike.ProductLike;
 import com.loopers.domain.productlike.ProductLikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,9 +19,9 @@ public class ProductLikeRepositoryImpl implements ProductLikeRepository {
     }
 
     @Override
-    public Optional<ProductLikeModel> register(ProductLikeModel productLikeModel) {
+    public Optional<ProductLike> register(ProductLike productLike) {
         try {
-            ProductLikeModel saved = productLikeJpaRepository.save(productLikeModel);
+            ProductLike saved = productLikeJpaRepository.save(productLike);
             return Optional.of(saved);
         } catch (Exception e) {
             return Optional.empty();

@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "product")
-public class ProductModel extends BaseEntity {
+public class Product extends BaseEntity {
 
     @Column(length = 20, nullable = false)
     private String name;
@@ -31,10 +31,10 @@ public class ProductModel extends BaseEntity {
     @Column(nullable = false)
     private ProductStatus status;
 
-    protected ProductModel() {
+    protected Product() {
     }
 
-    public ProductModel(String name, String description, Long brandId, Long memberId, BigDecimal price, ProductStatus status) {
+    public Product(String name, String description, Long brandId, Long memberId, BigDecimal price, ProductStatus status) {
         this.name = name;
         this.description = description;
         this.brandId = brandId;
@@ -43,10 +43,10 @@ public class ProductModel extends BaseEntity {
         this.status = status;
     }
 
-    public static ProductModel create(String name, String description, Long brandId, Long memberId, BigDecimal price) {
+    public static Product create(String name, String description, Long brandId, Long memberId, BigDecimal price) {
         validated(name, description, brandId, memberId, price);
 
-        return new ProductModel(name, description, brandId, memberId, price, ProductStatus.REGISTERED);
+        return new Product(name, description, brandId, memberId, price, ProductStatus.REGISTERED);
     }
 
     private static void validated(String name, String description, Long brandId, Long memberId, BigDecimal price) {

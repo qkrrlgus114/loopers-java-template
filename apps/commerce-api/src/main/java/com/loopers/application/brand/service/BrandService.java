@@ -5,7 +5,7 @@ import com.loopers.application.brand.command.BrandUpdateCommand;
 import com.loopers.application.brand.result.BrandListResult;
 import com.loopers.application.brand.result.BrandRegisterResult;
 import com.loopers.application.brand.result.BrandUpdateResult;
-import com.loopers.domain.brand.BrandModel;
+import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.support.error.BrandErrorType;
 import com.loopers.support.error.CoreException;
@@ -28,9 +28,9 @@ public class BrandService {
      * */
     @Transactional
     public BrandRegisterResult registerBrand(BrandRegisterCommand command) {
-        BrandModel brandModel = BrandModel.create(command.name(), command.description(), command.memberId());
+        Brand brand = Brand.create(command.name(), command.description(), command.memberId());
 
-        BrandModel savedModel = brandRepository.register(brandModel).orElseThrow(() -> {
+        Brand savedModel = brandRepository.register(brand).orElseThrow(() -> {
             return new RuntimeException("브랜드 등록에 실패했습니다.");
         });
 
@@ -42,7 +42,7 @@ public class BrandService {
      * */
     @Transactional
     public BrandUpdateResult updateBrand(BrandUpdateCommand command) {
-        BrandModel findBrand = brandRepository.findById(command.id()).orElseThrow(() -> {
+        Brand findBrand = brandRepository.findById(command.id()).orElseThrow(() -> {
             return new RuntimeException("브랜드를 찾을 수 없습니다.");
         });
 
@@ -65,7 +65,7 @@ public class BrandService {
      * 브랜드 상세 정보를 조회한다.
      * */
     @Transactional(readOnly = true)
-    public BrandModel getBrandDetail(Long brandId) {
+    public Brand getBrandDetail(Long brandId) {
         return brandRepository.findById(brandId).orElseThrow(() ->
                 new CoreException(BrandErrorType.BRAND_NOT_FOUND, "상품의 브랜드를 찾을 수 없습니다. brandId: " + brandId)
         );

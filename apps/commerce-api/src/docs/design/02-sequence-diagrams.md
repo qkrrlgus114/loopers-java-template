@@ -683,7 +683,7 @@ sequenceDiagram
             PS -->> PC: 주문 없음
             PC -->> U: 404 Not Found
         else 주문 존재
-            ORR -->> PS: order
+            ORR -->> PS: orders
 
             alt 이미 결제 완료
                 PS -->> PC: 이미 결제 완료

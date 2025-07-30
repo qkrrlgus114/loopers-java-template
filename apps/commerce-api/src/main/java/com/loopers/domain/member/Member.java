@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "member")
-public class MemberModel extends BaseEntity {
+public class Member extends BaseEntity {
 
     @Column(name = "login_id", nullable = false, length = 10, unique = true)
     private String loginId;
@@ -34,10 +34,10 @@ public class MemberModel extends BaseEntity {
     @Column(name = "point", nullable = false)
     private Long point = 0L;
 
-    protected MemberModel() {
+    protected Member() {
     }
 
-    private MemberModel(String loginId, String password, String email, String name, LocalDate birth, String gender) {
+    private Member(String loginId, String password, String email, String name, LocalDate birth, String gender) {
         this.loginId = validateLoginId(loginId);
         this.password = password;
         this.email = validateEmail(email);
@@ -47,8 +47,8 @@ public class MemberModel extends BaseEntity {
     }
 
 
-    public static MemberModel registerMember(String loginId, String password, String email, String name, LocalDate birth, String gender) {
-        return new MemberModel(loginId, password, email, name, birth, gender);
+    public static Member registerMember(String loginId, String password, String email, String name, LocalDate birth, String gender) {
+        return new Member(loginId, password, email, name, birth, gender);
     }
 
     private String validateLoginId(String loginId) {

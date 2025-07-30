@@ -8,28 +8,28 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "product_like")
-public class ProductLikeModel extends BaseEntity {
+public class ProductLike extends BaseEntity {
 
     private Long productId;
 
     private Long memberId;
 
-    protected ProductLikeModel() {
+    protected ProductLike() {
     }
 
-    public ProductLikeModel(Long productId, Long memberId) {
+    public ProductLike(Long productId, Long memberId) {
         this.productId = productId;
         this.memberId = memberId;
     }
 
-    public static ProductLikeModel create(Long productId, Long memberId) {
+    public static ProductLike create(Long productId, Long memberId) {
         if (productId == null || productId <= 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 상품 ID가 필요합니다.");
         }
         if (memberId == null || memberId <= 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 회원 ID가 필요합니다.");
         }
-        return new ProductLikeModel(productId, memberId);
+        return new ProductLike(productId, memberId);
     }
 
     public Long getProductId() {

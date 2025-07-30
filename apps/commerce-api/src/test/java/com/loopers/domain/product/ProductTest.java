@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
-public class ProductModelTest {
+public class ProductTest {
 
     @DisplayName("상품을 등록할 때, ")
     @Nested
@@ -34,7 +34,7 @@ public class ProductModelTest {
 
             assertThrows(
                     CoreException.class,
-                    () -> ProductModel.create(name, description, brandId, memberId, price)
+                    () -> Product.create(name, description, brandId, memberId, price)
             );
         }
 
@@ -49,7 +49,7 @@ public class ProductModelTest {
 
             assertThrows(
                     CoreException.class,
-                    () -> ProductModel.create(name, description, brandId, memberId, price)
+                    () -> Product.create(name, description, brandId, memberId, price)
             );
         }
 
@@ -72,7 +72,7 @@ public class ProductModelTest {
 
             assertThrows(
                     CoreException.class,
-                    () -> ProductModel.create(name, description, brandId, memberId, price)
+                    () -> Product.create(name, description, brandId, memberId, price)
             );
         }
 
@@ -91,7 +91,7 @@ public class ProductModelTest {
 
             assertThrows(
                     CoreException.class,
-                    () -> ProductModel.create(name, description, brandId, memberId, price)
+                    () -> Product.create(name, description, brandId, memberId, price)
             );
         }
 
@@ -110,7 +110,7 @@ public class ProductModelTest {
 
             assertThrows(
                     CoreException.class,
-                    () -> ProductModel.create(name, description, brandId, memberId, price)
+                    () -> Product.create(name, description, brandId, memberId, price)
             );
         }
 
@@ -131,15 +131,15 @@ public class ProductModelTest {
             Long memberId = 1L;
             BigDecimal price = BigDecimal.valueOf(1000);
 
-            ProductModel productModel = ProductModel.create(name, description, brandId, memberId, price);
+            Product product = Product.create(name, description, brandId, memberId, price);
 
-            assertNotNull(productModel);
-            assertEquals(name, productModel.getName());
-            assertEquals(description, productModel.getDescription());
-            assertEquals(brandId, productModel.getBrandId());
-            assertEquals(memberId, productModel.getMemberId());
-            assertEquals(price, productModel.getPrice());
-            assertEquals(ProductStatus.REGISTERED, productModel.getStatus());
+            assertNotNull(product);
+            assertEquals(name, product.getName());
+            assertEquals(description, product.getDescription());
+            assertEquals(brandId, product.getBrandId());
+            assertEquals(memberId, product.getMemberId());
+            assertEquals(price, product.getPrice());
+            assertEquals(ProductStatus.REGISTERED, product.getStatus());
         }
     }
 

@@ -1,7 +1,9 @@
 package com.loopers.application.product.service;
 
+import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.product.projection.ProductLikeView;
+import com.loopers.support.error.CommonErrorType;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ProductErrorType;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,16 @@ public class ProductService {
      * */
     public ProductLikeView getProductDetail(Long productId, Long memberId) {
         return productRepository.findDetailWithLikes(productId, memberId).orElseThrow(() ->
+                new CoreException(ProductErrorType.PRODUCT_NOT_FOUND, "상품을 찾을 수 없습니다. productId: " + productId)
+        );
+    }
+
+    public Product findProductById(Long productId) {
+        if (productId == null || productId <= 0) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효하지 않은 상품 ID입니다.");
+        }
+
+        return productRepository.findById(productId).orElseThrow(() ->
                 new CoreException(ProductErrorType.PRODUCT_NOT_FOUND, "상품을 찾을 수 없습니다. productId: " + productId)
         );
     }

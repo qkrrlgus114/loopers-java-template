@@ -1,7 +1,7 @@
 package com.loopers.application.member.result;
 
 import com.loopers.application.member.command.PointChargeCommand;
-import com.loopers.domain.member.MemberModel;
+import com.loopers.domain.member.Member;
 
 public record MemberPointResult(
         Long memberId,
@@ -13,7 +13,7 @@ public record MemberPointResult(
                 pointChargeCommand.amount());
     }
 
-    public static MemberPointResult fromGetPoint(MemberModel model) {
+    public static MemberPointResult fromGetPoint(Member model) {
         return new MemberPointResult(
                 model.getId(),
                 model.getPoint());

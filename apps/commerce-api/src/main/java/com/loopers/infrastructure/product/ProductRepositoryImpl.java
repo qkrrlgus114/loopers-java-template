@@ -1,10 +1,10 @@
 package com.loopers.infrastructure.product;
 
-import com.loopers.domain.product.ProductModel;
+import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
-import com.loopers.domain.product.QProductModel;
+import com.loopers.domain.product.QProduct;
 import com.loopers.domain.product.projection.ProductLikeView;
-import com.loopers.domain.productlike.QProductLikeModel;
+import com.loopers.domain.productlike.QProductLike;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -21,18 +21,18 @@ public class ProductRepositoryImpl implements ProductRepository {
     private final JPAQueryFactory query;
 
 
-    private final QProductModel product = QProductModel.productModel;
-    private final QProductLikeModel like = QProductLikeModel.productLikeModel;
+    private final QProduct product = QProduct.product;
+    private final QProductLike like = QProductLike.productLike;
 
     @Override
-    public Optional<ProductModel> findById(Long productId) {
+    public Optional<Product> findById(Long productId) {
         return productJpaRepository.findById(productId);
     }
 
     @Override
-    public Optional<ProductModel> register(ProductModel productModel) {
+    public Optional<Product> register(Product product) {
         try {
-            ProductModel saved = productJpaRepository.save(productModel);
+            Product saved = productJpaRepository.save(product);
             return Optional.of(saved);
         } catch (Exception e) {
             return Optional.empty();
@@ -60,7 +60,7 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .where(product.id.eq(productId))
                 .groupBy(product.id)
                 .fetchOne();
-        
+
         return Optional.ofNullable(result);
     }
 }

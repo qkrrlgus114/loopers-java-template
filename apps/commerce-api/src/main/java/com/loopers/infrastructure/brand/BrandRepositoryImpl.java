@@ -1,6 +1,6 @@
 package com.loopers.infrastructure.brand;
 
-import com.loopers.domain.brand.BrandModel;
+import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -14,14 +14,14 @@ public class BrandRepositoryImpl implements BrandRepository {
     private final BrandJpaRepository brandJpaRepository;
 
     @Override
-    public Optional<BrandModel> findById(Long id) {
+    public Optional<Brand> findById(Long id) {
         return brandJpaRepository.findById(id);
     }
 
     @Override
-    public Optional<BrandModel> register(BrandModel brandModel) {
+    public Optional<Brand> register(Brand brand) {
         try {
-            BrandModel saved = brandJpaRepository.save(brandModel);
+            Brand saved = brandJpaRepository.save(brand);
             return Optional.of(saved);
         } catch (Exception e) {
             return Optional.empty();
@@ -29,7 +29,7 @@ public class BrandRepositoryImpl implements BrandRepository {
     }
 
     @Override
-    public List<BrandModel> findAll() {
+    public List<Brand> findAll() {
         return brandJpaRepository.findAll();
     }
 

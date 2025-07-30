@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class StockModelTest {
+class StockTest {
 
     @DisplayName("재고를 생성할 때, ")
     @Nested
@@ -22,7 +22,7 @@ class StockModelTest {
             int quantity = 10;
 
             Assertions.assertThrows(CoreException.class,
-                    () -> StockModel.create(productId, quantity));
+                    () -> Stock.create(productId, quantity));
         }
 
         @DisplayName("수량이 0 미만인 경우 실패한다.")
@@ -32,7 +32,7 @@ class StockModelTest {
             int quantity = -1;
 
             Assertions.assertThrows(CoreException.class,
-                    () -> StockModel.create(productId, quantity));
+                    () -> Stock.create(productId, quantity));
         }
 
         @DisplayName("유효한 상품 ID와 수량으로 재고를 생성할 수 있다.")
@@ -41,7 +41,7 @@ class StockModelTest {
             Long productId = 1L;
             int quantity = 10;
 
-            StockModel stock = StockModel.create(productId, quantity);
+            Stock stock = Stock.create(productId, quantity);
 
             assertNotNull(stock);
             assertEquals(productId, stock.getProductId());
@@ -58,7 +58,7 @@ class StockModelTest {
         void fail_decreaseQuantityZeroOrLess() {
             Long productId = 1L;
             int quantity = 10;
-            StockModel stock = StockModel.create(productId, quantity);
+            Stock stock = Stock.create(productId, quantity);
 
             Assertions.assertThrows(CoreException.class,
                     () -> stock.decreaseQuantity(0));
@@ -69,7 +69,7 @@ class StockModelTest {
         void fail_insufficientStock() {
             Long productId = 1L;
             int quantity = 10;
-            StockModel stock = StockModel.create(productId, quantity);
+            Stock stock = Stock.create(productId, quantity);
 
             Assertions.assertThrows(CoreException.class,
                     () -> stock.decreaseQuantity(11));
@@ -80,7 +80,7 @@ class StockModelTest {
         void success_decreaseQuantity() {
             Long productId = 1L;
             int quantity = 10;
-            StockModel stock = StockModel.create(productId, quantity);
+            Stock stock = Stock.create(productId, quantity);
 
             stock.decreaseQuantity(5);
             assertEquals(5, stock.getQuantity());

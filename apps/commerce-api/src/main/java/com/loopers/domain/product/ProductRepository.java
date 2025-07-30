@@ -11,9 +11,9 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository {
 
-    Optional<ProductModel> findById(Long productId);
+    Optional<Product> findById(Long productId);
 
-    Optional<ProductModel> register(ProductModel productModel);
+    Optional<Product> register(Product product);
 
     Optional<ProductLikeView> findDetailWithLikes(Long productId, Long memberId);
 

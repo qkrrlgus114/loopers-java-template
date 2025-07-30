@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class BrandModelTest {
+public class BrandTest {
 
     @DisplayName("브랜드 등록을 진행할 때, ")
     @Nested
@@ -29,7 +29,7 @@ public class BrandModelTest {
 
             assertThrows(
                     CoreException.class,
-                    () -> BrandModel.create(name, description, memberId)
+                    () -> Brand.create(name, description, memberId)
             );
         }
 
@@ -62,7 +62,7 @@ public class BrandModelTest {
 
             assertThrows(
                     CoreException.class,
-                    () -> BrandModel.create(name, description, memberId)
+                    () -> Brand.create(name, description, memberId)
             );
         }
 
@@ -73,10 +73,10 @@ public class BrandModelTest {
             String description = "테스트 브랜드 설명";
             Long memberId = 1L;
 
-            BrandModel brandModel = BrandModel.create(name, description, memberId);
+            Brand brand = Brand.create(name, description, memberId);
 
-            assertEquals(name, brandModel.getName());
-            assertEquals(description, brandModel.getDescription());
+            assertEquals(name, brand.getName());
+            assertEquals(description, brand.getDescription());
         }
     }
 

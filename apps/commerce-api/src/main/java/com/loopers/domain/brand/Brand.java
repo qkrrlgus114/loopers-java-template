@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "brand")
-public class BrandModel extends BaseEntity {
+public class Brand extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 20)
     private String name;
@@ -22,16 +22,16 @@ public class BrandModel extends BaseEntity {
 
     private Long memberId;
 
-    private BrandModel(String name, String description, Long memberId) {
+    private Brand(String name, String description, Long memberId) {
         this.name = name;
         this.description = description;
         this.memberId = memberId;
     }
 
-    public static BrandModel create(String name, String description, Long memberId) {
+    public static Brand create(String name, String description, Long memberId) {
         validate(name, description, memberId);
 
-        return new BrandModel(name, description, memberId);
+        return new Brand(name, description, memberId);
     }
 
     private static void validate(String name, String description, Long memberId) {
