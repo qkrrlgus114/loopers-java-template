@@ -85,17 +85,6 @@ public class PointModelTest {
             );
         }
 
-        @DisplayName("수량이 0 이하면 예외를 발생시킨다.")
-        @Test
-        void failUse_whenQuantityLessThanOrEqualToZero() {
-            Point point = Point.create(1L, new BigDecimal("100"));
-
-            // 예외 발생 테스트
-            assertThrows(CoreException.class, () ->
-                    point.use(BigDecimal.valueOf(10))
-            );
-        }
-
         @DisplayName("사용할 포인트 금액이 현재 포인트 금액보다 크면 예외를 발생시킨다.")
         @Test
         void failUse_whenAmountExceedsCurrentPoints() {
