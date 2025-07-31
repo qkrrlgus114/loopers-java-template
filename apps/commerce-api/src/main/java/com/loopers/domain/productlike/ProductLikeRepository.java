@@ -14,4 +14,7 @@ public interface ProductLikeRepository {
 
     Optional<ProductLike> register(ProductLike productLike);
 
+    Optional<ProductLike> getProductLike(Long productId, Long memberId);
+
+    void delete(ProductLike productLike);
 }

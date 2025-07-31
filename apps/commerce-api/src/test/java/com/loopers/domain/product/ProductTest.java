@@ -143,5 +143,58 @@ public class ProductTest {
         }
     }
 
+    @DisplayName("좋아요 수를 정상적으로 증가시킬 수 있다.")
+    @Test
+    void increaseLikeCount() {
+        // Given
+        String name = "상품 이름";
+        String description = "ㅁㄴㅇㅁㄴㅇㄴㅁㅎ매ㅔㄴㅇㅎ르ㅜㄴ애ㅔㅁ랜엠렁ㄴ매ㅔㄹㄴㅇ매ㅔㄹ";
+        Long brandId = 1L;
+        Long memberId = 1L;
+        BigDecimal price = BigDecimal.valueOf(1000);
+        Product product = Product.create(name, description, brandId, memberId, price);
+
+
+        product.increaseLikeCount();
+
+        // Then
+        assertEquals(Integer.valueOf(1), product.getLikeCount());
+    }
+
+    @DisplayName("좋아요 수를 정상적으로 감소시킬 수 있다.")
+    @Test
+    void decreaseLikeCount() {
+        // Given
+        String name = "상품 이름";
+        String description = "ㅁㄴㅇㅁㄴㅇㄴㅁㅎ매ㅔㄴㅇㅎ르ㅜㄴ애ㅔㅁ랜엠렁ㄴ매ㅔㄹㄴㅇ매ㅔㄹ";
+        Long brandId = 1L;
+        Long memberId = 1L;
+        BigDecimal price = BigDecimal.valueOf(1000);
+        Product product = Product.create(name, description, brandId, memberId, price);
+
+        product.increaseLikeCount();
+        product.decreaseLikeCount();
+
+        // Then
+        assertEquals(Integer.valueOf(0), product.getLikeCount());
+    }
+
+    @DisplayName("좋아요 수는 0보다 작아질 수 없다.")
+    @Test
+    void decreaseLikeCount_shouldNotGoBelowZero() {
+        // Given
+        String name = "상품 이름";
+        String description = "ㅁㄴㅇㅁㄴㅇㄴㅁㅎ매ㅔㄴㅇㅎ르ㅜㄴ애ㅔㅁ랜엠렁ㄴ매ㅔㄹㄴㅇ매ㅔㄹ";
+        Long brandId = 1L;
+        Long memberId = 1L;
+        BigDecimal price = BigDecimal.valueOf(1000);
+        Product product = Product.create(name, description, brandId, memberId, price);
+
+
+        assertThrows(CoreException.class, () ->
+                product.decreaseLikeCount()
+        );
+
+    }
 
 }

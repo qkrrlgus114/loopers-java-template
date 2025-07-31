@@ -27,4 +27,14 @@ public class ProductLikeRepositoryImpl implements ProductLikeRepository {
             return Optional.empty();
         }
     }
+
+    @Override
+    public Optional<ProductLike> getProductLike(Long productId, Long memberId) {
+        return productLikeJpaRepository.findByProductIdAndMemberId(productId, memberId);
+    }
+
+    @Override
+    public void delete(ProductLike productLike) {
+        productLikeJpaRepository.delete(productLike);
+    }
 }

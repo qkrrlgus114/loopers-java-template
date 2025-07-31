@@ -90,4 +90,12 @@ public class MemberService {
 
         return MemberPointResult.fromChargePoint(pointChargeCommand);
     }
+
+    /*
+     * 사용자 조회
+     * */
+    public Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new CoreException(MemberErrorType.NOT_FOUND_MEMBER, "유저를 찾을 수 없습니다. memberId: " + memberId));
+    }
 }

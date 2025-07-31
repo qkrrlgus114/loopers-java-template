@@ -31,6 +31,9 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private ProductStatus status;
 
+    @Column(nullable = false)
+    private Integer likeCount;
+
     protected Product() {
     }
 
@@ -41,6 +44,7 @@ public class Product extends BaseEntity {
         this.memberId = memberId;
         this.price = price;
         this.status = status;
+        this.likeCount = 0;
     }
 
     public static Product create(String name, String description, Long brandId, Long memberId, BigDecimal price) {
@@ -90,5 +94,21 @@ public class Product extends BaseEntity {
 
     public ProductStatus getStatus() {
         return status;
+    }
+
+    public Integer getLikeCount() {
+        return likeCount;
+    }
+
+    public void increaseLikeCount() {
+        likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        if (likeCount > 0) {
+            likeCount--;
+        } else {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "좋아요 수는 0보다 작을 수 없습니다.");
+        }
     }
 }
