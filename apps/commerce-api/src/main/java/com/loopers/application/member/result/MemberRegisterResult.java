@@ -1,6 +1,6 @@
 package com.loopers.application.member.result;
 
-import com.loopers.domain.member.MemberModel;
+import com.loopers.domain.member.Member;
 
 public record MemberRegisterResult(
         Long id,
@@ -10,7 +10,7 @@ public record MemberRegisterResult(
         String birth,
         String gender) {
 
-    public static MemberRegisterResult from(MemberModel member) {
+    public static MemberRegisterResult from(Member member) {
         String birthStr = member.getBirth() != null ? member.getBirth().toString() : null;
 
         return new MemberRegisterResult(

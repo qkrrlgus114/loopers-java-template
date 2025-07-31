@@ -1,6 +1,6 @@
 package com.loopers.interfaces.api;
 
-import com.loopers.domain.member.MemberModel;
+import com.loopers.domain.member.Member;
 import com.loopers.domain.member.MemberRepository;
 import com.loopers.interfaces.api.member.dto.MemberDTO;
 import com.loopers.utils.DatabaseCleanUp;
@@ -36,7 +36,7 @@ public class MemberV1ApiE2ETest {
 
     private MemberDTO.RegisterRequest setUpMemberReqDTO;
 
-    private MemberModel setUpMemberModel;
+    private Member setUpMember;
 
     @BeforeEach
     void setUp() {
@@ -48,7 +48,7 @@ public class MemberV1ApiE2ETest {
                 .name("박기현")
                 .gender("M").build();
 
-        setUpMemberModel = MemberModel.registerMember(
+        setUpMember = Member.registerMember(
                 setUpMemberReqDTO.getLoginId(),
                 setUpMemberReqDTO.getPassword(),
                 setUpMemberReqDTO.getEmail(),
@@ -129,7 +129,7 @@ public class MemberV1ApiE2ETest {
         @Test
         void returnMemberInfo_whenGetMyInfoSuccessful() {
             // given
-            MemberModel saved = memberRepository.register(setUpMemberModel).get();
+            Member saved = memberRepository.register(setUpMember).get();
             HttpHeaders headers = new HttpHeaders();
             headers.add("X-USER-ID", String.valueOf(saved.getId()));
 
@@ -196,7 +196,7 @@ public class MemberV1ApiE2ETest {
         @Test
         void returnMemberPoint_whenGetMemberPointSuccessful() {
             // given
-            MemberModel saved = memberRepository.register(setUpMemberModel).get();
+            Member saved = memberRepository.register(setUpMember).get();
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-USER-ID", "test");
 
@@ -244,7 +244,7 @@ public class MemberV1ApiE2ETest {
         @Test
         void returnChargedPoint_whenChargePointSuccessful() {
             // given
-            MemberModel saved = memberRepository.register(setUpMemberModel).get();
+            Member saved = memberRepository.register(setUpMember).get();
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-USER-ID", String.valueOf(saved.getId()));
