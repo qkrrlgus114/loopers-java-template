@@ -45,17 +45,14 @@ public class Point extends BaseEntity {
         return amount;
     }
 
-    public void use(BigDecimal amount, int quantity) {
+    public void use(BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "사용할 포인트는 0 이상이어야 합니다.");
-        }
-        if (quantity < 1) {
-            throw new CoreException(CommonErrorType.BAD_REQUEST, "수량은 1 이상이어야 합니다.");
         }
         if (this.amount.compareTo(amount) < 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "포인트가 부족합니다.");
         }
-        
+
         this.amount = this.amount.subtract(amount);
     }
 }

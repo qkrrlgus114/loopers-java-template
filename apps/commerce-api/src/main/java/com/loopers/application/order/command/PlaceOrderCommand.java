@@ -6,37 +6,39 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlaceOrderCommand {
 
-    private Long productId;
-
     private Long memberId;
+    private List<OrderItem> items;
 
-    private int quantity;
-
-    public PlaceOrderCommand(Long productId, Long memberId, int quantity) {
-        this.productId = productId;
+    private PlaceOrderCommand(Long memberId, List<OrderItem> items) {
         this.memberId = memberId;
-        this.quantity = quantity;
+        this.items = items;
     }
 
-    public static PlaceOrderCommand of(Long productId, Long memberId, int quantity) {
-        validate(productId, memberId, quantity);
+    public static PlaceOrderCommand of(Long memberId, List<OrderItem> items) {
+        validate(memberId, items);
 
-        return new PlaceOrderCommand(productId, memberId, quantity);
+        return new PlaceOrderCommand(memberId, items);
     }
 
-    private static void validate(Long productId, Long memberId, int quantity) {
-        if (productId == null || productId <= 0) {
-            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효하지 않은 상품 ID입니다.");
-        }
+    private static void validate(Long memberId, List<OrderItem> items) {
         if (memberId == null || memberId <= 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효하지 않은 회원 ID입니다.");
         }
-        if (quantity <= 0) {
-            throw new CoreException(CommonErrorType.BAD_REQUEST, "수량은 1 이상이어야 합니다.");
+        if (items == null || items.isEmpty()) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "주문 항목이 비어 있습니다.");
         }
+        items.forEach(OrderItem::validate);
+    }
+
+    public int getTotalPrice() {
+        return items.stream()
+                .mapToInt(i -> i.getPrice() * i.getQuantity())
+                .sum();
     }
 }

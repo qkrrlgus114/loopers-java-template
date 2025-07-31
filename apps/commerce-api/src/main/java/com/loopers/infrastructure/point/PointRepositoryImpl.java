@@ -23,4 +23,10 @@ public class PointRepositoryImpl implements PointRepository {
     public Point register(Point point) {
         return pointJpaRepository.save(point);
     }
+
+    @Override
+    public Point findById(Long id) {
+        return pointJpaRepository.findById(id)
+                .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "포인트를 찾을 수 없습니다. id: " + id));
+    }
 }

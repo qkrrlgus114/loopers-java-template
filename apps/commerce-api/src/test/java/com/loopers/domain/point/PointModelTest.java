@@ -81,7 +81,7 @@ public class PointModelTest {
 
             // 예외 발생 테스트
             assertThrows(CoreException.class, () ->
-                    point.use(BigDecimal.valueOf(0), 1)
+                    point.use(BigDecimal.valueOf(0))
             );
         }
 
@@ -92,7 +92,7 @@ public class PointModelTest {
 
             // 예외 발생 테스트
             assertThrows(CoreException.class, () ->
-                    point.use(BigDecimal.valueOf(10), 0)
+                    point.use(BigDecimal.valueOf(10))
             );
         }
 
@@ -103,7 +103,7 @@ public class PointModelTest {
 
             // 예외 발생 테스트
             assertThrows(CoreException.class, () ->
-                    point.use(new BigDecimal("200"), 1)
+                    point.use(new BigDecimal("200"))
             );
         }
 
