@@ -37,7 +37,7 @@ public class ProductLikeFacade {
      * 3. 상품 좋아요 확인
      * */
     @Transactional
-    public ProductLikeResult toggleProductLike(ProductLikeCommand command) {
+    public ProductLikeResult registerProductLike(ProductLikeCommand command) {
         Product product = productService.findProductById(command.getProductId());
 
         Member member = memberService.findMemberById(command.getMemberId());

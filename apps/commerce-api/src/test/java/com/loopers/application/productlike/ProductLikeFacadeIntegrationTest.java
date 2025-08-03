@@ -10,6 +10,8 @@ import com.loopers.domain.member.MemberRepository;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.utils.DatabaseCleanUp;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +38,9 @@ class ProductLikeFacadeIntegrationTest {
 
     @Autowired
     private BrandRepository brandRepository;
+
+    @Autowired
+    private EntityManager em;
 
     private Member setUpMember;
     private Product setUpProduct;
@@ -82,7 +87,7 @@ class ProductLikeFacadeIntegrationTest {
         void successToggleProductLike_whenNotLiked() {
             ProductLikeCommand command = ProductLikeCommand.of(setUpProduct.getId(), setUpMember.getId());
 
-            ProductLikeResult result = productLikeFacade.toggleProductLike(command);
+            ProductLikeResult result = productLikeFacade.registerProductLike(command);
 
             assertAll(
                     () -> assertNotNull(result),
@@ -97,10 +102,10 @@ class ProductLikeFacadeIntegrationTest {
         @Test
         void successToggleProductLike_whenAlreadyLiked() {
             // 좋아요 누른 상태로 시작
-            productLikeFacade.toggleProductLike(ProductLikeCommand.of(setUpProduct.getId(), setUpMember.getId()));
+            productLikeFacade.registerProductLike(ProductLikeCommand.of(setUpProduct.getId(), setUpMember.getId()));
             ProductLikeCommand command = ProductLikeCommand.of(setUpProduct.getId(), setUpMember.getId());
 
-            ProductLikeResult result = productLikeFacade.toggleProductLike(command);
+            ProductLikeResult result = productLikeFacade.registerProductLike(command);
 
             // Then
             assertAll(
@@ -121,7 +126,7 @@ class ProductLikeFacadeIntegrationTest {
         @Test
         void successCancelProductLike_whenLiked() {
             // Given
-            productLikeFacade.toggleProductLike(ProductLikeCommand.of(setUpProduct.getId(), setUpMember.getId()));
+            productLikeFacade.registerProductLike(ProductLikeCommand.of(setUpProduct.getId(), setUpMember.getId()));
             ProductLikeCommand command = ProductLikeCommand.of(setUpProduct.getId(), setUpMember.getId());
 
             // When
@@ -155,5 +160,33 @@ class ProductLikeFacadeIntegrationTest {
                     () -> assertFalse(result.isStatus())
             );
         }
+    }
+
+    @DisplayName("상품 좋아요 스케줄러가 likeCount를 정상 업데이트 한다.")
+    @Test
+    @Transactional
+    void successUpdateAllProductLikeCount() {
+        // Given
+        productLikeFacade.registerProductLike(ProductLikeCommand.of(setUpProduct.getId(), setUpMember.getId()));
+
+        // when
+        productLikeFacade.updateAllProductLikeCount();
+
+        em.flush();
+        em.clear();
+
+        // then
+        Product product = productRepository.findById(setUpProduct.getId()).orElseThrow();
+        assertEquals(1, product.getLikeCount());
+
+        productLikeFacade.cancelProductLike(ProductLikeCommand.of(setUpProduct.getId(), setUpMember.getId()));
+
+        productLikeFacade.updateAllProductLikeCount();
+
+        em.flush();
+        em.clear();
+
+        Product updatedProduct = productRepository.findById(setUpProduct.getId()).orElseThrow();
+        assertEquals(0, updatedProduct.getLikeCount());
     }
 }
