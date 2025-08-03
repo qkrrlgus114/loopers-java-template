@@ -14,33 +14,16 @@ class OrdersTest {
     @Nested
     class register {
 
-        @DisplayName("상품 ID가 유효하지 않으면, 예외를 발생시킨다.")
-        @Test
-        void throwException_whenInvalidProductId() {
-            // given
-            Long productId = null;
-            Long memberId = 1L;
-            int quantity = 2;
-            String orderKey = "test";
-
-            // when & then
-            assertThrows(CoreException.class, () -> {
-                Orders.create(memberId, productId, quantity, orderKey);
-            });
-        }
-
         @DisplayName("회원 ID가 유효하지 않으면, 예외를 발생시킨다.")
         @Test
         void throwException_whenInvalidMemberId() {
             // given
-            Long productId = 1L;
             Long memberId = null;
             int quantity = 2;
-            String orderKey = "test";
 
             // when & then
             assertThrows(CoreException.class, () -> {
-                Orders.create(memberId, productId, quantity, orderKey);
+                Orders.create(memberId, quantity);
             });
         }
 
@@ -48,14 +31,13 @@ class OrdersTest {
         @Test
         void throwException_whenInvalidQuantity() {
             // given
-            Long productId = 1L;
             Long memberId = 1L;
             int quantity = 0;
-            String orderKey = "test";
+
 
             // when & then
             assertThrows(CoreException.class, () -> {
-                Orders.create(memberId, productId, quantity, orderKey);
+                Orders.create(memberId, quantity);
             });
         }
 
@@ -63,17 +45,15 @@ class OrdersTest {
         @Test
         void createOrder_whenAllValuesAreValid() {
             // given
-            Long productId = 1L;
             Long memberId = 1L;
             int quantity = 2;
-            String orderKey = "test";
+
 
             // when
-            Orders orders = Orders.create(memberId, productId, quantity, orderKey);
+            Orders orders = Orders.create(memberId, quantity);
 
             // then
             assertEquals(memberId, orders.getMemberId());
-            assertEquals(productId, orders.getProductId());
             assertEquals(OrderStatus.PENDING, orders.getOrderStatus());
             assertEquals(quantity, orders.getQuantity());
         }

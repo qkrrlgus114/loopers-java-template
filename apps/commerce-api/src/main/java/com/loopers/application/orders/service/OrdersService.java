@@ -1,4 +1,4 @@
-package com.loopers.application.order.service;
+package com.loopers.application.orders.service;
 
 import com.loopers.domain.orders.Orders;
 import com.loopers.domain.orders.OrdersRepository;
@@ -13,8 +13,11 @@ public class OrdersService {
 
     private final OrdersRepository ordersRepository;
 
-    public Orders placeOrder(Long productId, Long memberId, int quantity, String orderKey) {
-        Orders orders = Orders.create(memberId, productId, quantity, orderKey);
+    /*
+     * 주문 생성
+     * */
+    public Orders placeOrder(Long memberId, int quantity) {
+        Orders orders = Orders.create(memberId, quantity);
 
         return ordersRepository.register(orders);
     }

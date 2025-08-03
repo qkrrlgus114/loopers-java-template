@@ -1,9 +1,8 @@
-package com.loopers.application.order;
+package com.loopers.application.orders;
 
-import com.loopers.application.order.command.OrderItem;
-import com.loopers.application.order.command.PlaceOrderCommand;
-import com.loopers.application.order.facade.OrdersFacade;
-import com.loopers.application.order.result.OrdersInfoResult;
+import com.loopers.application.orders.command.PlaceOrderCommand;
+import com.loopers.application.orders.facade.OrdersFacade;
+import com.loopers.application.orders.result.OrdersInfoResult;
 import com.loopers.domain.member.Member;
 import com.loopers.domain.member.MemberRepository;
 import com.loopers.domain.orders.OrderStatus;
@@ -97,21 +96,12 @@ public class OrderFacadeIntegrationTest {
         @DisplayName("모든 조건이 만족되면 주문이 등록된다.")
         @Test
         void successRegister_whenAllConditionsMet() {
-            OrderItem orderItem = OrderItem.of(
-                    setUpProduct.getId(),
-                    2,
-                    1000
+            List<PlaceOrderCommand.Item> items = List.of(
+                    new PlaceOrderCommand.Item(setUpProduct.getId(), 2, 1000)
             );
-            OrderItem orderItem1 = OrderItem.of(
-                    setUpProduct.getId(),
-                    2,
-                    1000
-            );
-            List<OrderItem> orderItems = List.of(orderItem, orderItem1);
-
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
-                    orderItems
+                    items
             );
 
             OrdersInfoResult ordersInfoResult = ordersFacade.placeOrder(placeOrderCommand);
@@ -133,22 +123,12 @@ public class OrderFacadeIntegrationTest {
             int quantity2 = 2;
             int price2 = 1000;
 
-
-            OrderItem orderItem = OrderItem.of(
-                    setUpProduct.getId(),
-                    quantity1,
-                    price1
+            List<PlaceOrderCommand.Item> items = List.of(
+                    new PlaceOrderCommand.Item(setUpProduct.getId(), 4, 1000)
             );
-            OrderItem orderItem1 = OrderItem.of(
-                    setUpProduct.getId(),
-                    quantity2,
-                    price2
-            );
-            List<OrderItem> orderItems = List.of(orderItem, orderItem1);
-
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
-                    orderItems
+                    items
             );
 
             // When
@@ -170,16 +150,12 @@ public class OrderFacadeIntegrationTest {
         @DisplayName("사용자의 포인트가 부족하면 주문에 실패한다.")
         @Test
         void failRegister_whenPointNotEnough() {
-            OrderItem orderItem = OrderItem.of(
-                    setUpProduct.getId(),
-                    10,
-                    1001
+            List<PlaceOrderCommand.Item> items = List.of(
+                    new PlaceOrderCommand.Item(setUpProduct.getId(), 2, 100000)
             );
-            List<OrderItem> orderItems = List.of(orderItem);
-
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
-                    orderItems
+                    items
             );
 
             // When & Then
@@ -191,16 +167,12 @@ public class OrderFacadeIntegrationTest {
         @DisplayName("상품의 재고가 부족하면 주문에 실패한다.")
         @Test
         void failRegister_whenStockNotEnough() {
-            OrderItem orderItem = OrderItem.of(
-                    setUpProduct.getId(),
-                    101,
-                    10
+            List<PlaceOrderCommand.Item> items = List.of(
+                    new PlaceOrderCommand.Item(setUpProduct.getId(), 101, 1000)
             );
-            List<OrderItem> orderItems = List.of(orderItem);
-
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
-                    orderItems
+                    items
             );
 
             // When & Then
