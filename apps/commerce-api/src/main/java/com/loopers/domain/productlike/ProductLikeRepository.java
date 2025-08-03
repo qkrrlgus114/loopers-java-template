@@ -1,7 +1,9 @@
 package com.loopers.domain.productlike;
 
+import com.loopers.application.productlike.query.ProductLikeGroup;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -10,11 +12,13 @@ import java.util.Optional;
 @Repository
 public interface ProductLikeRepository {
 
-    int getProductLikeCount(Long productId, Long memberId);
+    boolean existsByProductIdAndMemberId(Long productId, Long memberId);
 
     Optional<ProductLike> register(ProductLike productLike);
 
     Optional<ProductLike> getProductLike(Long productId, Long memberId);
 
     void delete(ProductLike productLike);
+
+    List<ProductLikeGroup> countGroupByProductId();
 }

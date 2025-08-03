@@ -2,13 +2,14 @@ package com.loopers.application.product.service;
 
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
-import com.loopers.domain.product.projection.ProductLikeView;
 import com.loopers.support.error.CommonErrorType;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ProductErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -20,8 +21,8 @@ public class ProductService {
     /*
      * 상품을 조회한다.
      * */
-    public ProductLikeView getProductDetail(Long productId, Long memberId) {
-        return productRepository.findDetailWithLikes(productId, memberId).orElseThrow(() ->
+    public Product getProductDetailById(Long productId) {
+        return productRepository.findById(productId).orElseThrow(() ->
                 new CoreException(ProductErrorType.PRODUCT_NOT_FOUND, "상품을 찾을 수 없습니다. productId: " + productId)
         );
     }
@@ -34,5 +35,9 @@ public class ProductService {
         return productRepository.findById(productId).orElseThrow(() ->
                 new CoreException(ProductErrorType.PRODUCT_NOT_FOUND, "상품을 찾을 수 없습니다. productId: " + productId)
         );
+    }
+
+    public List<Product> findProductListByProductId(List<Long> productIds) {
+        return productRepository.findProductListByProductId(productIds);
     }
 }

@@ -1,8 +1,8 @@
 package com.loopers.domain.product;
 
-import com.loopers.domain.product.projection.ProductLikeView;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -15,6 +15,5 @@ public interface ProductRepository {
 
     Optional<Product> register(Product product);
 
-    Optional<ProductLikeView> findDetailWithLikes(Long productId, Long memberId);
-
+    List<Product> findProductListByProductId(List<Long> productIds);
 }

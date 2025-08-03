@@ -3,6 +3,7 @@ package com.loopers.application.productlike.facade;
 import com.loopers.application.member.service.MemberService;
 import com.loopers.application.product.service.ProductService;
 import com.loopers.application.productlike.command.ProductLikeCommand;
+import com.loopers.application.productlike.query.ProductLikeGroup;
 import com.loopers.application.productlike.result.ProductLikeResult;
 import com.loopers.application.productlike.service.ProductLikeService;
 import com.loopers.domain.member.Member;
@@ -13,7 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -71,5 +76,24 @@ public class ProductLikeFacade {
         } else {
             return ProductLikeResult.of(product.getId(), false, product.getLikeCount(), false);
         }
+    }
+
+    /*
+     * 1. ProductLike 테이블에서 모든 상품의 좋아요를 카운팅한다.
+     * 2. Product 테이블에서 해당 상품을 조회한다.
+     * 3. Product 도메인에서 좋아요 수를 업데이트 한다.
+     * */
+    @Transactional
+    public void updateAllProductLikeCount() {
+        Map<Long, Integer> likeCountMap = productLikeService.countGroupByProductId().stream()
+                .collect(Collectors.toMap(
+                        ProductLikeGroup::getProductId,
+                        ProductLikeGroup::getLikeCount));
+
+        List<Product> products = productService.findProductListByProductId(
+                new ArrayList<>(likeCountMap.keySet()));
+
+        products.forEach(p ->
+                p.updateLikeCount(likeCountMap.getOrDefault(p.getId(), 0)));
     }
 }

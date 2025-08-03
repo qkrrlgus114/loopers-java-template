@@ -111,4 +111,11 @@ public class Product extends BaseEntity {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "좋아요 수는 0보다 작을 수 없습니다.");
         }
     }
+
+    public void updateLikeCount(Integer likeCount) {
+        if (likeCount < 0) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "좋아요 수는 음수일 수 없습니다.");
+        }
+        this.likeCount = likeCount;
+    }
 }

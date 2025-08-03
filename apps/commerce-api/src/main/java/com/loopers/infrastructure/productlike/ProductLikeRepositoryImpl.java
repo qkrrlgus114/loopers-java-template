@@ -1,10 +1,12 @@
 package com.loopers.infrastructure.productlike;
 
+import com.loopers.application.productlike.query.ProductLikeGroup;
 import com.loopers.domain.productlike.ProductLike;
 import com.loopers.domain.productlike.ProductLikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -12,10 +14,9 @@ import java.util.Optional;
 public class ProductLikeRepositoryImpl implements ProductLikeRepository {
     private final ProductLikeJpaRepository productLikeJpaRepository;
 
-
     @Override
-    public int getProductLikeCount(Long productId, Long memberId) {
-        return productLikeJpaRepository.countByProductIdAndMemberId(productId, memberId);
+    public boolean existsByProductIdAndMemberId(Long productId, Long memberId) {
+        return productLikeJpaRepository.existsByProductIdAndMemberId(productId, memberId);
     }
 
     @Override
@@ -36,5 +37,10 @@ public class ProductLikeRepositoryImpl implements ProductLikeRepository {
     @Override
     public void delete(ProductLike productLike) {
         productLikeJpaRepository.delete(productLike);
+    }
+
+    @Override
+    public List<ProductLikeGroup> countGroupByProductId() {
+        return productLikeJpaRepository.countGroupByProductId();
     }
 }

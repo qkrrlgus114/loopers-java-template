@@ -1,7 +1,7 @@
 package com.loopers.application.product;
 
 import com.loopers.application.product.command.ProductDetailCommand;
-import com.loopers.application.product.facade.ProductDetailFacade;
+import com.loopers.application.product.facade.ProductFacade;
 import com.loopers.application.product.result.ProductDetailResult;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class ProductServiceIntegrationTest {
 
     @Autowired
-    private ProductDetailFacade productDetailFacade;
+    private ProductFacade productFacade;
 
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
@@ -79,7 +79,7 @@ class ProductServiceIntegrationTest {
 
 
             // When
-            ProductDetailResult result = productDetailFacade.getProductDetail(command);
+            ProductDetailResult result = productFacade.getProductDetail(command);
 
             // Then
             assertAll(
@@ -91,7 +91,7 @@ class ProductServiceIntegrationTest {
                     , () -> assertEquals(product.getMemberId(), result.memberId())
                     , () -> assertEquals(brand.getId(), result.brandId())
                     , () -> assertEquals(brand.getName(), result.brandName())
-                    , () -> assertEquals(1L, result.likeCount().longValue())
+                    , () -> assertEquals(0, result.likeCount())
                     , () -> assertEquals(true, result.isLiked())
                     , () -> assertEquals(product.getStatus(), ProductStatus.REGISTERED)
             );
@@ -104,7 +104,7 @@ class ProductServiceIntegrationTest {
             ProductDetailCommand command = new ProductDetailCommand(-1L, 1L);
 
             Assertions.assertThrows(CoreException.class, () -> {
-                productDetailFacade.getProductDetail(command);
+                productFacade.getProductDetail(command);
             });
         }
 
@@ -114,7 +114,7 @@ class ProductServiceIntegrationTest {
             ProductDetailCommand command = new ProductDetailCommand(1L, -1L);
 
             Assertions.assertThrows(CoreException.class, () -> {
-                productDetailFacade.getProductDetail(command);
+                productFacade.getProductDetail(command);
             });
         }
 
