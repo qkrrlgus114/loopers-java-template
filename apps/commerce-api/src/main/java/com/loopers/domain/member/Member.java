@@ -31,9 +31,6 @@ public class Member extends BaseEntity {
     @Column(name = "gender", nullable = false)
     private String gender;
 
-    @Column(name = "point", nullable = false)
-    private Long point = 0L;
-
     protected Member() {
     }
 
@@ -130,18 +127,5 @@ public class Member extends BaseEntity {
 
     public String getGender() {
         return gender;
-    }
-
-    public long getPoint() {
-        return point;
-    }
-
-    // 포인트 충전
-    public void chargePoint(Long amount) {
-        if (amount == null || amount <= 0) {
-            throw new CoreException(CommonErrorType.BAD_REQUEST, "충전할 포인트는 0보다 커야 합니다.");
-        }
-
-        this.point += amount;
     }
 }

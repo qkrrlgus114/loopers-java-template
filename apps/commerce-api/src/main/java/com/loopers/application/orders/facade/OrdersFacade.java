@@ -65,7 +65,7 @@ public class OrdersFacade {
         }
 
         // 포인트 확인 및 사용
-        Point point = pointService.findPointByMemberId(command.getMemberId());
+        Point point = pointService.getPointByMemberId(command.getMemberId());
         point.use(command.getTotalPrice());
 
         return OrdersInfoResult.of(

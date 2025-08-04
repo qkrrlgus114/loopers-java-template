@@ -1,7 +1,9 @@
 package com.loopers.application.member.command;
 
+import java.math.BigDecimal;
+
 public record PointChargeCommand(
         Long memberId,
-        Long amount
+        BigDecimal amount
 ) {
 }

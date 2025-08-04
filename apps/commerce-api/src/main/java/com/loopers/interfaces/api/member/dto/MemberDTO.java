@@ -1,8 +1,8 @@
 package com.loopers.interfaces.api.member.dto;
 
 import com.loopers.application.member.result.MemberInfoResult;
-import com.loopers.application.member.result.MemberPointResult;
 import com.loopers.application.member.result.MemberRegisterResult;
+import com.loopers.application.point.result.PointInfoResult;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -72,6 +72,20 @@ public class MemberDTO {
 
     }
 
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class PointChargeResponse {
+
+        @NotNull
+        private String memberId;
+
+        @NotNull
+        private Long amount;
+
+    }
+
     /*
      * 사용자의 포인트 정보 응답 DTO
      * */
@@ -85,10 +99,10 @@ public class MemberDTO {
 
         private Long point;
 
-        public static MemberPointInfoResponse from(MemberPointResult memberPointResult) {
+        public static MemberPointInfoResponse from(PointInfoResult pointInfoResult) {
             return MemberPointInfoResponse.builder()
-                    .memberId(String.valueOf(memberPointResult.memberId()))
-                    .point(memberPointResult.point())
+                    .memberId(String.valueOf(pointInfoResult.getMemberId()))
+                    .point(pointInfoResult.getAmount().longValue())
                     .build();
         }
     }

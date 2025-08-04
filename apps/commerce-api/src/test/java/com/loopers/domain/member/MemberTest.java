@@ -4,7 +4,6 @@ import com.loopers.application.member.command.MemberRegisterCommand;
 import com.loopers.support.error.CoreException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -105,19 +104,6 @@ public class MemberTest {
                     () -> Member.registerMember(loginId, password, email, name, birth, gender)
             );
         }
-    }
-
-    @DisplayName("0 이하의 정수로 포인트를 충전 시 실패한다.")
-    @Test
-    void fail_whenChargePointZeroOrLess() {
-        // given
-        Member member = Member.registerMember("test1234", "12341234", "test@naver.com", "박기현", LocalDate.parse("1997-12-04"), "M");
-        Long amount = 0L;
-
-        // when && then
-        assertThrows(CoreException.class, () -> {
-            member.chargePoint(amount);
-        });
     }
 
 }
