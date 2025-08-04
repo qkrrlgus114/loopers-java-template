@@ -738,3 +738,42 @@ sequenceDiagram
         PC -->> U: 500 Internal Server Error
     end
 ```
+
+---
+
+# 쿠폰 목록 조회하기
+
+쿠폰과 사용자를 하나의 애그리거트로 묶는다면
+
+즉, 생명주기가 같다고 본다면 MemberController에서 쿠폰을 조회하는게 맞다고 판단.
+
+그러나 쿠폰과 사용자를 독립 객체로 바라본다면 CouponController에서 받는 게 더 적합하다고 판단.
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant CC as CouponController
+    participant CS as CouponService
+    participant CR as CouponRepository
+    U ->> CC: 쿠폰 목록 요청(userId)
+
+    alt X-USER-ID 헤더 없음
+        PC -->> U: 401 Unauthorized
+    else X-USER-ID 헤더 존재
+        CC ->> CS: 쿠폰 목록 요청(userId)
+        CS ->> CR: 쿠폰 목록 조회(userId)
+        alt 쿠폰 없음
+            CR -->> CS: null
+        else 쿠폰 있음
+            CR -->> CS: couponList
+        end
+        CS -->> CC: 쿠폰 리스트 반환
+    end
+
+    opt 예기치 못한 예외
+        CS --x CC: Exception
+        CC -->> U: 500 Internal Server Error
+    end
+```
+
+---
