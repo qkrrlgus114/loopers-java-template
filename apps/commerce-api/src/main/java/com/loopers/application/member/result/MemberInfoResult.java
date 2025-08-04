@@ -1,6 +1,6 @@
 package com.loopers.application.member.result;
 
-import com.loopers.domain.member.MemberModel;
+import com.loopers.domain.member.Member;
 
 import java.time.LocalDate;
 
@@ -12,7 +12,7 @@ public record MemberInfoResult(
         LocalDate birth,
         String gender) {
 
-    public static MemberInfoResult from(MemberModel member) {
+    public static MemberInfoResult from(Member member) {
 
         return new MemberInfoResult(
                 member.getId(),

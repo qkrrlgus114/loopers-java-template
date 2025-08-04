@@ -1,6 +1,9 @@
 package com.loopers.interfaces.api;
 
-import com.loopers.domain.member.MemberModel;
+import com.loopers.application.member.MemberFacade;
+import com.loopers.application.member.command.MemberRegisterCommand;
+import com.loopers.application.member.result.MemberRegisterResult;
+import com.loopers.domain.member.Member;
 import com.loopers.domain.member.MemberRepository;
 import com.loopers.interfaces.api.member.dto.MemberDTO;
 import com.loopers.utils.DatabaseCleanUp;
@@ -32,11 +35,14 @@ public class MemberV1ApiE2ETest {
     private MemberRepository memberRepository;
 
     @Autowired
+    private MemberFacade memberFacade;
+
+    @Autowired
     private DatabaseCleanUp databaseCleanUp;
 
     private MemberDTO.RegisterRequest setUpMemberReqDTO;
 
-    private MemberModel setUpMemberModel;
+    private Member setUpMember;
 
     @BeforeEach
     void setUp() {
@@ -48,7 +54,7 @@ public class MemberV1ApiE2ETest {
                 .name("박기현")
                 .gender("M").build();
 
-        setUpMemberModel = MemberModel.registerMember(
+        setUpMember = Member.registerMember(
                 setUpMemberReqDTO.getLoginId(),
                 setUpMemberReqDTO.getPassword(),
                 setUpMemberReqDTO.getEmail(),
@@ -129,7 +135,7 @@ public class MemberV1ApiE2ETest {
         @Test
         void returnMemberInfo_whenGetMyInfoSuccessful() {
             // given
-            MemberModel saved = memberRepository.register(setUpMemberModel).get();
+            Member saved = memberRepository.register(setUpMember).get();
             HttpHeaders headers = new HttpHeaders();
             headers.add("X-USER-ID", String.valueOf(saved.getId()));
 
@@ -196,12 +202,20 @@ public class MemberV1ApiE2ETest {
         @Test
         void returnMemberPoint_whenGetMemberPointSuccessful() {
             // given
-            MemberModel saved = memberRepository.register(setUpMemberModel).get();
+            MemberRegisterCommand memberRegisterCommand = MemberRegisterCommand.of(
+                    setUpMemberReqDTO.getLoginId(),
+                    setUpMemberReqDTO.getPassword(),
+                    setUpMemberReqDTO.getEmail(),
+                    setUpMemberReqDTO.getName(),
+                    setUpMemberReqDTO.getBirth(),
+                    setUpMemberReqDTO.getGender()
+            );
+            MemberRegisterResult memberRegisterResult = memberFacade.registerMember(memberRegisterCommand);
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-USER-ID", "test");
 
             // when
-            ResponseEntity<ApiResponse<MemberDTO.MemberPointInfoResponse>> response = testRestTemplate.exchange("/api/v1/points?memberId=" + saved.getId(),
+            ResponseEntity<ApiResponse<MemberDTO.MemberPointInfoResponse>> response = testRestTemplate.exchange("/api/v1/points?memberId=" + memberRegisterResult.id(),
                     HttpMethod.GET, new HttpEntity<>(headers), new ParameterizedTypeReference<>() {
                     });
 
@@ -244,17 +258,25 @@ public class MemberV1ApiE2ETest {
         @Test
         void returnChargedPoint_whenChargePointSuccessful() {
             // given
-            MemberModel saved = memberRepository.register(setUpMemberModel).get();
+            MemberRegisterCommand memberRegisterCommand = MemberRegisterCommand.of(
+                    setUpMemberReqDTO.getLoginId(),
+                    setUpMemberReqDTO.getPassword(),
+                    setUpMemberReqDTO.getEmail(),
+                    setUpMemberReqDTO.getName(),
+                    setUpMemberReqDTO.getBirth(),
+                    setUpMemberReqDTO.getGender()
+            );
+            MemberRegisterResult memberRegisterResult = memberFacade.registerMember(memberRegisterCommand);
 
             HttpHeaders headers = new HttpHeaders();
-            headers.set("X-USER-ID", String.valueOf(saved.getId()));
+            headers.set("X-USER-ID", String.valueOf(memberRegisterResult.id()));
             MemberDTO.PointChargeRequest reqDTO = MemberDTO.PointChargeRequest.builder()
-                    .memberId(String.valueOf(saved.getId()))
+                    .memberId(String.valueOf(memberRegisterResult.id()))
                     .amount(1000L).build();
             HttpEntity<MemberDTO.PointChargeRequest> requestEntity = new HttpEntity<>(reqDTO, headers);
 
             // when
-            ResponseEntity<ApiResponse<MemberDTO.MemberPointInfoResponse>> response = testRestTemplate.exchange("/api/v1/points",
+            ResponseEntity<ApiResponse<MemberDTO.PointChargeResponse>> response = testRestTemplate.exchange("/api/v1/points",
                     HttpMethod.POST, requestEntity, new ParameterizedTypeReference<>() {
                     });
 
@@ -263,7 +285,7 @@ public class MemberV1ApiE2ETest {
                     () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                     () -> assertThat(response.getBody()).isNotNull(),
                     () -> assertThat(response.getBody().data()).isNotNull(),
-                    () -> assertThat(response.getBody().data().getPoint()).isEqualTo(1000)
+                    () -> assertThat(response.getBody().data().getAmount()).isEqualTo(1000)
             );
         }
 

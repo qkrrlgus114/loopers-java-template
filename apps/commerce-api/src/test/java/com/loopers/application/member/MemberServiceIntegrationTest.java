@@ -1,11 +1,11 @@
-package com.loopers.domain.member;
+package com.loopers.application.member;
 
-import com.loopers.application.member.MemberService;
 import com.loopers.application.member.command.MemberRegisterCommand;
 import com.loopers.application.member.command.PointChargeCommand;
 import com.loopers.application.member.result.MemberInfoResult;
-import com.loopers.application.member.result.MemberPointResult;
 import com.loopers.application.member.result.MemberRegisterResult;
+import com.loopers.application.member.service.MemberService;
+import com.loopers.application.point.result.PointInfoResult;
 import com.loopers.interfaces.api.member.dto.MemberDTO;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,6 +24,9 @@ class MemberServiceIntegrationTest {
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private MemberFacade memberFacade;
 
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
@@ -112,9 +116,8 @@ class MemberServiceIntegrationTest {
         void returnMemberInfo_whenMemberExists() {
             MemberRegisterResult saved = memberService.register(memberRegisterCommand);
 
-            String memberId = String.valueOf(saved.id());
             // when
-            MemberInfoResult memberInfoResult = memberService.getMemberInfo(memberId);
+            MemberInfoResult memberInfoResult = memberService.getMemberInfo(saved.id());
 
             // then
             assertAll(
@@ -131,7 +134,7 @@ class MemberServiceIntegrationTest {
         @Test
         void returnNull_whenMemberDoesNotExist() {
             // given
-            String memberId = "9999";
+            Long memberId = 9999L;
 
             // when
             MemberInfoResult memberInfoResult = memberService.getMemberInfo(memberId);
@@ -153,16 +156,16 @@ class MemberServiceIntegrationTest {
         @Test
         void returnMemberPoint_whenMemberExists() {
             // given
-            MemberRegisterResult saved = memberService.register(memberRegisterCommand);
+            MemberRegisterResult saved = memberFacade.registerMember(memberRegisterCommand);
 
             // when
-            MemberPointResult memberPointResult = memberService.getMemberPoint(String.valueOf(saved.id()));
+            PointInfoResult pointInfoResult = memberFacade.getMemberPoint(saved.id());
 
             // then
             assertAll(
-                    () -> assertThat(memberPointResult).isNotNull(),
-                    () -> assertThat(memberPointResult.memberId()).isEqualTo(saved.id()),
-                    () -> assertThat(memberPointResult.point()).isEqualTo(0)
+                    () -> assertThat(pointInfoResult).isNotNull(),
+                    () -> assertThat(pointInfoResult.getMemberId()).isEqualTo(saved.id()),
+                    () -> assertThat(pointInfoResult.getAmount()).isEqualByComparingTo(BigDecimal.ZERO)
             );
         }
 
@@ -170,13 +173,13 @@ class MemberServiceIntegrationTest {
         @Test
         void returnNull_whenMemberDoesNotExist() {
             // given
-            String memberId = "9999";
+            Long memberId = 9999L;
 
             // when
-            MemberPointResult memberPointResult = memberService.getMemberPoint(memberId);
+            MemberInfoResult memberInfoResult = memberService.getMemberInfo(memberId);
 
             // then
-            assertNull(memberPointResult);
+            assertNull(memberInfoResult);
         }
     }
 
@@ -186,13 +189,13 @@ class MemberServiceIntegrationTest {
         // given
         PointChargeCommand pointChargeCommand = new PointChargeCommand(
                 1L,
-                10000L
+                BigDecimal.valueOf(10000L)
         );
 
 
         // when & then
         assertThrows(CoreException.class, () -> {
-            memberService.chargeMemberPoint(pointChargeCommand);
+            memberFacade.chargePoint(pointChargeCommand);
         });
     }
 }

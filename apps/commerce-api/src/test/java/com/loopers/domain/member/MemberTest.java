@@ -1,9 +1,9 @@
 package com.loopers.domain.member;
 
 import com.loopers.application.member.command.MemberRegisterCommand;
+import com.loopers.support.error.CoreException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class MemberModelTest {
+public class MemberTest {
 
     @DisplayName("회원가입을 진행할 때, ")
     @Nested
@@ -34,8 +34,8 @@ public class MemberModelTest {
             String gender = "M";
 
             assertThrows(
-                    IllegalArgumentException.class,
-                    () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
+                    CoreException.class,
+                    () -> Member.registerMember(loginId, password, email, name, birth, gender)
             );
         }
 
@@ -57,8 +57,8 @@ public class MemberModelTest {
             String gender = "M";
 
             assertThrows(
-                    IllegalArgumentException.class,
-                    () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
+                    CoreException.class,
+                    () -> Member.registerMember(loginId, password, email, name, birth, gender)
             );
         }
 
@@ -81,7 +81,7 @@ public class MemberModelTest {
             String gender = "M";
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoreException.class,
                     () -> MemberRegisterCommand.of(loginId, password, email, name, birthStr, gender)
             );
         }
@@ -100,23 +100,10 @@ public class MemberModelTest {
             LocalDate birth = LocalDate.parse("1997-12-04");
 
             assertThrows(
-                    IllegalArgumentException.class,
-                    () -> MemberModel.registerMember(loginId, password, email, name, birth, gender)
+                    CoreException.class,
+                    () -> Member.registerMember(loginId, password, email, name, birth, gender)
             );
         }
-    }
-
-    @DisplayName("0 이하의 정수로 포인트를 충전 시 실패한다.")
-    @Test
-    void fail_whenChargePointZeroOrLess() {
-        // given
-        MemberModel memberModel = MemberModel.registerMember("test1234", "12341234", "test@naver.com", "박기현", LocalDate.parse("1997-12-04"), "M");
-        Long amount = 0L;
-
-        // when && then
-        assertThrows(IllegalArgumentException.class, () -> {
-            memberModel.chargePoint(amount);
-        });
     }
 
 }
