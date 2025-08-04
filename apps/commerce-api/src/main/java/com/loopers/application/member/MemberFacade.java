@@ -5,9 +5,12 @@ import com.loopers.application.member.command.PointChargeCommand;
 import com.loopers.application.member.result.MemberInfoResult;
 import com.loopers.application.member.result.MemberRegisterResult;
 import com.loopers.application.member.service.MemberService;
+import com.loopers.application.point.result.PointChargeResult;
 import com.loopers.application.point.result.PointInfoResult;
 import com.loopers.application.point.service.PointService;
+import com.loopers.application.pointhistory.service.PointHistoryService;
 import com.loopers.domain.point.Point;
+import com.loopers.domain.point.history.PointHistoryStatus;
 import com.loopers.support.error.CommonErrorType;
 import com.loopers.support.error.CoreException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ public class MemberFacade {
 
     private final MemberService memberService;
     private final PointService pointService;
+    private final PointHistoryService pointHistoryService;
 
     /*
      * 사용자 회원가입
@@ -55,6 +59,8 @@ public class MemberFacade {
         Point point = pointService.getPointByMemberId(command.memberId());
 
         point.charge(command.amount());
+
+        pointHistoryService.savePointHistory(command.memberId(), point.getId(), command.amount(), PointHistoryStatus.CHARGED);
 
         return PointChargeResult.of(
                 point.getMemberId(),

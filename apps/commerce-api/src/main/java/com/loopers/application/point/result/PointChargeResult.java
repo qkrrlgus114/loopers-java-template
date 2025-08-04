@@ -1,4 +1,4 @@
-package com.loopers.application.member;
+package com.loopers.application.point.result;
 
 import java.math.BigDecimal;
 

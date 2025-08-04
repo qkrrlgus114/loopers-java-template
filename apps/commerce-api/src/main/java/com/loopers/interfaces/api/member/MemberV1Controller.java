@@ -1,12 +1,12 @@
 package com.loopers.interfaces.api.member;
 
 import com.loopers.application.member.MemberFacade;
-import com.loopers.application.member.PointChargeResult;
 import com.loopers.application.member.command.MemberRegisterCommand;
 import com.loopers.application.member.command.PointChargeCommand;
 import com.loopers.application.member.result.MemberInfoResult;
 import com.loopers.application.member.result.MemberRegisterResult;
 import com.loopers.application.member.service.MemberService;
+import com.loopers.application.point.result.PointChargeResult;
 import com.loopers.application.point.result.PointInfoResult;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.member.dto.MemberDTO;
