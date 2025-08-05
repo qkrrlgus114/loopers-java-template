@@ -5,5 +5,5 @@ import java.util.List;
 public interface CouponRepository {
     List<Coupon> findAllByIds(List<Long> couponIds);
 
-    void save(Coupon coupon);
+    Coupon save(Coupon coupon);
 }

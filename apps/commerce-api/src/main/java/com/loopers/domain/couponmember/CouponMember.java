@@ -32,18 +32,18 @@ public class CouponMember extends BaseEntity {
     private LocalDateTime usedAt;
 
     @Column(nullable = true)
-    private Long orderItemId;
+    private Long ordersId;
 
     protected CouponMember() {
     }
 
-    public CouponMember(Long memberId, Long couponId, CouponStatus status, LocalDateTime expirationAt, Long orderItemId) {
+    public CouponMember(Long memberId, Long couponId, CouponStatus status, LocalDateTime expirationAt, Long ordersId) {
         this.memberId = memberId;
         this.couponId = couponId;
         this.status = status;
         this.expirationAt = expirationAt;
         this.usedAt = null;
-        this.orderItemId = orderItemId;
+        this.ordersId = ordersId;
     }
 
     public static CouponMember create(Long memberId, Long couponId, CouponStatus status, LocalDateTime expirationAt, Long orderItemId) {
@@ -89,7 +89,7 @@ public class CouponMember extends BaseEntity {
         return usedAt;
     }
 
-    public Long getOrderItemId() {
-        return orderItemId;
+    public Long getOrdersId() {
+        return ordersId;
     }
 }

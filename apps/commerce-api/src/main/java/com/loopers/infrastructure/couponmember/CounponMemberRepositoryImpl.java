@@ -19,7 +19,7 @@ public class CounponMemberRepositoryImpl implements CouponMemberRepository {
     }
 
     @Override
-    public void save(CouponMember couponMember) {
-        couponMemberJpaRepository.save(couponMember);
+    public CouponMember save(CouponMember couponMember) {
+        return couponMemberJpaRepository.save(couponMember);
     }
 }

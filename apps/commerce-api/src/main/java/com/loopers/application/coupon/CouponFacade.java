@@ -2,8 +2,10 @@ package com.loopers.application.coupon;
 
 import com.loopers.application.couponmember.CouponMemberService;
 import com.loopers.application.couponmember.result.MyCouponListResut;
+import com.loopers.application.member.service.MemberService;
 import com.loopers.domain.coupon.Coupon;
 import com.loopers.domain.couponmember.CouponMember;
+import com.loopers.domain.member.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class CouponFacade {
 
     private final CouponMemberService couponMemberService;
     private final CouponService couponService;
+    private final MemberService memberService;
 
     /*
      * 내가 가진 쿠폰 목록 조회
@@ -29,6 +32,8 @@ public class CouponFacade {
      * 3. 조합
      * */
     public List<MyCouponListResut> getMyCouponList(Long memberId) {
+        Member member = memberService.findMemberById(memberId);
+        
         // 1. 쿠폰 멤버 리스트 조회
         List<CouponMember> couponMemberList = couponMemberService.getMyCouponList(memberId);
         if (couponMemberList == null || couponMemberList.isEmpty()) {
@@ -54,6 +59,7 @@ public class CouponFacade {
                     coupon.getName(),
                     coupon.getCouponType(),
                     coupon.getAmount(),
+                    coupon.getRate(),
                     coupon.getMinimumPrice(),
                     couponMember.getExpirationAt()
             );

@@ -10,10 +10,11 @@ public record MyCouponListResut(
         String name,
         CouponType couponType,
         BigDecimal amount,
+        Integer rate,
         BigDecimal minimumPrice,
         LocalDateTime expirationAt
 ) {
-    public static MyCouponListResut of(Long couponId, String name, CouponType couponType, BigDecimal amount, BigDecimal minimumPrice, LocalDateTime expirationAt) {
-        return new MyCouponListResut(couponId, name, couponType, amount, minimumPrice, expirationAt);
+    public static MyCouponListResut of(Long couponId, String name, CouponType couponType, BigDecimal amount, Integer rate, BigDecimal minimumPrice, LocalDateTime expirationAt) {
+        return new MyCouponListResut(couponId, name, couponType, amount, rate, minimumPrice, expirationAt);
     }
 }
