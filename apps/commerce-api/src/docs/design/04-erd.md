@@ -71,6 +71,26 @@ erDiagram
         BIGDECIMAL quantity
     }
 
+    COUPON {
+        LONG coupon_id PK
+        STRING name
+        COUPON_TYPE couponType
+        INT amount
+        INT rate
+        BIGDECIMAL minimumPrice
+        INT expirationDays
+    }
+
+    MEMBER_COUPON {
+        LONG member_coupon_id PK
+        LONG member_id FK
+        LONG coupon_id FK
+        COUPON_STATUS status
+        DATE expirationAt
+        DATE usedAt
+        LONG orderItemId FK
+    }
+
     MEMBER ||--o{ BRAND: owns
     MEMBER ||--o{ PRODUCT: creates
     MEMBER ||--o{ POINT: has
