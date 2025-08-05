@@ -580,51 +580,58 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant U as User
-    participant OC as OrderController
-    participant OS as OrderService
-    participant PR as ProductRepository
-    participant IR as InventoryRepository
-    participant ORR as OrderRepository
-    U ->> OC: 주문하기 요청(cartItems, amount)
+    participant U as 사용자
+    participant OC as 주문Controller
+    participant OS as 주문Service
+    participant PR as 상품Repo
+    participant IR as 재고Repo
+    participant CMR as 쿠폰Repo
+    participant Pnt as 포인트Repo
+    participant ORR as 주문Repo
+%% 1. 주문 요청
+    U ->> OC: 주문하기(cartItems, amount)
 
-    alt X-USER-ID 헤더 없음
+    alt 헤더 없음
         OC -->> U: 401 Unauthorized
-    else X-USER-ID 헤더 존재
-        OC ->> OS: 주문하기 요청(userId, cartItems)
-        OS ->> PR: 상품 목록 조회(cartItems.productIds)
+    else 정상
+        OC ->> OS: 주문처리(userId, cartItems)
+    %% 2. 상품·재고
+        OS ->> PR: 상품조회
+        PR -->> OS: products
+        OS ->> IR: 재고차감
 
-        alt 상품 조회 실패
-            PR --x OS: Exception
-            OS -->> OC: 주문 실패
-            OC -->> U: 500 Internal Server Error
-        else 상품 조회 성공
-            PR -->> OS: products
-            OS ->> IR: 재고 확인·차감(cartItems)
-            alt 재고 부족
-                IR -->> OS: 재고 부족
-                OS -->> OC: 재고 부족
+        alt 재고 부족
+            OS -->> OC: 400 재고부족
+            OC -->> U: 400 Bad Request
+        else 재고 OK
+        %% 3. 쿠폰
+            OS ->> CMR: 쿠폰조회
+            alt 쿠폰 없음·만료
+                OS -->> IR: 재고롤백
+                OS -->> OC: 400 쿠폰없음
                 OC -->> U: 400 Bad Request
-            else 재고 확보 성공
-                IR -->> OS: 재고 차감 완료
-                OS ->> ORR: 주문 저장(userId, orderDetails)
-                alt 주문 저장 실패
-                    ORR --x OS: Exception
-                    OS -->> OC: 주문 실패
-                    OC -->> U: 500 Internal Server Error
-                else 주문 저장 성공
+            else 쿠폰 OK
+            %% 4. 포인트
+                OS ->> Pnt: 포인트조회
+                alt 포인트 부족
+                    OS -->> IR: 재고롤백
+                    OS -->> OC: 400 포인트부족
+                    OC -->> U: 400 Bad Request
+                else 포인트 OK
+                %% 5. 주문 저장
+                    OS ->> ORR: 주문저장
                     ORR -->> OS: savedOrder
-                    OS -->> OC: 주문 완료(savedOrderId, amount)
+                    OS -->> OC: 주문완료(savedOrderId)
                     OC -->> U: 201 Created
                 end
             end
         end
     end
 
-    opt 예기치 못한 예외
-        OS --x OC: Exception
-        OC -->> U: 500 Internal Server Error
-    end
+%% 예기치 못한 시스템 예외
+    OS --x OC: Exception
+    OC -->> U: 500 Internal Error
+
 ```
 
 ---
