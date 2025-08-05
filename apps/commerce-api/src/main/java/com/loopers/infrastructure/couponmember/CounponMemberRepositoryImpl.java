@@ -17,4 +17,9 @@ public class CounponMemberRepositoryImpl implements CouponMemberRepository {
     public List<CouponMember> findAllByMemberId(Long memberId) {
         return couponMemberJpaRepository.findAllCouponByMemberIdAndIsActive(memberId);
     }
+
+    @Override
+    public void save(CouponMember couponMember) {
+        couponMemberJpaRepository.save(couponMember);
+    }
 }

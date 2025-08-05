@@ -6,4 +6,6 @@ public interface CouponMemberRepository {
 
     List<CouponMember> findAllByMemberId(Long memberId);
 
+    void save(CouponMember couponMember);
+
 }
