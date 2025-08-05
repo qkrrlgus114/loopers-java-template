@@ -18,4 +18,8 @@ public class CouponService {
     public List<Coupon> getCouponByIds(List<Long> couponIds) {
         return couponRepository.findAllByIds(couponIds);
     }
+
+    public Coupon getCouponId(Long couponId) {
+        return couponRepository.findById(couponId);
+    }
 }

@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -16,9 +18,10 @@ public class OrdersService {
     /*
      * 주문 생성
      * */
-    public Orders placeOrder(Long memberId, int quantity) {
-        Orders orders = Orders.create(memberId, quantity);
+    public Orders placeOrder(Long memberId, int quantity, BigDecimal totalPrice, Long couponMemberId, boolean couponUsed) {
+        Orders orders = null;
 
+        orders = Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed);
         return ordersRepository.register(orders);
     }
 

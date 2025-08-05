@@ -8,4 +8,5 @@ public interface CouponMemberRepository {
 
     CouponMember save(CouponMember couponMember);
 
+    CouponMember findByCouponIdAndMemberId(Long couponId, Long memberId);
 }

@@ -3,6 +3,12 @@ package com.loopers.application.orders;
 import com.loopers.application.orders.command.PlaceOrderCommand;
 import com.loopers.application.orders.facade.OrdersFacade;
 import com.loopers.application.orders.result.OrdersInfoResult;
+import com.loopers.domain.coupon.Coupon;
+import com.loopers.domain.coupon.CouponRepository;
+import com.loopers.domain.coupon.CouponStatus;
+import com.loopers.domain.coupon.CouponType;
+import com.loopers.domain.couponmember.CouponMember;
+import com.loopers.domain.couponmember.CouponMemberRepository;
 import com.loopers.domain.member.Member;
 import com.loopers.domain.member.MemberRepository;
 import com.loopers.domain.orders.OrderStatus;
@@ -22,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -33,6 +40,12 @@ public class OrderFacadeIntegrationTest {
 
     @Autowired
     private OrdersFacade ordersFacade;
+
+    @Autowired
+    private CouponRepository couponRepository;
+
+    @Autowired
+    private CouponMemberRepository couponMemberRepository;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -97,11 +110,12 @@ public class OrderFacadeIntegrationTest {
         @Test
         void successRegister_whenAllConditionsMet() {
             List<PlaceOrderCommand.Item> items = List.of(
-                    new PlaceOrderCommand.Item(setUpProduct.getId(), 2, 1000)
+                    new PlaceOrderCommand.Item(setUpProduct.getId(), 2, BigDecimal.valueOf(1000L))
             );
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
-                    items
+                    items,
+                    null
             );
 
             OrdersInfoResult ordersInfoResult = ordersFacade.placeOrder(placeOrderCommand);
@@ -109,6 +123,90 @@ public class OrderFacadeIntegrationTest {
             assertAll(
                     () -> Assertions.assertNotNull(ordersInfoResult),
                     () -> Assertions.assertEquals(OrderStatus.PENDING, ordersInfoResult.getStatus())
+            );
+        }
+
+        @DisplayName("정액 할인 쿠폰을 사용하여 성공적으로 주문을 등록한다. (1000원 할인)")
+        @Test
+        void successRegister_whenUsingFixedDiscountCoupon() {
+            // Given
+            List<PlaceOrderCommand.Item> items = List.of(
+                    new PlaceOrderCommand.Item(setUpProduct.getId(), 2, BigDecimal.valueOf(2000L))
+            );
+            Coupon coupon = Coupon.create(
+                    "1000원 할인 쿠폰",
+                    CouponType.FIXED_AMOUNT,
+                    BigDecimal.valueOf(1000L),
+                    null,
+                    BigDecimal.valueOf(1000L),
+                    30
+            );
+            Coupon savedCoupon = couponRepository.save(coupon);
+
+            CouponMember couponMember = CouponMember.create(
+                    setUpMember.getId(),
+                    savedCoupon.getId(),
+                    CouponStatus.ACTIVE,
+                    LocalDateTime.now().plusDays(5),
+                    null
+            );
+            CouponMember savedCouponMember = couponMemberRepository.save(couponMember);
+            PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
+                    setUpMember.getId(),
+                    items,
+                    couponMember.getCouponId()
+            );
+
+            // When
+            OrdersInfoResult ordersInfoResult = ordersFacade.placeOrder(placeOrderCommand);
+
+            // Then
+            assertAll(
+                    () -> Assertions.assertNotNull(ordersInfoResult),
+                    () -> Assertions.assertEquals(OrderStatus.PENDING, ordersInfoResult.getStatus()),
+                    () -> Assertions.assertEquals(0, ordersInfoResult.getTotalPrice().compareTo(BigDecimal.valueOf(3000L)))
+            );
+        }
+
+        @DisplayName("정률 할인 쿠폰을 사용하여 성공적으로 주문을 등록한다. (10% 할인)")
+        @Test
+        void successRegister_whenUsingPercentageDiscountCoupon() {
+            // Given
+            List<PlaceOrderCommand.Item> items = List.of(
+                    new PlaceOrderCommand.Item(setUpProduct.getId(), 2, BigDecimal.valueOf(2000L))
+            );
+            Coupon coupon = Coupon.create(
+                    "10% 할인 쿠폰",
+                    CouponType.PERCENTAGE,
+                    null,
+                    10,
+                    BigDecimal.valueOf(1000L),
+                    30
+            );
+            Coupon savedCoupon = couponRepository.save(coupon);
+
+            CouponMember couponMember = CouponMember.create(
+                    setUpMember.getId(),
+                    savedCoupon.getId(),
+                    CouponStatus.ACTIVE,
+                    LocalDateTime.now().plusDays(5),
+                    null
+            );
+            CouponMember savedCouponMember = couponMemberRepository.save(couponMember);
+            PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
+                    setUpMember.getId(),
+                    items,
+                    couponMember.getCouponId()
+            );
+
+            // When
+            OrdersInfoResult ordersInfoResult = ordersFacade.placeOrder(placeOrderCommand);
+
+            // Then
+            assertAll(
+                    () -> Assertions.assertNotNull(ordersInfoResult),
+                    () -> Assertions.assertEquals(OrderStatus.PENDING, ordersInfoResult.getStatus()),
+                    () -> Assertions.assertEquals(0, ordersInfoResult.getTotalPrice().compareTo(BigDecimal.valueOf(3600L)))
             );
         }
 
@@ -124,11 +222,12 @@ public class OrderFacadeIntegrationTest {
             int price2 = 1000;
 
             List<PlaceOrderCommand.Item> items = List.of(
-                    new PlaceOrderCommand.Item(setUpProduct.getId(), 4, 1000)
+                    new PlaceOrderCommand.Item(setUpProduct.getId(), 4, BigDecimal.valueOf(1000L))
             );
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
-                    items
+                    items,
+                    null
             );
 
             // When
@@ -151,11 +250,12 @@ public class OrderFacadeIntegrationTest {
         @Test
         void failRegister_whenPointNotEnough() {
             List<PlaceOrderCommand.Item> items = List.of(
-                    new PlaceOrderCommand.Item(setUpProduct.getId(), 2, 100000)
+                    new PlaceOrderCommand.Item(setUpProduct.getId(), 2, BigDecimal.valueOf(100000L))
             );
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
-                    items
+                    items,
+                    null
             );
 
             // When & Then
@@ -168,11 +268,12 @@ public class OrderFacadeIntegrationTest {
         @Test
         void failRegister_whenStockNotEnough() {
             List<PlaceOrderCommand.Item> items = List.of(
-                    new PlaceOrderCommand.Item(setUpProduct.getId(), 101, 1000)
+                    new PlaceOrderCommand.Item(setUpProduct.getId(), 101, BigDecimal.valueOf(1000L))
             );
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
-                    items
+                    items,
+                    null
             );
 
             // When & Then

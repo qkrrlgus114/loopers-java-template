@@ -6,4 +6,6 @@ public interface CouponRepository {
     List<Coupon> findAllByIds(List<Long> couponIds);
 
     Coupon save(Coupon coupon);
+
+    Coupon findById(Long couponId);
 }

@@ -97,4 +97,22 @@ public class Coupon extends BaseEntity {
     public Integer getExpirationDays() {
         return expirationDays;
     }
+
+    public BigDecimal calculateDiscount(BigDecimal totalPrice) {
+        // 최소 사용 금액보다 적으면 할인 없음
+        if (totalPrice.compareTo(minimumPrice) < 0) {
+            return BigDecimal.ZERO;
+        }
+        if (couponType == CouponType.FIXED_AMOUNT) {
+            return totalPrice.subtract(amount);
+        } else if (couponType == CouponType.PERCENTAGE && rate != null) {
+            BigDecimal discount = totalPrice
+                    .multiply(BigDecimal.valueOf(rate))
+                    .divide(BigDecimal.valueOf(100));
+            return totalPrice.subtract(discount)
+                    .max(BigDecimal.ZERO);
+        }
+
+        return totalPrice;
+    }
 }

@@ -2,6 +2,8 @@ package com.loopers.domain.couponmember;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.coupon.CouponStatus;
+import com.loopers.support.error.CommonErrorType;
+import com.loopers.support.error.CoreException;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -91,5 +93,13 @@ public class CouponMember extends BaseEntity {
 
     public Long getOrdersId() {
         return ordersId;
+    }
+
+    public void useCoupon() {
+        if (this.status != CouponStatus.ACTIVE) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "쿠폰이 활성화 상태가 아닙니다.");
+        }
+        this.status = CouponStatus.USED;
+        this.usedAt = LocalDateTime.now();
     }
 }

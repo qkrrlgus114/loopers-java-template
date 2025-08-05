@@ -21,4 +21,12 @@ public class CouponMemberService {
     public List<CouponMember> getMyCouponList(Long memberId) {
         return couponMemberRepository.findAllByMemberId(memberId);
     }
+
+    /*
+     * 쿠폰 조회
+     * */
+    public CouponMember getCouponMemberById(Long memberId, Long couponId) {
+        return couponMemberRepository.findByCouponIdAndMemberId(couponId, memberId);
+    }
+
 }
