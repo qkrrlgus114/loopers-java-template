@@ -20,7 +20,7 @@ public class Coupon extends BaseEntity {
 
     @Column(nullable = true)
     // 정액 할인
-    private Integer amount;
+    private BigDecimal amount;
 
     @Column(nullable = true)
     // 정률 할인
@@ -37,7 +37,7 @@ public class Coupon extends BaseEntity {
     protected Coupon() {
     }
 
-    public Coupon(String name, CouponType couponType, Integer amount, Integer rate, BigDecimal minimumPrice, Integer expirationDays) {
+    public Coupon(String name, CouponType couponType, BigDecimal amount, Integer rate, BigDecimal minimumPrice, Integer expirationDays) {
         this.name = name;
         this.couponType = couponType;
         this.amount = amount;
@@ -46,20 +46,22 @@ public class Coupon extends BaseEntity {
         this.expirationDays = expirationDays;
     }
 
-    public static Coupon create(String name, CouponType couponType, Integer amount, Integer rate, BigDecimal minimumPrice, Integer expirationDays) {
+    public static Coupon create(String name, CouponType couponType, BigDecimal amount, Integer rate, BigDecimal minimumPrice, Integer expirationDays) {
         validate(name, couponType, amount, rate, minimumPrice, expirationDays);
         return new Coupon(name, couponType, amount, rate, minimumPrice, expirationDays);
     }
 
-    private static void validate(String name, CouponType couponType, Integer amount, Integer rate, BigDecimal minimumPrice, Integer expirationDays) {
+    private static void validate(String name, CouponType couponType, BigDecimal amount, Integer rate, BigDecimal minimumPrice, Integer expirationDays) {
         if (name == null || name.isBlank() || name.length() > 20) {
             throw new IllegalArgumentException("쿠폰 이름은 1자 이상 20자 이내여야 합니다.");
         }
         if (couponType != CouponType.FIXED_AMOUNT && couponType != CouponType.PERCENTAGE) {
             throw new IllegalArgumentException("할인 타입은 '정액' 또는 '정률'만 가능합니다.");
         }
-        if (amount != null && amount < 0) {
-            throw new IllegalArgumentException("정액 할인 금액은 0 이상이어야 합니다.");
+        if (couponType == CouponType.FIXED_AMOUNT) {
+            if (amount == null || amount.compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException("정액 할인 금액은 0 이상이어야 합니다.");
+            }
         }
         if (rate != null && (rate < 0 || rate > 100)) {
             throw new IllegalArgumentException("정률 할인 비율은 0 이상 100 이하이어야 합니다.");
@@ -80,7 +82,7 @@ public class Coupon extends BaseEntity {
         return couponType;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 

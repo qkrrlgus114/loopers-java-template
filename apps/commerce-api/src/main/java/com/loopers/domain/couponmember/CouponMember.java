@@ -1,13 +1,14 @@
-package com.loopers.domain.coupon;
+package com.loopers.domain.couponmember;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.coupon.CouponStatus;
 import jakarta.persistence.*;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "member_coupon")
-public class MemberCounpon extends BaseEntity {
+@Table(name = "coupon_member")
+public class CouponMember extends BaseEntity {
 
     // 회원 ID
     @Column(nullable = false)
@@ -24,19 +25,19 @@ public class MemberCounpon extends BaseEntity {
 
     // 만료일
     @Column(nullable = false)
-    private ZonedDateTime expirationAt;
+    private LocalDateTime expirationAt;
 
     // 사용일
     @Column(nullable = true)
-    private ZonedDateTime usedAt;
+    private LocalDateTime usedAt;
 
     @Column(nullable = true)
     private Long orderItemId;
 
-    protected MemberCounpon() {
+    protected CouponMember() {
     }
 
-    public MemberCounpon(Long memberId, Long couponId, CouponStatus status, ZonedDateTime expirationAt, Long orderItemId) {
+    public CouponMember(Long memberId, Long couponId, CouponStatus status, LocalDateTime expirationAt, Long orderItemId) {
         this.memberId = memberId;
         this.couponId = couponId;
         this.status = status;
@@ -45,12 +46,12 @@ public class MemberCounpon extends BaseEntity {
         this.orderItemId = orderItemId;
     }
 
-    public static MemberCounpon create(Long memberId, Long couponId, CouponStatus status, ZonedDateTime expirationAt, Long orderItemId) {
+    public static CouponMember create(Long memberId, Long couponId, CouponStatus status, LocalDateTime expirationAt, Long orderItemId) {
         validate(memberId, couponId, status, expirationAt, orderItemId);
-        return new MemberCounpon(memberId, couponId, status, expirationAt, orderItemId);
+        return new CouponMember(memberId, couponId, status, expirationAt, orderItemId);
     }
 
-    private static void validate(Long memberId, Long couponId, CouponStatus status, ZonedDateTime expirationAt, Long orderItemId) {
+    private static void validate(Long memberId, Long couponId, CouponStatus status, LocalDateTime expirationAt, Long orderItemId) {
         if (memberId == null || memberId <= 0) {
             throw new IllegalArgumentException("유효한 회원 ID가 필요합니다.");
         }
@@ -60,7 +61,7 @@ public class MemberCounpon extends BaseEntity {
         if (status == null) {
             throw new IllegalArgumentException("쿠폰 상태는 필수입니다.");
         }
-        if (expirationAt == null || expirationAt.isBefore(ZonedDateTime.now())) {
+        if (expirationAt == null || expirationAt.isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("유효한 만료일이 필요합니다.");
         }
         if (orderItemId != null && orderItemId <= 0) {
@@ -68,5 +69,27 @@ public class MemberCounpon extends BaseEntity {
         }
     }
 
+    public Long getMemberId() {
+        return memberId;
+    }
 
+    public Long getCouponId() {
+        return couponId;
+    }
+
+    public CouponStatus getStatus() {
+        return status;
+    }
+
+    public LocalDateTime getExpirationAt() {
+        return expirationAt;
+    }
+
+    public LocalDateTime getUsedAt() {
+        return usedAt;
+    }
+
+    public Long getOrderItemId() {
+        return orderItemId;
+    }
 }

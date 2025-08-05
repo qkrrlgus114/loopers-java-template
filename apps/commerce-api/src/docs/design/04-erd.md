@@ -75,7 +75,7 @@ erDiagram
         LONG coupon_id PK
         STRING name
         COUPON_TYPE couponType
-        INT amount
+        BIGDECIMAL amount
         INT rate
         BIGDECIMAL minimumPrice
         INT expirationDays
