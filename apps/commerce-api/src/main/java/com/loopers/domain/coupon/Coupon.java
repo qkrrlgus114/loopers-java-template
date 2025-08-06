@@ -1,6 +1,8 @@
 package com.loopers.domain.coupon;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.support.error.CommonErrorType;
+import com.loopers.support.error.CoreException;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -98,21 +100,26 @@ public class Coupon extends BaseEntity {
         return expirationDays;
     }
 
+    /*
+     * 쿠폰 할인 금액 계산
+     * */
     public BigDecimal calculateDiscount(BigDecimal totalPrice) {
         // 최소 사용 금액보다 적으면 할인 없음
         if (totalPrice.compareTo(minimumPrice) < 0) {
             return BigDecimal.ZERO;
         }
         if (couponType == CouponType.FIXED_AMOUNT) {
+            // 정액 쿠폰
             return totalPrice.subtract(amount);
         } else if (couponType == CouponType.PERCENTAGE && rate != null) {
+            // 정률 쿠폰
             BigDecimal discount = totalPrice
                     .multiply(BigDecimal.valueOf(rate))
                     .divide(BigDecimal.valueOf(100));
             return totalPrice.subtract(discount)
                     .max(BigDecimal.ZERO);
+        } else {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효하지 않은 쿠폰 타입입니다.");
         }
-
-        return totalPrice;
     }
 }

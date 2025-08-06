@@ -6,6 +6,7 @@ import com.loopers.application.member.service.MemberService;
 import com.loopers.application.orderItem.service.OrderItemService;
 import com.loopers.application.orders.command.PlaceOrderCommand;
 import com.loopers.application.orders.result.OrdersInfoResult;
+import com.loopers.application.orders.result.OrdersRegisterInfoResult;
 import com.loopers.application.orders.service.OrdersService;
 import com.loopers.application.point.service.PointService;
 import com.loopers.application.product.service.ProductService;
@@ -58,7 +59,7 @@ public class OrdersFacade {
      * 6. 주문 생성
      * */
     @Transactional
-    public OrdersInfoResult placeOrder(PlaceOrderCommand command) {
+    public OrdersRegisterInfoResult placeOrder(PlaceOrderCommand command) {
         // 1. 사용자 조회
         Member member = memberService.findMemberById(command.getMemberId());
 
@@ -92,7 +93,7 @@ public class OrdersFacade {
         }
 
         // 포인트 확인
-        Point point = pointService.getPointByMemberId(member.getId());
+        Point point = pointService.getPointByMemberIdWithLock(member.getId());
         point.enoughPoint(couponDiscount);
         point.use(couponDiscount);
 
@@ -118,12 +119,38 @@ public class OrdersFacade {
         }
         orderItemsService.register(orderItems);
 
-        return OrdersInfoResult.of(
+        return OrdersRegisterInfoResult.of(
                 OrderStatus.PENDING,
                 LocalDateTime.now(),
                 couponDiscount,
                 orderItems.size()
         );
+    }
+
+    /*
+     * 사용자의 전체 주문 리스트 조회하기
+     * */
+    @Transactional(readOnly = true)
+    public List<OrdersInfoResult> getOrdersByMemberId(Long memberId) {
+        List<Orders> ordersList = ordersService.findAllByMemberId(memberId);
+
+        if (ordersList == null || ordersList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<OrdersInfoResult> ordersInfoResults = new ArrayList<>();
+        for (Orders orders : ordersList) {
+            OrdersInfoResult result = OrdersInfoResult.of(
+                    orders.getId(),
+                    orders.getOrderStatus(),
+                    orders.getQuantity(),
+                    orders.getTotalPrice(),
+                    orders.getCouponMemberId()
+            );
+            ordersInfoResults.add(result);
+        }
+
+        return ordersInfoResults;
     }
 }
 

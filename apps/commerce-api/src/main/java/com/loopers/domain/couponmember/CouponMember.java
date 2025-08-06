@@ -1,6 +1,7 @@
 package com.loopers.domain.couponmember;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.coupon.Coupon;
 import com.loopers.domain.coupon.CouponStatus;
 import com.loopers.support.error.CommonErrorType;
 import com.loopers.support.error.CoreException;
@@ -101,5 +102,23 @@ public class CouponMember extends BaseEntity {
         }
         this.status = CouponStatus.USED;
         this.usedAt = LocalDateTime.now();
+    }
+
+    public void checkCouponAvailable(Coupon coupon) {
+        if (this.status != CouponStatus.ACTIVE) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "쿠폰이 활성화 상태가 아닙니다.");
+        }
+
+        if (this.expirationAt.isBefore(LocalDateTime.now())) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "쿠폰이 만료되었습니다.");
+        }
+
+        if (coupon == null) {
+            throw new CoreException(CommonErrorType.NOT_FOUND, "쿠폰을 찾을 수 없습니다.");
+        }
+
+        if (!coupon.getId().equals(this.couponId)) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "쿠폰 ID가 일치하지 않습니다.");
+        }
     }
 }
