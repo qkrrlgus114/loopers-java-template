@@ -3,12 +3,14 @@ package com.loopers.application.productlike;
 import com.loopers.application.productlike.command.ProductLikeCommand;
 import com.loopers.application.productlike.facade.ProductLikeFacade;
 import com.loopers.application.productlike.result.ProductLikeResult;
+import com.loopers.application.productlike.result.ProductLikeView;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.member.Member;
 import com.loopers.domain.member.MemberRepository;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
+import com.loopers.domain.productlike.ProductLikeRepository;
 import com.loopers.utils.DatabaseCleanUp;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -18,6 +20,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,6 +46,9 @@ class ProductLikeFacadeIntegrationTest {
 
     @Autowired
     private BrandRepository brandRepository;
+
+    @Autowired
+    private ProductLikeRepository productLikeRepository;
 
     @Autowired
     private EntityManager em;
@@ -188,5 +199,77 @@ class ProductLikeFacadeIntegrationTest {
 
         Product updatedProduct = productRepository.findById(setUpProduct.getId()).orElseThrow();
         assertEquals(0, updatedProduct.getLikeCount());
+    }
+
+    @DisplayName("동시에 좋아요를 눌러도 멱등성이 보장된다.")
+    @Test
+    void successIdempotentToggleProductLike() throws InterruptedException {
+        // Given
+        ProductLikeCommand command = ProductLikeCommand.of(setUpProduct.getId(), setUpMember.getId());
+
+        // When
+        int threadCount = 9;
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        for (int i = 0; i < threadCount; i++) {
+            executor.submit(() -> {
+                try {
+                    productLikeFacade.registerProductLike(command);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+
+        List<ProductLikeView> productLikeList = productLikeFacade.getProductLikeList(command.getMemberId());
+
+        assertAll(
+                () -> assertNotNull(productLikeList),
+                () -> assertEquals(1, productLikeList.size()),
+                () -> assertEquals(setUpProduct.getId(), productLikeList.get(0).getProductId()),
+                () -> assertEquals(1, productLikeList.get(0).getLikeCount())
+        );
+    }
+
+    @DisplayName("동일한 상품에 대해 여러명이 좋아요를 요청해도, 상품의 좋아요 개수가 정상 반영되어야 한다.")
+    @Test
+    void successConcurrentLikesOnSameProduct() throws InterruptedException {
+        // Given
+        List<Optional<Member>> members;
+        members = IntStream.rangeClosed(1, 3)
+                .mapToObj(i -> Member.registerMember(
+                        "testUser" + i,
+                        "password123",
+                        "test" + i + "@naver.com",
+                        "테스트유저" + i,
+                        LocalDate.parse("1990-01-01"),
+                        "M"))
+                .map(memberRepository::register)
+                .toList();
+        int threadCount = 10;
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        // id가 1,2,3인 3명이서 좋아요 요청을 보낸다고 가정
+        for (Optional<Member> m : members) {
+            IntStream.range(0, 10).forEach(i ->
+                    executor.submit(() -> {
+                        try {
+                            ProductLikeCommand cmd =
+                                    ProductLikeCommand.of(setUpProduct.getId(), m.get().getId());
+                            productLikeFacade.registerProductLike(cmd);
+                        } finally {
+                            latch.countDown();
+                        }
+                    }));
+        }
+
+        latch.await();
+
+        int count = productLikeRepository.countByProductId(setUpProduct.getId());
+
+        assertEquals(3, count);
     }
 }

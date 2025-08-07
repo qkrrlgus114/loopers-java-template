@@ -34,8 +34,12 @@ public class ProductLikeService {
     public boolean isLikedByMember(Long productId, Long memberId) {
         return productLikeRepository.existsByProductIdAndMemberId(productId, memberId);
     }
-    
+
     public List<ProductLikeGroup> countGroupByProductId() {
         return productLikeRepository.countGroupByProductId();
+    }
+
+    public List<Long> findProductLikeIdsByMemberId(Long memberId) {
+        return productLikeRepository.findProductLikeIdsByMemberId(memberId);
     }
 }
