@@ -56,7 +56,7 @@ public class MemberFacade {
      * */
     @Transactional
     public PointChargeResult chargePoint(PointChargeCommand command) {
-        Point point = pointService.getPointByMemberId(command.memberId());
+        Point point = pointService.getPointByMemberIdWithLock(command.memberId());
 
         point.charge(command.amount());
 

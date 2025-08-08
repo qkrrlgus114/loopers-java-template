@@ -16,4 +16,6 @@ public interface ProductRepository {
     Optional<Product> register(Product product);
 
     List<Product> findProductListByProductId(List<Long> productIds);
+
+    Product findByIdForUpdate(Long productId);
 }

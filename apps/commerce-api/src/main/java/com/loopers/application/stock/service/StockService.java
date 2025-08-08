@@ -14,6 +14,6 @@ public class StockService {
     private final StockRepository stockRepository;
 
     public Stock findStockByProductId(Long productId) {
-        return stockRepository.findByProductId(productId);
+        return stockRepository.findByProductIdWithLock(productId);
     }
 }

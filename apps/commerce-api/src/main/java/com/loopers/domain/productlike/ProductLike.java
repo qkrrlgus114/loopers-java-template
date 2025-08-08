@@ -3,15 +3,24 @@ package com.loopers.domain.productlike;
 import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CommonErrorType;
 import com.loopers.support.error.CoreException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "product_like")
+@Table(name = "product_like",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_product_like_product_member",
+                columnNames = {"productId", "memberId"}
+        )
+)
 public class ProductLike extends BaseEntity {
 
+    @Column(nullable = false)
     private Long productId;
 
+    @Column(nullable = false)
     private Long memberId;
 
     protected ProductLike() {

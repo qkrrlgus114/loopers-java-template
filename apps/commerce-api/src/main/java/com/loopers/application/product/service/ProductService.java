@@ -40,4 +40,16 @@ public class ProductService {
     public List<Product> findProductListByProductId(List<Long> productIds) {
         return productRepository.findProductListByProductId(productIds);
     }
+
+    public Product findProductByIdWithLock(Long productId) {
+        if (productId == null || productId <= 0) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효하지 않은 상품 ID입니다.");
+        }
+
+        Product byIdWithLock = productRepository.findByIdForUpdate(productId);
+        if (byIdWithLock == null) {
+            throw new CoreException(ProductErrorType.PRODUCT_NOT_FOUND, "상품을 찾을 수 없습니다. productId: " + productId);
+        }
+        return byIdWithLock;
+    }
 }

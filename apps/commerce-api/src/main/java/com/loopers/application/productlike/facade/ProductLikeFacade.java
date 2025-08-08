@@ -5,6 +5,7 @@ import com.loopers.application.product.service.ProductService;
 import com.loopers.application.productlike.command.ProductLikeCommand;
 import com.loopers.application.productlike.query.ProductLikeGroup;
 import com.loopers.application.productlike.result.ProductLikeResult;
+import com.loopers.application.productlike.result.ProductLikeView;
 import com.loopers.application.productlike.service.ProductLikeService;
 import com.loopers.domain.member.Member;
 import com.loopers.domain.product.Product;
@@ -38,7 +39,7 @@ public class ProductLikeFacade {
      * */
     @Transactional
     public ProductLikeResult registerProductLike(ProductLikeCommand command) {
-        Product product = productService.findProductById(command.getProductId());
+        Product product = productService.findProductByIdWithLock(command.getProductId());
 
         Member member = memberService.findMemberById(command.getMemberId());
 
@@ -95,5 +96,29 @@ public class ProductLikeFacade {
 
         products.forEach(p ->
                 p.updateLikeCount(likeCountMap.getOrDefault(p.getId(), 0)));
+    }
+
+    /*
+     * 현재 사용자가 좋아요한 상품 목록 가져오기
+     * */
+    @Transactional(readOnly = true)
+    public List<ProductLikeView> getProductLikeList(Long memberId) {
+        Member member = memberService.findMemberById(memberId);
+
+        List<Long> productIds = productLikeService.findProductLikeIdsByMemberId(member.getId());
+
+        List<Product> productList = productService.findProductListByProductId(productIds);
+
+        List<ProductLikeView> productLikeViews = productList.stream()
+                .map(product -> {
+                    return ProductLikeView.of(
+                            product.getId(),
+                            product.getName(),
+                            product.getLikeCount()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return productLikeViews;
     }
 }

@@ -14,6 +14,12 @@ public class PointRepositoryImpl implements PointRepository {
     private final PointJpaRepository pointJpaRepository;
 
     @Override
+    public Point findByMemberIdWithLock(Long memberId) {
+        return pointJpaRepository.findByMemberIdWitkLock(memberId)
+                .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "사용자의 포인트를 찾을 수 없습니다. memberId: " + memberId));
+    }
+
+    @Override
     public Point findByMemberId(Long memberId) {
         return pointJpaRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "사용자의 포인트를 찾을 수 없습니다. memberId: " + memberId));
