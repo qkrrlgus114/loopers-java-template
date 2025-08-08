@@ -20,11 +20,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -235,41 +234,53 @@ class ProductLikeFacadeIntegrationTest {
 
     @DisplayName("동일한 상품에 대해 여러명이 좋아요를 요청해도, 상품의 좋아요 개수가 정상 반영되어야 한다.")
     @Test
-    void successConcurrentLikesOnSameProduct() throws InterruptedException {
-        // Given
-        List<Optional<Member>> members;
-        members = IntStream.rangeClosed(1, 3)
+    void successConcurrentLikesOnSameProduct() throws Exception {
+        List<Member> members = IntStream.rangeClosed(1, 3)
                 .mapToObj(i -> Member.registerMember(
-                        "testUser" + i,
+                        "testUser" + (i + 1),
                         "password123",
                         "test" + i + "@naver.com",
                         "테스트유저" + i,
                         LocalDate.parse("1990-01-01"),
                         "M"))
                 .map(memberRepository::register)
+                .map(Optional::orElseThrow)
                 .toList();
-        int threadCount = 10;
-        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-        CountDownLatch latch = new CountDownLatch(threadCount);
 
-        // id가 1,2,3인 3명이서 좋아요 요청을 보낸다고 가정
-        for (Optional<Member> m : members) {
-            IntStream.range(0, 10).forEach(i ->
-                    executor.submit(() -> {
+        int attemptsPerMember = 1000;
+        int totalTasks = members.size() * attemptsPerMember;
+        ExecutorService pool = Executors.newFixedThreadPool(
+                Runtime.getRuntime().availableProcessors() * 2);
+
+        CountDownLatch latch = new CountDownLatch(totalTasks);
+        List<Future<?>> futures = new ArrayList<>(totalTasks);
+
+        for (Member member : members) {
+            IntStream.range(0, attemptsPerMember).forEach(i ->
+                    futures.add(pool.submit(() -> {
                         try {
                             ProductLikeCommand cmd =
-                                    ProductLikeCommand.of(setUpProduct.getId(), m.get().getId());
+                                    ProductLikeCommand.of(setUpProduct.getId(), member.getId());
                             productLikeFacade.registerProductLike(cmd);
+                            return null;
                         } finally {
                             latch.countDown();
                         }
-                    }));
+                    }))
+            );
         }
 
         latch.await();
 
-        int count = productLikeRepository.countByProductId(setUpProduct.getId());
+        for (Future<?> f : futures) {
+            f.get();
+        }
 
-        assertEquals(3, count);
+        pool.shutdown();
+        pool.awaitTermination(5, TimeUnit.SECONDS);
+
+        // then
+        int likeCount = productLikeRepository.countByProductId(setUpProduct.getId());
+        assertEquals(3, likeCount);
     }
 }

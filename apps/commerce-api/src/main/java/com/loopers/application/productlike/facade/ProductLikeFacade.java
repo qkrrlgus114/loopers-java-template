@@ -39,7 +39,7 @@ public class ProductLikeFacade {
      * */
     @Transactional
     public ProductLikeResult registerProductLike(ProductLikeCommand command) {
-        Product product = productService.findProductById(command.getProductId());
+        Product product = productService.findProductByIdWithLock(command.getProductId());
 
         Member member = memberService.findMemberById(command.getMemberId());
 
