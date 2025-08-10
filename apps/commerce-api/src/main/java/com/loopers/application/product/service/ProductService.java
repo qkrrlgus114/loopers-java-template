@@ -1,14 +1,18 @@
 package com.loopers.application.product.service;
 
+import com.loopers.application.product.result.ProductListResult;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.support.error.CommonErrorType;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ProductErrorType;
+import com.loopers.support.sort.ProductSortType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -51,5 +55,10 @@ public class ProductService {
             throw new CoreException(ProductErrorType.PRODUCT_NOT_FOUND, "상품을 찾을 수 없습니다. productId: " + productId);
         }
         return byIdWithLock;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductListResult> searchProducts(ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice) {
+        return productRepository.searchProducts(sort, page, minPrice, maxPrice);
     }
 }
