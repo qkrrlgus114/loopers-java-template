@@ -58,7 +58,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductListResult> searchProducts(ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice) {
-        return productRepository.searchProducts(sort, page, minPrice, maxPrice);
+    public List<ProductListResult> searchProducts(ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice, String brands) {
+        return productRepository.searchProducts(sort, page, minPrice, maxPrice, brands);
     }
 }

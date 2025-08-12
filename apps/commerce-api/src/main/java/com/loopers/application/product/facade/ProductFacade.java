@@ -48,9 +48,9 @@ public class ProductFacade {
      * */
     @Transactional(readOnly = true)
     public List<ProductListResult> searchProducts(
-            ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice
+            ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice, String keyword
     ) {
-        return productService.searchProducts(sort, page, minPrice, maxPrice);
+        return productService.searchProducts(sort, page, minPrice, maxPrice, keyword);
     }
 
 }

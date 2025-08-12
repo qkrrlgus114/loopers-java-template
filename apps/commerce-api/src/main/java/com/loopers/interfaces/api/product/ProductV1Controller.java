@@ -33,8 +33,9 @@ public class ProductV1Controller {
             @RequestParam(value = "sort", required = false) ProductSortType sort,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "minPrice", required = false) BigDecimal minPrice,
-            @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice) {
-        List<ProductListResult> productListResults = productFacade.searchProducts(sort, page, minPrice, maxPrice);
+            @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice,
+            @RequestParam(value = "brands", required = false) String brands) {
+        List<ProductListResult> productListResults = productFacade.searchProducts(sort, page, minPrice, maxPrice, brands);
 
         ProductSearchResDTO productSearchResDTO = ProductSearchResDTO.of(productListResults);
 

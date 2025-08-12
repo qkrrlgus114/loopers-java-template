@@ -22,5 +22,5 @@ public interface ProductRepository {
 
     Product findByIdForUpdate(Long productId);
 
-    List<ProductListResult> searchProducts(ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice);
+    List<ProductListResult> searchProducts(ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice, String brands);
 }
