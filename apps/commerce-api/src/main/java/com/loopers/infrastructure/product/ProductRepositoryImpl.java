@@ -1,6 +1,5 @@
 package com.loopers.infrastructure.product;
 
-import com.loopers.application.product.result.ProductListResult;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.product.QProduct;
@@ -55,8 +54,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public List<ProductListResult> searchProducts(ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice, String brands) {
-        Long startTime = System.currentTimeMillis();
+    public List<Product> searchProducts(ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice, String brands) {
         QProduct product = QProduct.product;
 
         List<Long> productIds = query.select(product.id)
@@ -65,35 +63,16 @@ public class ProductRepositoryImpl implements ProductRepository {
                         priceGoe(minPrice),
                         priceLoe(maxPrice),
                         brandIn(brands)
-
                 )
                 .orderBy(getProductOrderSpecifiers(sort))
                 .offset((long) (page - 1) * 10)
                 .limit(10)
                 .fetch();
 
-        List<Product> products = query.select(product)
+        return query.select(product)
                 .from(product)
-                .where(
-                        product.id.in(productIds)
-                ).fetch();
-
-//        List<Product> products = query.selectFrom(product)
-//                .where(
-//                        priceGoe(minPrice),
-//                        priceLoe(maxPrice)
-//                )
-//                .orderBy(getProductOrderSpecifier(sort))
-//                .offset((long) (page - 1) * 10)
-//                .limit(10)
-//                .fetch();
-
-        Long endTime = System.currentTimeMillis();
-        log.info("[검색 시간] : {} ms", endTime - startTime);
-
-        return products.stream()
-                .map(ProductListResult::of)
-                .toList();
+                .where(product.id.in(productIds))
+                .fetch();
     }
 
     private BooleanExpression priceGoe(BigDecimal minPrice) {
@@ -122,10 +101,6 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     private OrderSpecifier<?>[] getProductOrderSpecifiers(ProductSortType sort) {
         QProduct p = QProduct.product;
-
-        if (sort == null) {
-            return new OrderSpecifier<?>[]{p.createdAt.desc(), p.id.desc()};
-        }
 
         return switch (sort) {
             case LATEST -> new OrderSpecifier<?>[]{p.createdAt.desc(), p.id.desc()};

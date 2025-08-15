@@ -4,10 +4,12 @@ import com.loopers.application.brand.service.BrandService;
 import com.loopers.application.product.command.ProductDetailCommand;
 import com.loopers.application.product.result.ProductDetailResult;
 import com.loopers.application.product.result.ProductListResult;
+import com.loopers.application.product.result.ProductRegisterResult;
 import com.loopers.application.product.service.ProductService;
 import com.loopers.application.productlike.service.ProductLikeService;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.Product;
+import com.loopers.interfaces.api.product.dto.ProductRegisterReqDTO;
 import com.loopers.support.sort.ProductSortType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,13 +46,17 @@ public class ProductFacade {
     }
 
     /*
-     * 상품 검색 기능
+     * 상품 리스트 조회(페이징 + 필터링)
      * */
     @Transactional(readOnly = true)
-    public List<ProductListResult> searchProducts(
+    public List<ProductListResult> getProductsWithPagingAndFilter(
             ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice, String keyword
     ) {
-        return productService.searchProducts(sort, page, minPrice, maxPrice, keyword);
+        return productService.getProductsWithPagingAndFilter(sort, page, minPrice, maxPrice, keyword);
     }
 
+    @Transactional
+    public ProductRegisterResult registerProduct(ProductRegisterReqDTO reqDTO) {
+        return productService.registerProduct(reqDTO);
+    }
 }

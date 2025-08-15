@@ -1,6 +1,5 @@
 package com.loopers.domain.product;
 
-import com.loopers.application.product.result.ProductListResult;
 import com.loopers.support.sort.ProductSortType;
 import org.springframework.stereotype.Repository;
 
@@ -22,5 +21,5 @@ public interface ProductRepository {
 
     Product findByIdForUpdate(Long productId);
 
-    List<ProductListResult> searchProducts(ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice, String brands);
+    List<Product> searchProducts(ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice, String brands);
 }
