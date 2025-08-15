@@ -3,14 +3,21 @@ package com.loopers.application.product.facade;
 import com.loopers.application.brand.service.BrandService;
 import com.loopers.application.product.command.ProductDetailCommand;
 import com.loopers.application.product.result.ProductDetailResult;
+import com.loopers.application.product.result.ProductListResult;
+import com.loopers.application.product.result.ProductRegisterResult;
 import com.loopers.application.product.service.ProductService;
 import com.loopers.application.productlike.service.ProductLikeService;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.Product;
+import com.loopers.interfaces.api.product.dto.ProductRegisterReqDTO;
+import com.loopers.support.sort.ProductSortType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -38,4 +45,21 @@ public class ProductFacade {
         return ProductDetailResult.of(product, brand, likedByMember);
     }
 
+    /*
+     * 상품 리스트 조회(페이징 + 필터링)
+     * */
+    @Transactional(readOnly = true)
+    public List<ProductListResult> getProductsWithPagingAndFilter(
+            ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice, String keyword
+    ) {
+        return productService.getProductsWithPagingAndFilter(sort, page, minPrice, maxPrice, keyword);
+    }
+
+    /*
+     * 상품 등록
+     * */
+    @Transactional
+    public ProductRegisterResult registerProduct(ProductRegisterReqDTO reqDTO) {
+        return productService.registerProduct(reqDTO);
+    }
 }

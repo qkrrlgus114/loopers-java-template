@@ -3,9 +3,7 @@ package com.loopers.domain.product;
 import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CommonErrorType;
 import com.loopers.support.error.CoreException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
@@ -29,6 +27,7 @@ public class Product extends BaseEntity {
     private BigDecimal price;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
     @Column(nullable = false)

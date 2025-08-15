@@ -1,0 +1,68 @@
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6767}
+      password: "${REDIS_PWD:}"
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 50
+          max-idle: 20
+          min-idle: 5
+          time-between-eviction-runs: 1000ms
+  cache:
+    type: redis
+
+---
+spring.config.activate.on-profile: local
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6767
+
+logging:
+  level:
+    org.springframework.cache: DEBUG
+    org.springframework.data.redis: DEBUG
+    com.loopers.application.product.ProductService: DEBUG
+---
+spring.config.activate.on-profile: test
+
+spring:
+  redis:
+    host: localhost
+    port: 6767
+    lettuce:
+      pool:
+        max-active: 10
+        max-idle: 5
+        min-idle: 1
+
+---
+spring.config.activate.on-profile: dev
+
+spring:
+  redis:
+    host: dev-redis-host
+    port: 6767
+    password: dev-redis-pass
+
+---
+spring.config.activate.on-profile: qa
+
+spring:
+  redis:
+    host: qa-redis-host
+    port: 6767
+    password: qa-redis-pass
+
+---
+spring.config.activate.on-profile: prd
+
+spring:
+  redis:
+    host: prd-redis-host
+    port: 6767
+    password: prd-redis-pass
