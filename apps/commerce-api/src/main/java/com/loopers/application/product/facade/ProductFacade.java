@@ -55,6 +55,9 @@ public class ProductFacade {
         return productService.getProductsWithPagingAndFilter(sort, page, minPrice, maxPrice, keyword);
     }
 
+    /*
+     * 상품 등록
+     * */
     @Transactional
     public ProductRegisterResult registerProduct(ProductRegisterReqDTO reqDTO) {
         return productService.registerProduct(reqDTO);
