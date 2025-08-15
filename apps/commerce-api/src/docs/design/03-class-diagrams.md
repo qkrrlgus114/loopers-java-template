@@ -1,122 +1,112 @@
-%% + : public
-%% - : private
-%% # : protected
-
 ```mermaid
 classDiagram
 
-    %% 회원
-    class Member {
-        -memberId      : Long
-        -pointBalance  : Long
-        -roles         : Set
-        +getMemberId() Long
-    }
-    
-    %% 권한
-    class Role {
-			  -roleId       : Long
-			  +memberId     : Long
-			  +roleName     : String
-			  +getRoleId    : Long
-		}
-    
-    %% 포인트
-    class Point {
-		    -pointId       : Long
-		    +memberId      : Long
-		    -amount        : Long
-		    +getPointId() Long
-		    +getAmount() Long
-		}
-		      
-		    
-    %% 브랜드
-    class Brand {
-        -brandId  : Long
-        +getBrandId() Long
-    }
+  class Member {
+    -id: Long
+    -loginId: String
+    -password: String
+    -email: String
+    -name: String
+    -birth: LocalDate
+    -gender: String
+    -point: Long
+    +registerMember(loginId, password, email, name, birth, gender): Member
+    +chargePoint(amount): void
+  }
 
-    %% 상품
-    class Product {
-        -productId : Long
-        +memberId  : Long
-        +brandId   : Long
-        +getProductId() Long
-    }
+  class Point {
+    -id: Long
+    -memberId: Long
+    -amount: BigDecimal
+    +create(memberId, amount): Point
+    +use(amount): void
+  }
 
-    %% 상품 이미지
-    class ProductImage {
-        -productImageId  : Long
-        -productImageUrl : String
-        +productId       : Long
-        +getProductImageId() Long
-    }
+  class PointHistory {
+    -id: Long
+    -memberId: Long
+    -pointId: Long
+    -amount: Integer
+    -description: String
+    +create(memberId, pointId, amount, status): PointHistory
+  }
 
-    %% 상품 좋아요
-    class ProductLike {
-        -productLikeId : Long
-        +productId     : Long
-        +memberId      : Long
-        +getProductLikeId() Long
-    }
+  class Brand {
+    -id: Long
+    -name: String
+    -description: String
+    -memberId: Long
+    +create(name, description, memberId): Brand
+    +updateBrandInfo(name, description, memberId): void
+  }
 
-    %% 주문
-    class Order {
-        -orderId     : Long
-        +memberId    : Long
-        -totalAmount : Long
-        -status      : OrderStatus
-        +getOrderId() Long
-    }
+  class Product {
+    -id: Long
+    -name: String
+    -description: String
+    -brandId: Long
+    -memberId: Long
+    -price: BigDecimal
+    -status: ProductStatus
+    -likeCount: Integer
+    +create(name, description, brandId, memberId, price): Product
+    +increaseLikeCount(): void
+    +decreaseLikeCount(): void
+    +updateLikeCount(likeCount): void
+  }
 
-    %% 주문 항목
-    class OrderItem {
-        -orderItemId : Long
-        +orderId     : Long
-        +productId   : Long
-        -quantity    : Int
-        -price       : Long
-    }
+  class ProductLike {
+    -id: Long
+    -productId: Long
+    -memberId: Long
+    +create(productId, memberId): ProductLike
+  }
 
-    %% 재고
-    class Inventory {
-        -inventoryId : Long
-        +productId   : Long
-        -stock       : Long
-    }
+  class Orders {
+    -id: Long
+    -memberId: Long
+    -orderStatus: OrderStatus
+    -quantity: int
+    +create(memberId, quantity): Orders
+  }
 
-    %% 포인트 트랜잭션
-    class PointTransaction {
-        -pointTransactionId : Long
-        +memberId           : Long
-        +orderId            : Long
-        -amount             : Long
-        -type               : TransactionType
-    }
+  class OrderItem {
+    -id: Long
+    -ordersId: Long
+    -productId: Long
+    -quantity: int
+    -price: BigDecimal
+    +create(ordersId, productId, quantity, price): OrderItem
+  }
 
-    class OrderStatus {
-        <<enumeration>>
-        PENDING - 결제중
-        PAYED - 결제완료
-        CANCELLED - 취소
-    }
+  class Stock {
+    -id: Long
+    -productId: Long
+    -quantity: int
+    +create(productId, quantity): Stock
+    +decreaseQuantity(quantity): void
+  }
+  
+  class Coupon {
+    -id: Long
+    -name: String
+  }
 
-    class TransactionType {
-        <<enumeration>>
-        CHARGE - 충전
-        PAY - 지불
-    }
+  Member "1" -- "1" Point : has
+  Member "1" -- "0..*" PointHistory : has
+  Member "1" -- "0..*" Brand : owns
+  Member "1" -- "0..*" Product : creates
+  Member "1" -- "0..*" ProductLike : likes
+  Member "1" -- "0..*" Orders : places
+  
+  Point "1" -- "0..*" PointHistory : has
+  
+  Brand "1" -- "0..*" Product : has
+  
+  Product "1" -- "0..*" ProductLike : is liked by
+  Product "1" -- "1" Stock : has
+  Product "1" -- "0..*" OrderItem : is included in
+  
+  Orders "1" -- "1..*" OrderItem : contains
 
-    Member  "1" --> "0..*" Product        : 소유
-    Member  "1" --> "1..*" Role           : 소유
-    Member  "1" --> "1*"   Point          : 소유
-    Brand   "1" --> "0..*" Product        : 소유
-    Product "1" --> "1..*" ProductImage   : 소유
-    Product "1" --> "0..*" ProductLike    : 소유
-    Member  "1" --> "0..*" ProductLike    : 소유
-    Member  "1" --> "0..*" Order          : 소유
-    Order   "1" --> "1..*" OrderItem      : 소유
-    Product "1" --> "0..*" OrderItem      : 소유
-    Product "1" --> "1"    Inventory      : 소유
-    Member  "1" --> "0..*" PointTransaction : 소유
+```

@@ -11,6 +11,10 @@ public class PointService {
 
     private final PointRepository pointRepository;
 
+    public Point getPointByMemberIdWithLock(Long memberId) {
+        return pointRepository.findByMemberIdWithLock(memberId);
+    }
+
     public Point getPointByMemberId(Long memberId) {
         return pointRepository.findByMemberId(memberId);
     }

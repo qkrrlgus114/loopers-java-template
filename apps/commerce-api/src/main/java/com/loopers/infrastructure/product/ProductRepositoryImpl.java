@@ -34,4 +34,14 @@ public class ProductRepositoryImpl implements ProductRepository {
     public List<Product> findProductListByProductId(List<Long> productIds) {
         return productJpaRepository.findAllById(productIds);
     }
+
+    @Override
+    public Product findByIdForUpdate(Long productId) {
+        if (productId == null || productId <= 0) {
+            throw new IllegalArgumentException("유효하지 않은 상품 ID입니다.");
+        }
+
+        return productJpaRepository.findByIdForUpdate(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. productId: " + productId));
+    }
 }

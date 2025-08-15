@@ -5,6 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -20,10 +22,14 @@ class OrdersTest {
             // given
             Long memberId = null;
             int quantity = 2;
+            BigDecimal totalPrice = BigDecimal.valueOf(1000);
+            Long couponMemberId = null;
+            boolean couponUsed = false;
+
 
             // when & then
             assertThrows(CoreException.class, () -> {
-                Orders.create(memberId, quantity);
+                Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed);
             });
         }
 
@@ -33,11 +39,14 @@ class OrdersTest {
             // given
             Long memberId = 1L;
             int quantity = 0;
+            BigDecimal totalPrice = BigDecimal.valueOf(1000);
+            Long couponMemberId = null;
+            boolean couponUsed = false;
 
 
             // when & then
             assertThrows(CoreException.class, () -> {
-                Orders.create(memberId, quantity);
+                Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed);
             });
         }
 
@@ -47,10 +56,13 @@ class OrdersTest {
             // given
             Long memberId = 1L;
             int quantity = 2;
+            BigDecimal totalPrice = BigDecimal.valueOf(100);
+            Long couponMemberId = null;
+            boolean couponUsed = false;
 
 
             // when
-            Orders orders = Orders.create(memberId, quantity);
+            Orders orders = Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed);
 
             // then
             assertEquals(memberId, orders.getMemberId());

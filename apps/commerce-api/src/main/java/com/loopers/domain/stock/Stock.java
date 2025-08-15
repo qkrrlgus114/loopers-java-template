@@ -52,4 +52,13 @@ public class Stock extends BaseEntity {
         }
         this.quantity -= quantity;
     }
+
+    public void enoughQuantity(int quantity) {
+        if (quantity <= 0) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "확인할 수량은 1 이상이어야 합니다.");
+        }
+        if (this.quantity < quantity) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "재고가 부족합니다.");
+        }
+    }
 }

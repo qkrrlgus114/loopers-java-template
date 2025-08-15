@@ -21,4 +21,8 @@ public interface ProductLikeRepository {
     void delete(ProductLike productLike);
 
     List<ProductLikeGroup> countGroupByProductId();
+
+    List<Long> findProductLikeIdsByMemberId(Long memberId);
+
+    int countByProductId(Long productId);
 }

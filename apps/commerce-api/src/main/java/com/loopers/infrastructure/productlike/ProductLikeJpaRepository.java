@@ -18,4 +18,9 @@ public interface ProductLikeJpaRepository extends JpaRepository<ProductLike, Lon
             "FROM ProductLike pl GROUP BY pl.productId")
     List<ProductLikeGroup> countGroupByProductId();
 
+    @Query("SELECT pl.productId FROM ProductLike pl WHERE pl.memberId = :memberId")
+    List<Long> findProductLikeIdsByMemberId(Long memberId);
+
+    @Query("SELECT COUNT(pl) FROM ProductLike pl WHERE pl.productId = :productId")
+    int countByProductId(Long productId);
 }
