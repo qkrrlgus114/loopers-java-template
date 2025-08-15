@@ -2,8 +2,11 @@ package com.loopers.interfaces.api.product;
 
 import com.loopers.application.product.facade.ProductFacade;
 import com.loopers.application.product.result.ProductListResult;
+import com.loopers.application.product.command.ProductDetailCommand;
+import com.loopers.application.product.result.ProductDetailResult;
 import com.loopers.application.product.result.ProductRegisterResult;
 import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.interfaces.api.product.dto.ProductDetailResponseDto;
 import com.loopers.interfaces.api.product.dto.ProductRegisterReqDTO;
 import com.loopers.interfaces.api.product.dto.ProductRegisterResDTO;
 import com.loopers.interfaces.api.product.dto.ProductSearchResDTO;
@@ -40,6 +43,18 @@ public class ProductV1Controller {
         ProductSearchResDTO productSearchResDTO = ProductSearchResDTO.of(productListResults);
 
         return ApiResponse.success(productSearchResDTO);
+    }
+
+    /*
+     * 상품 상세 조회
+     * */
+    @GetMapping("/products/{productId}")
+    public ApiResponse<ProductDetailResponseDto> getProductDetail(
+            @PathVariable("productId") Long productId,
+            @RequestParam("memberId") Long memberId) {
+        ProductDetailCommand command = new ProductDetailCommand(productId, memberId);
+        ProductDetailResult productDetailResult = productFacade.getProductDetail(command);
+        return ApiResponse.success(ProductDetailResponseDto.of(productDetailResult));
     }
 
     /*
