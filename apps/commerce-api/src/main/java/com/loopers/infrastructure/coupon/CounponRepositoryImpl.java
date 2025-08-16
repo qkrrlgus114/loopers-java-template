@@ -2,12 +2,11 @@ package com.loopers.infrastructure.coupon;
 
 import com.loopers.domain.coupon.Coupon;
 import com.loopers.domain.coupon.CouponRepository;
-import com.loopers.support.error.CommonErrorType;
-import com.loopers.support.error.CoreException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -26,8 +25,7 @@ public class CounponRepositoryImpl implements CouponRepository {
     }
 
     @Override
-    public Coupon findById(Long couponId) {
-        return couponJpaRepository.findById(couponId)
-                .orElseThrow(() -> new CoreException(CommonErrorType.BAD_REQUEST, "쿠폰을 찾을 수 없습니다. 쿠폰 ID: " + couponId));
+    public Optional<Coupon> findById(Long couponId) {
+        return couponJpaRepository.findById(couponId);
     }
 }
