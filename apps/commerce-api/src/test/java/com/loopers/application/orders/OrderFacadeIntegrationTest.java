@@ -410,7 +410,7 @@ public class OrderFacadeIntegrationTest {
 
                 // then
                 List<OrdersInfoResult> ordersList = ordersFacade.getOrdersByMemberId(setUpMember.getId());
-                Point point = pointRepository.findByMemberId(setUpMember.getId());
+                Point point = pointRepository.findByMemberId(setUpMember.getId()).get();
 
                 assertAll(
                         () -> assertNotNull(ordersList),
@@ -539,7 +539,7 @@ public class OrderFacadeIntegrationTest {
             ordersFacade.placeOrder(placeOrderCommand);
 
             // Then
-            Point updatedPoint = pointRepository.findById(setUpPoint.getId());
+            Point updatedPoint = pointRepository.findById(setUpPoint.getId()).get();
             Stock updatedStock = stockRepository.findById(setUpStock.getId());
 
             BigDecimal totalCost = BigDecimal.valueOf((long) quantity1 * price1 + (long) quantity2 * price2);
