@@ -28,18 +28,22 @@ public class Orders extends BaseEntity {
     @Column(nullable = true)
     private Long couponMemberId;
 
+    @Column(nullable = false)
+    private String orderKey;
+
     protected Orders() {
     }
 
-    private Orders(Long memberId, int quantity, BigDecimal totalPrice, Long couponMemberId) {
+    private Orders(Long memberId, int quantity, BigDecimal totalPrice, Long couponMemberId, String orderKey) {
         this.memberId = memberId;
         this.orderStatus = OrderStatus.PENDING;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
         this.couponMemberId = couponMemberId;
+        this.orderKey = orderKey;
     }
 
-    public static Orders create(Long memberId, int quantity, BigDecimal totalPrice, Long couponMemberId, boolean couponUsed) {
+    public static Orders create(Long memberId, int quantity, BigDecimal totalPrice, Long couponMemberId, boolean couponUsed, String orderKey) {
         if (memberId == null || memberId <= 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 회원 ID가 필요합니다.");
         }
@@ -52,8 +56,11 @@ public class Orders extends BaseEntity {
         if (couponUsed && (couponMemberId == null || couponMemberId <= 0)) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "쿠폰 사용 시 유효한 쿠폰 회원 ID가 필요합니다.");
         }
+        if (orderKey == null || orderKey.isBlank()) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 주문 키가 필요합니다.");
+        }
 
-        return new Orders(memberId, quantity, totalPrice, couponMemberId);
+        return new Orders(memberId, quantity, totalPrice, couponMemberId, orderKey);
     }
 
     public Long getMemberId() {
@@ -74,5 +81,9 @@ public class Orders extends BaseEntity {
 
     public Long getCouponMemberId() {
         return couponMemberId;
+    }
+
+    public String getOrderKey() {
+        return orderKey;
     }
 }
