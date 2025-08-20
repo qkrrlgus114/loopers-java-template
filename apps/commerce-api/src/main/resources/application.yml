@@ -24,6 +24,37 @@ spring:
       - logging.yml
       - monitoring.yml
 
+resilience4j:
+  retry:
+    instances:
+      pg-api:
+        maxAttempts: 2           # 총 시도 횟수 (원호출 + 재시도 포함)
+        waitDuration: 300ms
+        retryExceptions:
+          - java.net.ConnectException # 연결 실패
+          - java.net.SocketTimeoutException # 소켓 타임아웃
+          - org.springframework.web.client.HttpServerErrorException   # 5xx
+          - org.springframework.web.client.ResourceAccessException    # 타임아웃/커넥션
+        ignoreExceptions:
+          - org.springframework.web.client.HttpClientErrorException   # 4xx는 보통 재시도 안함
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2.0
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-type: count_based # 슬라이딩 윈도우 타입(횟수 기반)
+        sliding-window-size: 100 # 슬라이딩 윈도우 크기
+        failure-rate-threshold: 10 # 실패율 임계값(%)
+        minimum-number-of-calls: 2 # 통계 반영 최소 호출 수
+        slow-call-rate-threshold: 20 # 느린 호출 비율 임계값(%)
+        slow-call-duration-threshold: 1500
+        wait-duration-in-open-state: 1000 # 오픈 상태에서 대기 시간(OPEN -> HALF_OPEN)
+        permitted-number-of-calls-in-half-open-state: 1 # HALF_OPEN 상태에서 허용되는 호출 수
+        event-consumer-buffer-size: 1
+        register-health-indicator: true
+        recordExceptions:
+          - java.lang.Throwable
+
 springdoc:
   use-fqn: true
   swagger-ui:
