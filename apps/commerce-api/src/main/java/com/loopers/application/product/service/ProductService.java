@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -92,7 +91,6 @@ public class ProductService {
         return products.stream().map(ProductListResult::of).toList();
     }
 
-    @Transactional
     public ProductRegisterResult registerProduct(ProductRegisterReqDTO reqDTO) {
         if (reqDTO == null) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "상품 등록 요청이 유효하지 않습니다.");

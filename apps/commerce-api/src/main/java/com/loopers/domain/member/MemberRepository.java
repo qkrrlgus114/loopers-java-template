@@ -10,5 +10,4 @@ public interface MemberRepository {
     Optional<Member> register(Member member);
 
     Optional<Member> findById(Long memberId);
-
 }

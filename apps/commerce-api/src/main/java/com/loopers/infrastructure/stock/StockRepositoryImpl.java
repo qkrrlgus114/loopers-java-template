@@ -2,6 +2,8 @@ package com.loopers.infrastructure.stock;
 
 import com.loopers.domain.stock.Stock;
 import com.loopers.domain.stock.StockRepository;
+import com.loopers.support.error.CommonErrorType;
+import com.loopers.support.error.CoreException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,13 +17,13 @@ public class StockRepositoryImpl implements StockRepository {
     @Override
     public Stock findByProductIdWithLock(Long productId) {
         return stockJpaRepository.findByProductIdWithLock(productId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 상품의 재고를 찾을 수 없습니다. productId: " + productId));
+                .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "해당 상품의 재고를 찾을 수 없습니다. productId: " + productId));
     }
 
     @Override
     public Stock findByProductId(Long productId) {
         return stockJpaRepository.findByProductId(productId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 상품의 재고를 찾을 수 없습니다. productId: " + productId));
+                .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "해당 상품의 재고를 찾을 수 없습니다. productId: " + productId));
     }
 
     @Override
@@ -32,6 +34,6 @@ public class StockRepositoryImpl implements StockRepository {
     @Override
     public Stock findById(Long id) {
         return stockJpaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 재고를 찾을 수 없습니다. id: " + id));
+                .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "해당 재고를 찾을 수 없습니다. id: " + id));
     }
 }

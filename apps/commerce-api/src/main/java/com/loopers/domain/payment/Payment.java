@@ -15,7 +15,10 @@ public class Payment extends BaseEntity {
     private String transactionKey;
 
     @Column(nullable = false)
-    private String orderId;
+    private Long orderId;
+
+    @Column(nullable = false)
+    private String orderKey;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -24,6 +27,9 @@ public class Payment extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
     private CardType cardType;
+
+    @Column(nullable = false)
+    private Long memberId;
 
     @Column(nullable = true)
     private String cardNo;
@@ -41,24 +47,29 @@ public class Payment extends BaseEntity {
     protected Payment() {
     }
 
-    private Payment(String orderId, PaymentType paymentType, CardType cardType, String cardNo, BigDecimal amount) {
+    private Payment(Long orderId, String orderKey, PaymentType paymentType, CardType cardType, String cardNo, BigDecimal amount, Long memberId) {
         this.orderId = orderId;
+        this.orderKey = orderKey;
         this.paymentType = paymentType;
         this.cardType = cardType;
         this.cardNo = cardNo;
         this.amount = amount;
         this.status = PaymentStatus.PENDING;
+        this.memberId = memberId;
     }
 
-    public static Payment create(String orderId, PaymentType paymentType, CardType cardType, String cardNo, BigDecimal amount) {
-        isValid(orderId, paymentType, cardType, cardNo, amount);
+    public static Payment create(Long orderId, String orderKey, PaymentType paymentType, CardType cardType, String cardNo, BigDecimal amount, Long memberId) {
+        isValid(orderId, orderKey, paymentType, cardType, cardNo, amount, memberId);
 
-        return new Payment(orderId, paymentType, cardType, cardNo, amount);
+        return new Payment(orderId, orderKey, paymentType, cardType, cardNo, amount, memberId);
     }
 
-    public static void isValid(String orderId, PaymentType paymentType, CardType cardType, String cardNo, BigDecimal amount) {
-        if (orderId == null || orderId.isBlank()) {
+    public static void isValid(Long orderId, String orderKey, PaymentType paymentType, CardType cardType, String cardNo, BigDecimal amount, Long memberId) {
+        if (orderId == null || orderId <= 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 주문 ID가 필요합니다.");
+        }
+        if (orderKey == null || orderKey.isBlank()) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 주문 키가 필요합니다.");
         }
         if (paymentType == null || !PaymentType.isValid(paymentType)) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 결제 유형이 필요합니다.");
@@ -75,6 +86,9 @@ public class Payment extends BaseEntity {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 금액이 필요합니다.");
         }
+        if (memberId == null || memberId <= 0) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 회원 ID가 필요합니다.");
+        }
 
     }
 
@@ -82,8 +96,12 @@ public class Payment extends BaseEntity {
         return transactionKey;
     }
 
-    public String getOrderId() {
+    public Long getOrderId() {
         return orderId;
+    }
+
+    public String getOrderKey() {
+        return orderKey;
     }
 
     public PaymentType getPaymentType() {
@@ -108,6 +126,10 @@ public class Payment extends BaseEntity {
 
     public String getReason() {
         return reason;
+    }
+
+    public Long getMemberId() {
+        return memberId;
     }
 
     public void updateTransactionKey(String transactionKey) {

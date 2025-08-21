@@ -32,13 +32,11 @@ public class PointPaymentProcessor implements PaymentProcessor {
         // 포인트 사용
         point.use(paymentContext.amount());
 
-        // 결제 데이터 생성
-        paymentService.register(
-                paymentContext.orderKey(),
-                PaymentType.POINT,
-                null, // 포인트 결제는 카드 타입이 없음
-                null, // 포인트 결제는 카드 번호가 없음
-                paymentContext.amount()
+        return PaymentResult.of(
+                "SUCCESS",
+                "COMPLETED",
+                null,
+                null
         );
     }
 }

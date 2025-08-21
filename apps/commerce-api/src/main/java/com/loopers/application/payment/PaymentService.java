@@ -1,9 +1,7 @@
 package com.loopers.application.payment;
 
-import com.loopers.domain.payment.CardType;
-import com.loopers.domain.payment.Payment;
-import com.loopers.domain.payment.PaymentRepository;
-import com.loopers.domain.payment.PaymentType;
+import com.loopers.domain.payment.*;
+import com.loopers.infrastructure.payment.PgPaymentInfoResponse;
 import com.loopers.support.error.CommonErrorType;
 import com.loopers.support.error.CoreException;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +20,16 @@ public class PaymentService {
     /*
      * 결제 Entity 등록
      * */
-    public Payment register(String orderKey,
-                            PaymentType paymentType,
-                            CardType cardType,
-                            String cardNo,
-                            BigDecimal amount) {
+    public Payment register(
+            Long orderId,
+            String orderKey,
+            PaymentType paymentType,
+            CardType cardType,
+            String cardNo,
+            BigDecimal amount,
+            Long memberId) {
 
-        Payment payment = Payment.create(orderKey, paymentType, cardType, cardNo, amount);
+        Payment payment = Payment.create(orderId, orderKey, paymentType, cardType, cardNo, amount, memberId);
 
         return paymentRepository.save(payment);
     }
@@ -36,5 +37,18 @@ public class PaymentService {
     public Payment findById(Long paymentId) {
         return paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "결제 정보를 찾을 수 없습니다. paymentId: " + paymentId));
+    }
+
+    public Long findMemberIdByTransactionKey(String transactionKey) {
+        return paymentRepository.findMemberIdByTransactionKey(transactionKey)
+                .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "트랜잭션 키로 회원 ID를 찾을 수 없습니다. transactionKey: " + transactionKey));
+    }
+
+    public void updatePaymentInfo(PgPaymentInfoResponse paymentInfo) {
+        Payment payment = paymentRepository.findByTransactionKey(paymentInfo.data().transactionKey())
+                .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "트랜잭션 키로 결제 정보를 찾을 수 없습니다. transactionKey: " + paymentInfo.data().transactionKey()));
+
+        PaymentStatus paymentStatus = PaymentStatus.fromString(paymentInfo.data().status());
+        payment.updateStatus(paymentStatus, paymentInfo.data().reason());
     }
 }

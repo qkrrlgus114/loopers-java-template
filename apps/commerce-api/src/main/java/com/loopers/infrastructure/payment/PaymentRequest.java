@@ -12,7 +12,7 @@ public record PaymentRequest(
         String callbackUrl
 ) {
 
-    private static final String CALLBACK_URL = "http://localhost:8080/api/v1/orders/callback";
+    private static final String CALLBACK_URL = "http://localhost:8080/api/v1/payments/callback";
 
     public static PaymentRequest of(String orderId, CardType cardType, String cardNo, BigDecimal amount) {
         return new PaymentRequest(orderId, cardType, cardNo, amount.toPlainString(), CALLBACK_URL);

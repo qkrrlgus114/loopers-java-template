@@ -41,11 +41,11 @@ public class CardPaymentProcessor implements PaymentProcessor {
 
         // FAIL이 떨어지는 경우
         if (pgPaymentResponse != null && !pgPaymentResponse.meta().result().equals("SUCCESS")) {
-            log.error("PG 결제 실패 | orderKey={}, memberId={}, error={}",
-                    paymentContext.orderKey(), paymentContext.memberId(), pgPaymentResponse.data().reason());
+            log.error("PG 결제 실패 | orderKey={}, memberId={}, error={}, message={}",
+                    paymentContext.orderKey(), paymentContext.memberId(), pgPaymentResponse.data().reason(), pgPaymentResponse.meta().message());
 
             // 실패 상태 + 사유 업데이트
-            payment.updateStatus(PaymentStatus.FAILED, pgPaymentResponse.data().reason());
+            payment.updateStatus(PaymentStatus.FAILED, pgPaymentResponse.meta().message());
 
             return PaymentResult.of(
                     pgPaymentResponse.meta().result(),
