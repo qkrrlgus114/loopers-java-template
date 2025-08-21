@@ -5,6 +5,7 @@ import com.loopers.domain.payment.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -31,5 +32,10 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public Optional<Payment> findByTransactionKey(String transactionKey) {
         return paymentJpaRepository.findByTransactionKey(transactionKey);
+    }
+
+    @Override
+    public List<Payment> findByFailedPaymentStatus() {
+        return paymentJpaRepository.findByFailedPaymentStatus();
     }
 }

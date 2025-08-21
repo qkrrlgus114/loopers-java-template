@@ -1,5 +1,6 @@
 package com.loopers.domain.payment;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PaymentRepository {
@@ -10,4 +11,6 @@ public interface PaymentRepository {
     Optional<Long> findMemberIdByTransactionKey(String transactionKey);
 
     Optional<Payment> findByTransactionKey(String transactionKey);
+
+    List<Payment> findByFailedPaymentStatus();
 }

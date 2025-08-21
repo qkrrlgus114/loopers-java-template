@@ -44,6 +44,9 @@ public class Payment extends BaseEntity {
     @Column(nullable = true, length = 500)
     private String reason;
 
+    @Column(nullable = false)
+    private boolean restoredStatus;
+
     protected Payment() {
     }
 
@@ -56,6 +59,7 @@ public class Payment extends BaseEntity {
         this.amount = amount;
         this.status = PaymentStatus.PENDING;
         this.memberId = memberId;
+        this.restoredStatus = false;
     }
 
     public static Payment create(Long orderId, String orderKey, PaymentType paymentType, CardType cardType, String cardNo, BigDecimal amount, Long memberId) {
@@ -132,6 +136,10 @@ public class Payment extends BaseEntity {
         return memberId;
     }
 
+    public boolean isRestoredStatus() {
+        return restoredStatus;
+    }
+
     public void updateTransactionKey(String transactionKey) {
         if (transactionKey == null || transactionKey.isBlank()) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 트랜잭션 키가 필요합니다.");
@@ -145,5 +153,12 @@ public class Payment extends BaseEntity {
         }
         this.status = status;
         this.reason = reason;
+    }
+
+    public void restoreStock() {
+        if (this.restoredStatus) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "이미 재고가 복원되었습니다.");
+        }
+        this.restoredStatus = true;
     }
 }

@@ -21,4 +21,8 @@ public class StockService {
         Stock stock = Stock.create(productId, stockQuantity);
         stockRepository.register(stock);
     }
+
+    public Stock findStockByProductIdWithLock(Long productId) {
+        return stockRepository.findByProductIdWithLock(productId);
+    }
 }
