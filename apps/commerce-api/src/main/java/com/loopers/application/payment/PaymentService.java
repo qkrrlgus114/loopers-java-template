@@ -7,6 +7,7 @@ import com.loopers.support.error.CoreException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -63,7 +64,7 @@ public class PaymentService {
         return paymentRepository.findByPendingPaymentStatus();
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updatePaymentInfoTransactional(PgPaymentInfoResponse paymentInfo) {
         // 결제 정보 업데이트
         this.updatePaymentInfo(paymentInfo);
