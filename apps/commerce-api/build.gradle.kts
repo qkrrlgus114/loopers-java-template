@@ -22,4 +22,6 @@ dependencies {
 
     // test-fixtures
     testImplementation(testFixtures(project(":modules:jpa")))
+
+    implementation("org.apache.httpcomponents.client5:httpclient5")
 }
