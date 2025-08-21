@@ -1,13 +1,8 @@
 package com.loopers.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+import jakarta.persistence.*;
 import lombok.Getter;
+
 import java.time.ZonedDateTime;
 
 /**
@@ -25,7 +20,7 @@ public abstract class BaseEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private ZonedDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "deleted_at")
@@ -35,7 +30,8 @@ public abstract class BaseEntity {
      * 엔티티의 유효성을 검증한다.
      * 이 메소드는 PrePersist 및 PreUpdate 시점에 호출된다.
      */
-    protected void guard() {}
+    protected void guard() {
+    }
 
     @PrePersist
     private void prePersist() {

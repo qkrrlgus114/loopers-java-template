@@ -1,7 +1,9 @@
 package com.loopers.domain.product;
 
+import com.loopers.support.sort.ProductSortType;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,4 +20,6 @@ public interface ProductRepository {
     List<Product> findProductListByProductId(List<Long> productIds);
 
     Product findByIdForUpdate(Long productId);
+
+    List<Product> searchProducts(ProductSortType sort, int page, BigDecimal minPrice, BigDecimal maxPrice, String brands);
 }
