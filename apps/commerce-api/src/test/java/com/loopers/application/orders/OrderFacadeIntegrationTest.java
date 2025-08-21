@@ -131,7 +131,7 @@ public class OrderFacadeIntegrationTest {
 
             assertAll(
                     () -> assertNotNull(ordersRegisterInfoResult),
-                    () -> assertEquals(OrderStatus.PENDING, ordersRegisterInfoResult.getStatus())
+                    () -> assertEquals(OrderStatus.PENDING, ordersRegisterInfoResult.getOrderStatus())
             );
         }
 
@@ -175,7 +175,7 @@ public class OrderFacadeIntegrationTest {
             // Then
             assertAll(
                     () -> assertNotNull(ordersRegisterInfoResult),
-                    () -> assertEquals(OrderStatus.PENDING, ordersRegisterInfoResult.getStatus()),
+                    () -> assertEquals(OrderStatus.PENDING, ordersRegisterInfoResult.getOrderStatus()),
                     () -> assertEquals(0, ordersRegisterInfoResult.getTotalPrice().compareTo(BigDecimal.valueOf(3000L)))
             );
         }
@@ -220,7 +220,7 @@ public class OrderFacadeIntegrationTest {
             // Then
             assertAll(
                     () -> assertNotNull(ordersRegisterInfoResult),
-                    () -> assertEquals(OrderStatus.PENDING, ordersRegisterInfoResult.getStatus()),
+                    () -> assertEquals(OrderStatus.PENDING, ordersRegisterInfoResult.getOrderStatus()),
                     () -> assertEquals(0, ordersRegisterInfoResult.getTotalPrice().compareTo(BigDecimal.valueOf(3600L)))
             );
         }

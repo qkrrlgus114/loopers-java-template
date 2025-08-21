@@ -42,20 +42,19 @@ public class PaymentGatewayRestPort implements PaymentGatewayPort {
                 exchange(PAYMENT_API_URL, HttpMethod.POST, httpEntity, new ParameterizedTypeReference<>() {
                 });
 
-
         return response.getBody();
     }
 
     private PgPaymentResponse paymentFallback(String orderKey, CardType cardType, String cardNo, BigDecimal amount,
                                               Long memberId, Throwable t) {
         if (t instanceof io.github.resilience4j.circuitbreaker.CallNotPermittedException) {
-            log.error("서킷 브레이커 발동: {}", t.getMessage());
+            log.error("CurcuitBreaker 열림 : {}", t.getMessage());
             return new PgPaymentResponse(
                     new PgPaymentResponse.Meta("FAIL", "TIMEOUT", "PG 호출이 지연되었습니다.(서킷브레이커 발동)"),
                     new PgPaymentResponse.Data(null, "CIRCUIT_BREAKER_OPEN", t.getMessage())
             );
         } else {
-            log.error("PG 호출 실패: {}", t.getMessage());
+            log.error("Retry 시도 : {}", t.getMessage());
             return new PgPaymentResponse(
                     new PgPaymentResponse.Meta("FAIL", "RETRY_FAIL", "PG 호출이 실패했습니다.(재시도 실패)"),
                     new PgPaymentResponse.Data(null, "RETRY_FAIL", t.getMessage())

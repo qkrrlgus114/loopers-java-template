@@ -78,14 +78,16 @@ public class Payment extends BaseEntity {
         if (paymentType == null || !PaymentType.isValid(paymentType)) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 결제 유형이 필요합니다.");
         }
-        if (cardType == null || !CardType.isValid(cardType)) {
-            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 카드 유형이 필요합니다.");
-        }
-        if (cardNo == null || cardNo.isBlank()) {
-            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 카드 번호가 필요합니다.");
-        }
-        if (!cardNo.matches("\\d{4}-\\d{4}-\\d{4}-\\d{4}")) {
-            throw new CoreException(CommonErrorType.BAD_REQUEST, "카드 번호는 xxxx-xxxx-xxxx-xxxx 형식이어야 합니다.");
+        if (paymentType == PaymentType.CARD) {
+            if (cardType == null || !CardType.isValid(cardType)) {
+                throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 카드 유형이 필요합니다.");
+            }
+            if (cardNo == null || cardNo.isBlank()) {
+                throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 카드 번호가 필요합니다.");
+            }
+            if (!cardNo.matches("\\d{4}-\\d{4}-\\d{4}-\\d{4}")) {
+                throw new CoreException(CommonErrorType.BAD_REQUEST, "카드 번호는 xxxx-xxxx-xxxx-xxxx 형식이어야 합니다.");
+            }
         }
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 금액이 필요합니다.");

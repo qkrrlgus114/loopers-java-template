@@ -56,17 +56,19 @@ public class PaymentFacade {
 
     }
 
-    @Transactional
     public void updatePendingPayments() {
         // 결제 대기 건 전부 조회
         List<Payment> pendingPayments = paymentService.findByPendingPaymentStatus();
 
         for (Payment payment : pendingPayments) {
-            // 결제 정보 조회
-            PgPaymentInfoResponse paymentInfo = client.getPaymentInfo(payment.getTransactionKey(), payment.getMemberId());
+            try {
+                // 결제 정보 조회
+                PgPaymentInfoResponse paymentInfo = client.getPaymentInfo(payment.getTransactionKey(), payment.getMemberId());
 
-            // 결제 정보 업데이트
-            paymentService.updatePaymentInfo(paymentInfo);
+                paymentService.updatePaymentInfoTransactional(paymentInfo);
+            } catch (Exception e) {
+                log.error("결제 대기 건 처리 중 오류 발생 | paymentId={}, error={}", payment.getId(), e.getMessage());
+            }
         }
     }
 }
