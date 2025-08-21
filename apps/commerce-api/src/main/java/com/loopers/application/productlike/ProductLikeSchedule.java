@@ -1,4 +1,4 @@
-package com.loopers.infrastructure.productlike;
+package com.loopers.application.productlike;
 
 import com.loopers.application.productlike.facade.ProductLikeFacade;
 import lombok.RequiredArgsConstructor;
