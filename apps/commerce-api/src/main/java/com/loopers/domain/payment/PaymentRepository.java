@@ -13,4 +13,6 @@ public interface PaymentRepository {
     Optional<Payment> findByTransactionKey(String transactionKey);
 
     List<Payment> findByFailedPaymentStatus();
+
+    List<Payment> findByPendingPaymentStatus();
 }

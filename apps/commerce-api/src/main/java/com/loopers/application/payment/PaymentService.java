@@ -58,4 +58,8 @@ public class PaymentService {
     }
 
 
+    public List<Payment> findByPendingPaymentStatus() {
+        return paymentRepository.findByPendingPaymentStatus();
+    }
 }
+

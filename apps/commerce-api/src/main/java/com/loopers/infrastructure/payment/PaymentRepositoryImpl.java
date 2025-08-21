@@ -38,4 +38,9 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     public List<Payment> findByFailedPaymentStatus() {
         return paymentJpaRepository.findByFailedPaymentStatus();
     }
+
+    @Override
+    public List<Payment> findByPendingPaymentStatus() {
+        return paymentJpaRepository.findByPendingPaymentStatus();
+    }
 }

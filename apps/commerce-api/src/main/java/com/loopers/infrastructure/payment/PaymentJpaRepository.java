@@ -17,4 +17,7 @@ public interface PaymentJpaRepository extends JpaRepository<Payment, Long> {
 
     @Query("SELECT p FROM Payment p WHERE p.status = 'FAILED' and p.restoredStatus = false ")
     List<Payment> findByFailedPaymentStatus();
+
+    @Query("SELECT p FROM Payment p WHERE p.status = 'PENDING'")
+    List<Payment> findByPendingPaymentStatus();
 }

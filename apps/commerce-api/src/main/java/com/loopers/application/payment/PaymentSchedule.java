@@ -16,4 +16,10 @@ public class PaymentSchedule {
     public void updatePaymentInfo() {
         paymentFacade.searchFailedPaymentAndUpdateStock();
     }
+
+    // 3분마다 결제 대기 건 찾아서 결제 정보 업데이트
+    @Scheduled(fixedRate = 60 * 1000 * 3)
+    public void processCallbackPayment() {
+        paymentFacade.updatePendingPayments();
+    }
 }
