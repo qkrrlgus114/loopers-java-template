@@ -1,6 +1,7 @@
 package com.loopers.domain.orders;
 
 import com.loopers.support.error.CoreException;
+import com.loopers.support.util.UUIDUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,11 +26,12 @@ class OrdersTest {
             BigDecimal totalPrice = BigDecimal.valueOf(1000);
             Long couponMemberId = null;
             boolean couponUsed = false;
+            String orderKey = UUIDUtil.generateUUID();
 
 
             // when & then
             assertThrows(CoreException.class, () -> {
-                Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed);
+                Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed, orderKey);
             });
         }
 
@@ -42,11 +44,12 @@ class OrdersTest {
             BigDecimal totalPrice = BigDecimal.valueOf(1000);
             Long couponMemberId = null;
             boolean couponUsed = false;
+            String orderKey = UUIDUtil.generateUUID();
 
 
             // when & then
             assertThrows(CoreException.class, () -> {
-                Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed);
+                Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed, orderKey);
             });
         }
 
@@ -59,10 +62,11 @@ class OrdersTest {
             BigDecimal totalPrice = BigDecimal.valueOf(100);
             Long couponMemberId = null;
             boolean couponUsed = false;
+            String orderKey = UUIDUtil.generateUUID();
 
 
             // when
-            Orders orders = Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed);
+            Orders orders = Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed, orderKey);
 
             // then
             assertEquals(memberId, orders.getMemberId());

@@ -1,12 +1,14 @@
 package com.loopers.domain.point;
 
+import java.util.Optional;
+
 public interface PointRepository {
 
-    Point findByMemberIdWithLock(Long memberId);
+    Optional<Point> findByMemberIdWithLock(Long memberId);
 
-    Point findByMemberId(Long memberId);
+    Optional<Point> findByMemberId(Long memberId);
 
     Point register(Point point);
 
-    Point findById(Long id);
+    Optional<Point> findById(Long id);
 }

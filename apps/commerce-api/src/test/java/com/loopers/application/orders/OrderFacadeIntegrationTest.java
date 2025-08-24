@@ -13,6 +13,8 @@ import com.loopers.domain.couponmember.CouponMemberRepository;
 import com.loopers.domain.member.Member;
 import com.loopers.domain.member.MemberRepository;
 import com.loopers.domain.orders.OrderStatus;
+import com.loopers.domain.payment.CardType;
+import com.loopers.domain.payment.PaymentType;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.Product;
@@ -119,14 +121,17 @@ public class OrderFacadeIntegrationTest {
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
                     items,
-                    null
+                    null,
+                    PaymentType.CARD,
+                    CardType.SAMSUNG,
+                    "1234-1234-1234-1234"
             );
 
             OrdersRegisterInfoResult ordersRegisterInfoResult = ordersFacade.placeOrder(placeOrderCommand);
 
             assertAll(
                     () -> assertNotNull(ordersRegisterInfoResult),
-                    () -> assertEquals(OrderStatus.PENDING, ordersRegisterInfoResult.getStatus())
+                    () -> assertEquals(OrderStatus.PENDING, ordersRegisterInfoResult.getOrderStatus())
             );
         }
 
@@ -158,7 +163,10 @@ public class OrderFacadeIntegrationTest {
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
                     items,
-                    couponMember.getCouponId()
+                    couponMember.getCouponId(),
+                    PaymentType.POINT,
+                    null,
+                    null
             );
 
             // When
@@ -167,7 +175,7 @@ public class OrderFacadeIntegrationTest {
             // Then
             assertAll(
                     () -> assertNotNull(ordersRegisterInfoResult),
-                    () -> assertEquals(OrderStatus.PENDING, ordersRegisterInfoResult.getStatus()),
+                    () -> assertEquals(OrderStatus.PENDING, ordersRegisterInfoResult.getOrderStatus()),
                     () -> assertEquals(0, ordersRegisterInfoResult.getTotalPrice().compareTo(BigDecimal.valueOf(3000L)))
             );
         }
@@ -200,7 +208,10 @@ public class OrderFacadeIntegrationTest {
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
                     items,
-                    couponMember.getCouponId()
+                    couponMember.getCouponId(),
+                    PaymentType.POINT,
+                    null,
+                    null
             );
 
             // When
@@ -209,7 +220,7 @@ public class OrderFacadeIntegrationTest {
             // Then
             assertAll(
                     () -> assertNotNull(ordersRegisterInfoResult),
-                    () -> assertEquals(OrderStatus.PENDING, ordersRegisterInfoResult.getStatus()),
+                    () -> assertEquals(OrderStatus.PENDING, ordersRegisterInfoResult.getOrderStatus()),
                     () -> assertEquals(0, ordersRegisterInfoResult.getTotalPrice().compareTo(BigDecimal.valueOf(3600L)))
             );
         }
@@ -242,7 +253,10 @@ public class OrderFacadeIntegrationTest {
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
                     items,
-                    couponMember.getCouponId()
+                    couponMember.getCouponId(),
+                    PaymentType.POINT,
+                    null,
+                    null
             );
 
             // When & Then
@@ -265,6 +279,9 @@ public class OrderFacadeIntegrationTest {
                 PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                         setUpMember.getId(),
                         items,
+                        null,
+                        PaymentType.POINT,
+                        null,
                         null
                 );
 
@@ -327,7 +344,10 @@ public class OrderFacadeIntegrationTest {
                 PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                         setUpMember.getId(),
                         items,
-                        couponMember.getCouponId()
+                        couponMember.getCouponId(),
+                        PaymentType.POINT,
+                        null,
+                        null
                 );
 
                 int threadCount = 10;
@@ -371,11 +391,17 @@ public class OrderFacadeIntegrationTest {
                 PlaceOrderCommand placeOrderCommand1 = PlaceOrderCommand.of(
                         setUpMember.getId(),
                         items1,
+                        null,
+                        PaymentType.POINT,
+                        null,
                         null
                 );
                 PlaceOrderCommand placeOrderCommand2 = PlaceOrderCommand.of(
                         setUpMember.getId(),
                         items2,
+                        null,
+                        PaymentType.POINT,
+                        null,
                         null
                 );
 
@@ -410,7 +436,7 @@ public class OrderFacadeIntegrationTest {
 
                 // then
                 List<OrdersInfoResult> ordersList = ordersFacade.getOrdersByMemberId(setUpMember.getId());
-                Point point = pointRepository.findByMemberId(setUpMember.getId());
+                Point point = pointRepository.findByMemberId(setUpMember.getId()).get();
 
                 assertAll(
                         () -> assertNotNull(ordersList),
@@ -429,6 +455,9 @@ public class OrderFacadeIntegrationTest {
                 PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                         setUpMember.getId(),
                         items,
+                        null,
+                        PaymentType.POINT,
+                        null,
                         null
                 );
 
@@ -487,7 +516,10 @@ public class OrderFacadeIntegrationTest {
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
                     items,
-                    couponMember.getCouponId()
+                    couponMember.getCouponId(),
+                    PaymentType.POINT,
+                    null,
+                    null
             );
 
             // When & Then
@@ -506,7 +538,10 @@ public class OrderFacadeIntegrationTest {
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
                     items,
-                    9999L // 존재하지 않는 쿠폰 ID
+                    9999L, // 존재하지 않는 쿠폰 ID
+                    PaymentType.POINT,
+                    null,
+                    null
             );
 
             // When & Then
@@ -532,6 +567,9 @@ public class OrderFacadeIntegrationTest {
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
                     items,
+                    null,
+                    PaymentType.POINT,
+                    null,
                     null
             );
 
@@ -539,7 +577,7 @@ public class OrderFacadeIntegrationTest {
             ordersFacade.placeOrder(placeOrderCommand);
 
             // Then
-            Point updatedPoint = pointRepository.findById(setUpPoint.getId());
+            Point updatedPoint = pointRepository.findById(setUpPoint.getId()).get();
             Stock updatedStock = stockRepository.findById(setUpStock.getId());
 
             BigDecimal totalCost = BigDecimal.valueOf((long) quantity1 * price1 + (long) quantity2 * price2);
@@ -560,6 +598,9 @@ public class OrderFacadeIntegrationTest {
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
                     items,
+                    null,
+                    PaymentType.POINT,
+                    null,
                     null
             );
 
@@ -578,6 +619,9 @@ public class OrderFacadeIntegrationTest {
             PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                     setUpMember.getId(),
                     items,
+                    null,
+                    PaymentType.POINT,
+                    null,
                     null
             );
 
@@ -598,6 +642,9 @@ public class OrderFacadeIntegrationTest {
         PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.of(
                 setUpMember.getId(),
                 items,
+                null,
+                PaymentType.POINT,
+                null,
                 null
         );
 

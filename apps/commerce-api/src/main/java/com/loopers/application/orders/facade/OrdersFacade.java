@@ -8,7 +8,10 @@ import com.loopers.application.orders.command.PlaceOrderCommand;
 import com.loopers.application.orders.result.OrdersInfoResult;
 import com.loopers.application.orders.result.OrdersRegisterInfoResult;
 import com.loopers.application.orders.service.OrdersService;
-import com.loopers.application.point.service.PointService;
+import com.loopers.application.payment.PaymentContext;
+import com.loopers.application.payment.PaymentService;
+import com.loopers.application.payment.processor.PaymentProcessorRegistry;
+import com.loopers.application.payment.processor.PaymentResult;
 import com.loopers.application.product.service.ProductService;
 import com.loopers.application.stock.service.StockService;
 import com.loopers.domain.coupon.Coupon;
@@ -18,9 +21,10 @@ import com.loopers.domain.orderItem.OrderItem;
 import com.loopers.domain.orderItem.OrderItemDomainService;
 import com.loopers.domain.orders.OrderStatus;
 import com.loopers.domain.orders.Orders;
-import com.loopers.domain.point.Point;
+import com.loopers.domain.payment.Payment;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.stock.Stock;
+import com.loopers.support.util.UUIDUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,11 +44,12 @@ public class OrdersFacade {
     private final ProductService productService;
     private final OrderItemDomainService orderItemDomainService;
     private final OrderItemService orderItemsService;
-    private final PointService pointService;
     private final StockService stockService;
     private final MemberService memberService;
     private final CouponService couponService;
     private final CouponMemberService couponMemberService;
+    private final PaymentProcessorRegistry paymentProcessorRegistry;
+    private final PaymentService paymentService;
 
     /*
      * 주문하기
@@ -60,6 +65,9 @@ public class OrdersFacade {
      * */
     @Transactional
     public OrdersRegisterInfoResult placeOrder(PlaceOrderCommand command) {
+        // 주문 키 생성
+        String orderKey = UUIDUtil.generateShortUUID();
+
         // 1. 사용자 조회
         Member member = memberService.findMemberById(command.getMemberId());
 
@@ -92,18 +100,36 @@ public class OrdersFacade {
             couponMember.useCoupon(); // 쿠폰 사용 처리
         }
 
-        // 포인트 확인
-        Point point = pointService.getPointByMemberIdWithLock(member.getId());
-        point.enoughPoint(couponDiscount);
-        point.use(couponDiscount);
-
         // 주문 생성
-        Orders orders = ordersService.placeOrder(
+        Orders orders = ordersService.register(
                 member.getId(),
                 quantity,
                 couponDiscount,
                 command.getCouponId(),
-                command.getCouponId() != null
+                command.getCouponId() != null,
+                orderKey
+        );
+
+        // 결제 생성
+        Payment payment = paymentService.register(
+                orders.getId(),
+                orders.getOrderKey(),
+                command.getPaymentType(),
+                command.getCardType(),
+                command.getCardNo(),
+                couponDiscount,
+                member.getId()
+        );
+
+        // 결제로 보낼 context 생성
+        PaymentContext paymentContext = PaymentContext.of(
+                orderKey,
+                member.getId(),
+                couponDiscount,
+                command.getPaymentType(),
+                command.getCardType(),
+                command.getCardNo(),
+                payment.getId()
         );
 
         // 주문 리스트 생성
@@ -119,8 +145,12 @@ public class OrdersFacade {
         }
         orderItemsService.register(orderItems);
 
+        // 결제 요청 처리(타입에 따라 전략 이용)
+        PaymentResult paymentResult = paymentProcessorRegistry.get(command.getPaymentType()).processPayment(paymentContext);
+
         return OrdersRegisterInfoResult.of(
                 OrderStatus.PENDING,
+                paymentResult.status(),
                 LocalDateTime.now(),
                 couponDiscount,
                 orderItems.size()

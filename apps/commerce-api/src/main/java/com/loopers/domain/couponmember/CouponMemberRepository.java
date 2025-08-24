@@ -1,6 +1,7 @@
 package com.loopers.domain.couponmember;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CouponMemberRepository {
 
@@ -8,5 +9,5 @@ public interface CouponMemberRepository {
 
     CouponMember save(CouponMember couponMember);
 
-    CouponMember findByCouponIdAndMemberId(Long couponId, Long memberId);
+    Optional<CouponMember> findByCouponIdAndMemberId(Long couponId, Long memberId);
 }

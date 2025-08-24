@@ -7,6 +7,7 @@ public record ProductRegisterReqDTO(
         String brandId,
         String description,
         String name,
+        Integer stock,
         BigDecimal price
 ) {
 }

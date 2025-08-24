@@ -16,6 +16,12 @@ dependencies {
     annotationProcessor("jakarta.persistence:jakarta.persistence-api")
     annotationProcessor("jakarta.annotation:jakarta.annotation-api")
 
+    // resilience4j
+    implementation("io.github.resilience4j:resilience4j-spring-boot3")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+
     // test-fixtures
     testImplementation(testFixtures(project(":modules:jpa")))
+
+    implementation("org.apache.httpcomponents.client5:httpclient5")
 }

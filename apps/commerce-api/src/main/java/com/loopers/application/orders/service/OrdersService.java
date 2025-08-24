@@ -21,10 +21,10 @@ public class OrdersService {
     /*
      * 주문 생성
      * */
-    public Orders placeOrder(Long memberId, int quantity, BigDecimal totalPrice, Long couponMemberId, boolean couponUsed) {
+    public Orders register(Long memberId, int quantity, BigDecimal totalPrice, Long couponMemberId, boolean couponUsed, String orderKey) {
         Orders orders = null;
 
-        orders = Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed);
+        orders = Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed, orderKey);
         return ordersRepository.register(orders);
     }
 

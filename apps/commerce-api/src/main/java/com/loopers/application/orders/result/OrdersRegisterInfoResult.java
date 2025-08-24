@@ -14,7 +14,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrdersRegisterInfoResult {
 
-    private OrderStatus status;
+    private OrderStatus orderStatus;
+
+    private String paymentStatus;
 
     private LocalDateTime orderDate;
 
@@ -22,22 +24,26 @@ public class OrdersRegisterInfoResult {
 
     private int totalCount;
 
-    private OrdersRegisterInfoResult(OrderStatus status, LocalDateTime orderDate, BigDecimal totalPrice, int totalCount) {
-        this.status = status;
+    private OrdersRegisterInfoResult(OrderStatus orderStatus, String paymentStatus, LocalDateTime orderDate, BigDecimal totalPrice, int totalCount) {
+        this.orderStatus = orderStatus;
+        this.paymentStatus = paymentStatus;
         this.orderDate = orderDate;
         this.totalPrice = totalPrice;
         this.totalCount = totalCount;
     }
 
-    public static OrdersRegisterInfoResult of(OrderStatus status, LocalDateTime orderDate, BigDecimal totalPrice, int totalCount) {
-        validate(status, orderDate, totalPrice, totalCount);
+    public static OrdersRegisterInfoResult of(OrderStatus orderStatus, String paymentStatus, LocalDateTime orderDate, BigDecimal totalPrice, int totalCount) {
+        validate(orderStatus, paymentStatus, orderDate, totalPrice, totalCount);
 
-        return new OrdersRegisterInfoResult(status, orderDate, totalPrice, totalCount);
+        return new OrdersRegisterInfoResult(orderStatus, paymentStatus, orderDate, totalPrice, totalCount);
     }
 
-    private static void validate(OrderStatus status, LocalDateTime orderDate, BigDecimal totalPrice, int totalCount) {
-        if (status == null) {
+    private static void validate(OrderStatus orderStatus, String paymentStatus, LocalDateTime orderDate, BigDecimal totalPrice, int totalCount) {
+        if (orderStatus == null) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "주문 상태는 필수입니다.");
+        }
+        if (paymentStatus == null || paymentStatus.isEmpty()) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "결제 상태는 필수입니다.");
         }
         if (orderDate == null) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "주문 날짜는 필수입니다.");

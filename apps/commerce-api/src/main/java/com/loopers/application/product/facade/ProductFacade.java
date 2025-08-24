@@ -7,6 +7,7 @@ import com.loopers.application.product.result.ProductListResult;
 import com.loopers.application.product.result.ProductRegisterResult;
 import com.loopers.application.product.service.ProductService;
 import com.loopers.application.productlike.service.ProductLikeService;
+import com.loopers.application.stock.service.StockService;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.Product;
 import com.loopers.interfaces.api.product.dto.ProductRegisterReqDTO;
@@ -25,6 +26,7 @@ import java.util.List;
 public class ProductFacade {
 
     private final ProductService productService;
+    private final StockService stockService;
     private final BrandService brandService;
     private final ProductLikeService productLikeService;
 
@@ -60,6 +62,9 @@ public class ProductFacade {
      * */
     @Transactional
     public ProductRegisterResult registerProduct(ProductRegisterReqDTO reqDTO) {
-        return productService.registerProduct(reqDTO);
+        ProductRegisterResult productRegisterResult = productService.registerProduct(reqDTO);
+        stockService.registerStock(productRegisterResult.productId(), reqDTO.stock());
+
+        return productRegisterResult;
     }
 }
