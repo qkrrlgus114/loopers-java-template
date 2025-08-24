@@ -32,4 +32,13 @@ public class CouponMemberService {
                 orElseThrow(() -> new CoreException(CommonErrorType.BAD_REQUEST, "쿠폰을 찾을 수 없습니다. couponId: " + couponId + ", memberId: " + memberId));
     }
 
+    /*
+     * 쿠폰 사용 취소
+     * */
+    public void cancelCouponUsage(Long memberId, Long couponId) {
+        CouponMember couponMember = couponMemberRepository.findByCouponIdAndMemberIdIsUsedWithLock(memberId, couponId).
+                orElseThrow(() -> new CoreException(CommonErrorType.BAD_REQUEST, "사용된 쿠폰을 찾을 수 없습니다. couponId: " + couponId + ", memberId: " + memberId));
+
+        couponMember.cancelCouponUsage();
+    }
 }

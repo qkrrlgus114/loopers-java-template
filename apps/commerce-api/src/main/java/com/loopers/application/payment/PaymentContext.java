@@ -14,7 +14,8 @@ public record PaymentContext(
         PaymentType paymentType,
         CardType cardType,
         String cardNo,
-        Long paymentId
+        Long paymentId,
+        Long couponId
 ) {
 
     public static PaymentContext of(String orderKey,
@@ -23,7 +24,8 @@ public record PaymentContext(
                                     PaymentType paymentType,
                                     CardType cardType,
                                     String cardNo,
-                                    Long paymentId) {
+                                    Long paymentId,
+                                    Long couponId) {
         if (orderKey == null || orderKey.isBlank()) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "주문 키가 비어 있습니다.");
         }
@@ -50,7 +52,7 @@ public record PaymentContext(
         if (paymentId != null && paymentId <= 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효하지 않은 결제 ID입니다.");
         }
-        return new PaymentContext(orderKey, memberId, amount, paymentType, cardType, cardNo, paymentId);
+        return new PaymentContext(orderKey, memberId, amount, paymentType, cardType, cardNo, paymentId, couponId);
     }
 
 }

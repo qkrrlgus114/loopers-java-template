@@ -104,6 +104,14 @@ public class CouponMember extends BaseEntity {
         this.usedAt = LocalDateTime.now();
     }
 
+    public void cancelCouponUsage() {
+        if (this.status != CouponStatus.USED) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "사용된 쿠폰이 아닙니다.");
+        }
+        this.status = CouponStatus.ACTIVE;
+        this.usedAt = null;
+    }
+
     public void checkCouponAvailable(Coupon coupon) {
         if (this.status != CouponStatus.ACTIVE) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "쿠폰이 활성화 상태가 아닙니다.");

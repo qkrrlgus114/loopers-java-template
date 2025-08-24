@@ -129,7 +129,8 @@ public class OrdersFacade {
                 command.getPaymentType(),
                 command.getCardType(),
                 command.getCardNo(),
-                payment.getId()
+                payment.getId(),
+                command.getCouponId()
         );
 
         // 주문 리스트 생성
