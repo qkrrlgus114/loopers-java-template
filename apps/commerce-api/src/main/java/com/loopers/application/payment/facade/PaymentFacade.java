@@ -1,8 +1,10 @@
 package com.loopers.application.payment.facade;
 
+import com.loopers.application.orders.service.OrdersService;
 import com.loopers.application.payment.PaymentService;
 import com.loopers.application.payment.command.PaymentCallbackCommand;
 import com.loopers.application.recovery.PaymentRecoveryService;
+import com.loopers.domain.orders.Orders;
 import com.loopers.domain.payment.Payment;
 import com.loopers.infrastructure.payment.PgPaymentApiClient;
 import com.loopers.infrastructure.payment.PgPaymentInfoResponse;
@@ -20,6 +22,7 @@ public class PaymentFacade {
 
     private final PgPaymentApiClient client;
     private final PaymentService paymentService;
+    private final OrdersService ordersService; // 의존성 추가
     private final PaymentRecoveryService paymentRecoveryService;
 
     @Transactional
@@ -31,6 +34,14 @@ public class PaymentFacade {
 
         // 결제 정보 업데이트
         paymentService.updatePaymentInfo(paymentInfo);
+
+        // 결제가 성공 상태인 경우, 주문 상태를 CONFIRMED로 변경
+        Orders orders = ordersService.findByOrderKeyWithLock(command.orderId());
+        if (paymentInfo.data().status().equals("SUCCESS")) {
+            orders.confirm();
+        } else {
+            orders.fail();
+        }
     }
 
     public void searchFailedPaymentAndUpdateStock() {

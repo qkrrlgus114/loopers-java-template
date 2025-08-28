@@ -28,4 +28,9 @@ public class CounponMemberRepositoryImpl implements CouponMemberRepository {
     public Optional<CouponMember> findByCouponIdAndMemberId(Long couponId, Long memberId) {
         return couponMemberJpaRepository.findByCouponIdAndMemberIdIsActive(couponId, memberId);
     }
+
+    @Override
+    public Optional<CouponMember> findByCouponIdAndMemberIdIsUsedWithLock(Long memberId, Long couponId) {
+        return couponMemberJpaRepository.findByCouponIdAndMemberIdIsUsedWithLock(couponId, memberId);
+    }
 }

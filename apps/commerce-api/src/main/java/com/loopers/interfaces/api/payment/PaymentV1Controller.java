@@ -20,7 +20,7 @@ public class PaymentV1Controller {
      * 결제 콜백 API
      * */
     @PostMapping("/callback")
-    public String paymentCallback(@RequestBody PaymentCallbackDTO paymentCallbackDTO) {
+    public void paymentCallback(@RequestBody PaymentCallbackDTO paymentCallbackDTO) {
         // 트랜잭션키로 결제 정보 조회
         paymentFacade.processCallbackPayment(
                 new PaymentCallbackCommand(
@@ -29,7 +29,13 @@ public class PaymentV1Controller {
                 )
         );
 
-        return "Payment callback processed successfully.";
+        // 외부 데이터플랫폼으로 결과 전송(?)
+        // 솔직히 이 부분 잘 이해가 되지 않습니다. 흑
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
 }

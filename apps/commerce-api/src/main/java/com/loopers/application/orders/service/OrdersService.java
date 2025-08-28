@@ -21,10 +21,10 @@ public class OrdersService {
     /*
      * 주문 생성
      * */
-    public Orders register(Long memberId, int quantity, BigDecimal totalPrice, Long couponMemberId, boolean couponUsed, String orderKey) {
+    public Orders register(Long memberId, int quantity, BigDecimal totalPrice, String orderKey) {
         Orders orders = null;
 
-        orders = Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed, orderKey);
+        orders = Orders.create(memberId, quantity, totalPrice, orderKey);
         return ordersRepository.register(orders);
     }
 
@@ -37,5 +37,23 @@ public class OrdersService {
         }
 
         return ordersRepository.findAllByMemberId(memberId);
+    }
+
+    public Orders findById(Long ordersId) {
+        if (ordersId == null || ordersId <= 0) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 주문 ID가 필요합니다.");
+        }
+
+        return ordersRepository.findById(ordersId)
+                .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "주문을 찾을 수 없습니다. ordersId=" + ordersId));
+    }
+
+    public Orders findByOrderKeyWithLock(String orderKey) {
+        if (orderKey == null || orderKey.isBlank()) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 주문 키가 필요합니다.");
+        }
+
+        return ordersRepository.findByOrderKeyWithLock(orderKey)
+                .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "주문을 찾을 수 없습니다. orderKey=" + orderKey));
     }
 }

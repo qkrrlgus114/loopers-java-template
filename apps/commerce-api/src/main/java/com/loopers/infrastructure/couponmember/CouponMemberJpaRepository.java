@@ -17,4 +17,8 @@ public interface CouponMemberJpaRepository extends JpaRepository<CouponMember, L
     @Query("SELECT cm FROM CouponMember cm WHERE cm.couponId = :couponId AND cm.memberId = :memberId AND cm.status = 'ACTIVE'")
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<CouponMember> findByCouponIdAndMemberIdIsActive(Long couponId, Long memberId);
+
+    @Query("SELECT cm FROM CouponMember cm WHERE cm.couponId = :couponId AND cm.memberId = :memberId AND cm.status = 'USED'")
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<CouponMember> findByCouponIdAndMemberIdIsUsedWithLock(Long couponId, Long memberId);
 }

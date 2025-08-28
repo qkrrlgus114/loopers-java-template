@@ -23,7 +23,9 @@ public class ProductLikeV1Controller {
     @PostMapping
     public ApiResponse<ProductLikeResponseDto> registerProductLike(@RequestBody ProductLikeRequestDto requestDto) {
         ProductLikeCommand command = ProductLikeCommand.of(requestDto.getProductId(), requestDto.getMemberId());
+
         ProductLikeResult result = productLikeFacade.registerProductLike(command);
+
         return ApiResponse.success(ProductLikeResponseDto.of(result));
     }
 

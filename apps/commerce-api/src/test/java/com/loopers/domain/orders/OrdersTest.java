@@ -24,14 +24,12 @@ class OrdersTest {
             Long memberId = null;
             int quantity = 2;
             BigDecimal totalPrice = BigDecimal.valueOf(1000);
-            Long couponMemberId = null;
-            boolean couponUsed = false;
             String orderKey = UUIDUtil.generateUUID();
 
 
             // when & then
             assertThrows(CoreException.class, () -> {
-                Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed, orderKey);
+                Orders.create(memberId, quantity, totalPrice, orderKey);
             });
         }
 
@@ -42,14 +40,12 @@ class OrdersTest {
             Long memberId = 1L;
             int quantity = 0;
             BigDecimal totalPrice = BigDecimal.valueOf(1000);
-            Long couponMemberId = null;
-            boolean couponUsed = false;
             String orderKey = UUIDUtil.generateUUID();
 
 
             // when & then
             assertThrows(CoreException.class, () -> {
-                Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed, orderKey);
+                Orders.create(memberId, quantity, totalPrice, orderKey);
             });
         }
 
@@ -60,13 +56,11 @@ class OrdersTest {
             Long memberId = 1L;
             int quantity = 2;
             BigDecimal totalPrice = BigDecimal.valueOf(100);
-            Long couponMemberId = null;
-            boolean couponUsed = false;
             String orderKey = UUIDUtil.generateUUID();
 
 
             // when
-            Orders orders = Orders.create(memberId, quantity, totalPrice, couponMemberId, couponUsed, orderKey);
+            Orders orders = Orders.create(memberId, quantity, totalPrice, orderKey);
 
             // then
             assertEquals(memberId, orders.getMemberId());
