@@ -5,6 +5,7 @@ import com.loopers.domain.payment.PaymentType;
 
 public record CouponProcessedEvent(
         Long ordersId,
+        String orderKey,
         Long memberId,
         Long couponId,
         PaymentType paymentType,
@@ -12,6 +13,6 @@ public record CouponProcessedEvent(
         String cardNo) {
 
     public static CouponProcessedEvent from(OrdersCreatedEvent event) {
-        return new CouponProcessedEvent(event.ordersId(), event.memberId(), event.couponId(), event.paymentType(), event.cardType(), event.cardNo());
+        return new CouponProcessedEvent(event.ordersId(), event.orderKey(), event.memberId(), event.couponId(), event.paymentType(), event.cardType(), event.cardNo());
     }
 }

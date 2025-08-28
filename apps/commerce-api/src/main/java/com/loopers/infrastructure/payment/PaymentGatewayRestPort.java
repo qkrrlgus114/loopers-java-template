@@ -11,8 +11,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.math.BigDecimal;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -45,7 +43,7 @@ public class PaymentGatewayRestPort implements PaymentGatewayPort {
         return response.getBody();
     }
 
-    private PgPaymentResponse paymentFallback(String orderKey, CardType cardType, String cardNo, BigDecimal amount,
+    private PgPaymentResponse paymentFallback(String orderKey, CardType cardType, String cardNo, Long amount,
                                               Long memberId, Throwable t) {
         if (t instanceof io.github.resilience4j.circuitbreaker.CallNotPermittedException) {
             log.error("CurcuitBreaker 열림 : {}", t.getMessage());
