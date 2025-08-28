@@ -8,25 +8,20 @@ import com.loopers.application.orders.command.PlaceOrderCommand;
 import com.loopers.application.orders.result.OrdersInfoResult;
 import com.loopers.application.orders.result.OrdersRegisterInfoResult;
 import com.loopers.application.orders.service.OrdersService;
-import com.loopers.application.payment.PaymentContext;
 import com.loopers.application.payment.PaymentService;
 import com.loopers.application.payment.processor.PaymentProcessorRegistry;
-import com.loopers.application.payment.processor.PaymentResult;
 import com.loopers.application.product.service.ProductService;
 import com.loopers.application.stock.service.StockService;
 import com.loopers.domain.coupon.Coupon;
-import com.loopers.domain.couponmember.CouponMember;
 import com.loopers.domain.member.Member;
 import com.loopers.domain.orderItem.OrderItem;
 import com.loopers.domain.orderItem.OrderItemDomainService;
-import com.loopers.domain.orders.OrderStatus;
 import com.loopers.domain.orders.Orders;
-import com.loopers.domain.payment.Payment;
-import com.loopers.domain.product.Product;
-import com.loopers.domain.stock.Stock;
+import com.loopers.domain.orders.event.OrdersCreatedEvent;
 import com.loopers.support.util.UUIDUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +46,8 @@ public class OrdersFacade {
     private final PaymentProcessorRegistry paymentProcessorRegistry;
     private final PaymentService paymentService;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     /*
      * 주문하기
      *
@@ -74,63 +71,24 @@ public class OrdersFacade {
         BigDecimal totalPrice = BigDecimal.ZERO;
         int quantity = 0;
 
-        // 2. 상품 조회
         for (PlaceOrderCommand.Item item : command.getItems()) {
-            Product product = productService.findProductById(item.getProductId());
-
-            // 3. 상품 재고 확인
-            Stock stock = stockService.findStockByProductId(product.getId());
-            stock.decreaseQuantity(item.getQuantity());
-
-            // 총 금액 계산
-            totalPrice = totalPrice.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
-
             quantity += item.getQuantity();
+            totalPrice = totalPrice.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
         }
 
         // 쿠폰 할인 계산
-        BigDecimal couponDiscount = totalPrice;
+        BigDecimal finalPrice = totalPrice;
         if (command.getCouponId() != null) {
-            // 5. 사용자 쿠폰 확인
-            CouponMember couponMember = couponMemberService.getCouponMemberById(member.getId(), command.getCouponId());
             Coupon coupon = couponService.getCouponId(command.getCouponId());
-
-            couponDiscount = coupon.calculateDiscount(totalPrice);
-
-            couponMember.useCoupon(); // 쿠폰 사용 처리
+            finalPrice = coupon.calculateDiscount(totalPrice);
         }
 
         // 주문 생성
         Orders orders = ordersService.register(
                 member.getId(),
                 quantity,
-                couponDiscount,
-                command.getCouponId(),
-                command.getCouponId() != null,
+                finalPrice,
                 orderKey
-        );
-
-        // 결제 생성
-        Payment payment = paymentService.register(
-                orders.getId(),
-                orders.getOrderKey(),
-                command.getPaymentType(),
-                command.getCardType(),
-                command.getCardNo(),
-                couponDiscount,
-                member.getId()
-        );
-
-        // 결제로 보낼 context 생성
-        PaymentContext paymentContext = PaymentContext.of(
-                orderKey,
-                member.getId(),
-                couponDiscount,
-                command.getPaymentType(),
-                command.getCardType(),
-                command.getCardNo(),
-                payment.getId(),
-                command.getCouponId()
         );
 
         // 주문 리스트 생성
@@ -146,15 +104,21 @@ public class OrdersFacade {
         }
         orderItemsService.register(orderItems);
 
-        // 결제 요청 처리(타입에 따라 전략 이용)
-        PaymentResult paymentResult = paymentProcessorRegistry.get(command.getPaymentType()).processPayment(paymentContext);
+        // 이벤트 발행
+        eventPublisher.publishEvent(OrdersCreatedEvent.of(
+                orders.getId(),
+                member.getId(),
+                command.getCouponId(),
+                command.getPaymentType(),
+                command.getCardType(),
+                command.getCardNo()
+        ));
 
         return OrdersRegisterInfoResult.of(
-                OrderStatus.PENDING,
-                paymentResult.status(),
-                LocalDateTime.now(),
-                couponDiscount,
-                orderItems.size()
+                orders.getOrderStatus(),
+                LocalDateTime.from(orders.getCreatedAt()),
+                orders.getTotalPrice(),
+                orders.getQuantity()
         );
     }
 

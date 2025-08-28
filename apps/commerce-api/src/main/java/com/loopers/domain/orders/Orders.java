@@ -3,9 +3,7 @@ package com.loopers.domain.orders;
 import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CommonErrorType;
 import com.loopers.support.error.CoreException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
@@ -17,6 +15,7 @@ public class Orders extends BaseEntity {
     private Long memberId;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
     @Column(nullable = false)
@@ -34,16 +33,15 @@ public class Orders extends BaseEntity {
     protected Orders() {
     }
 
-    private Orders(Long memberId, int quantity, BigDecimal totalPrice, Long couponMemberId, String orderKey) {
+    private Orders(Long memberId, int quantity, BigDecimal totalPrice, String orderKey) {
         this.memberId = memberId;
         this.orderStatus = OrderStatus.PENDING;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
-        this.couponMemberId = couponMemberId;
         this.orderKey = orderKey;
     }
 
-    public static Orders create(Long memberId, int quantity, BigDecimal totalPrice, Long couponMemberId, boolean couponUsed, String orderKey) {
+    public static Orders create(Long memberId, int quantity, BigDecimal totalPrice, String orderKey) {
         if (memberId == null || memberId <= 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 회원 ID가 필요합니다.");
         }
@@ -53,14 +51,11 @@ public class Orders extends BaseEntity {
         if (totalPrice == null || totalPrice.compareTo(BigDecimal.ZERO) <= 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "총 가격은 0 이상이어야 합니다.");
         }
-        if (couponUsed && (couponMemberId == null || couponMemberId <= 0)) {
-            throw new CoreException(CommonErrorType.BAD_REQUEST, "쿠폰 사용 시 유효한 쿠폰 회원 ID가 필요합니다.");
-        }
         if (orderKey == null || orderKey.isBlank()) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 주문 키가 필요합니다.");
         }
 
-        return new Orders(memberId, quantity, totalPrice, couponMemberId, orderKey);
+        return new Orders(memberId, quantity, totalPrice, orderKey);
     }
 
     public Long getMemberId() {
@@ -85,5 +80,13 @@ public class Orders extends BaseEntity {
 
     public String getOrderKey() {
         return orderKey;
+    }
+
+    public void confirm() {
+        this.orderStatus = OrderStatus.CONFIRMED;
+    }
+
+    public void fail() {
+        this.orderStatus = OrderStatus.FAILED;
     }
 }

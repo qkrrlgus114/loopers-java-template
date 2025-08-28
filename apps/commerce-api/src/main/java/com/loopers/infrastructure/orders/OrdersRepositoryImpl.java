@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,5 +26,21 @@ public class OrdersRepositoryImpl implements OrdersRepository {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 회원 ID가 필요합니다.");
         }
         return ordersJpaRepository.findAllByMemberId(memberId);
+    }
+
+    @Override
+    public Optional<Orders> findById(Long ordersId) {
+        if (ordersId == null || ordersId <= 0) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 주문 ID가 필요합니다.");
+        }
+        return ordersJpaRepository.findById(ordersId);
+    }
+
+    @Override
+    public Optional<Orders> findByOrderKeyWithLock(String orderKey) {
+        if (orderKey == null || orderKey.isBlank()) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 주문 키가 필요합니다.");
+        }
+        return ordersJpaRepository.findByOrderKey(orderKey);
     }
 }
