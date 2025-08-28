@@ -13,6 +13,8 @@ import com.loopers.domain.couponmember.CouponMemberRepository;
 import com.loopers.domain.member.Member;
 import com.loopers.domain.member.MemberRepository;
 import com.loopers.domain.orders.OrderStatus;
+import com.loopers.domain.orders.Orders;
+import com.loopers.domain.orders.OrdersRepository;
 import com.loopers.domain.payment.CardType;
 import com.loopers.domain.payment.PaymentType;
 import com.loopers.domain.point.Point;
@@ -49,6 +51,9 @@ public class OrderFacadeIntegrationTest {
 
     @Autowired
     private CouponRepository couponRepository;
+
+    @Autowired
+    private OrdersRepository ordersRepository;
 
     @Autowired
     private CouponMemberRepository couponMemberRepository;
@@ -604,10 +609,13 @@ public class OrderFacadeIntegrationTest {
                     null
             );
 
-            // When & Then
-            Assertions.assertThrows(CoreException.class, () -> {
-                ordersFacade.placeOrder(placeOrderCommand);
-            });
+            // When
+            OrdersRegisterInfoResult ordersRegisterInfoResult = ordersFacade.placeOrder(placeOrderCommand);
+
+            Orders orders = ordersRepository.findById(ordersRegisterInfoResult.getOrdersId()).get();
+            // then
+            Assertions.assertEquals(ordersRegisterInfoResult.getOrderStatus(), OrderStatus.PENDING);
+            Assertions.assertEquals(orders.getOrderStatus(), OrderStatus.FAILED);
         }
 
         @DisplayName("상품의 재고가 부족하면 주문에 실패한다.")
