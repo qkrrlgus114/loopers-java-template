@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrdersRegisterInfoResult {
 
+    private Long ordersId;
+
     private OrderStatus orderStatus;
 
     private PaymentStatus paymentStatus;
@@ -25,7 +27,8 @@ public class OrdersRegisterInfoResult {
 
     private int totalCount;
 
-    private OrdersRegisterInfoResult(OrderStatus orderStatus, LocalDateTime orderDate, BigDecimal totalPrice, int totalCount) {
+    private OrdersRegisterInfoResult(Long ordersId, OrderStatus orderStatus, LocalDateTime orderDate, BigDecimal totalPrice, int totalCount) {
+        this.ordersId = ordersId;
         this.orderStatus = orderStatus;
         this.paymentStatus = PaymentStatus.PENDING;
         this.orderDate = orderDate;
@@ -33,13 +36,16 @@ public class OrdersRegisterInfoResult {
         this.totalCount = totalCount;
     }
 
-    public static OrdersRegisterInfoResult of(OrderStatus orderStatus, LocalDateTime orderDate, BigDecimal totalPrice, int totalCount) {
-        validate(orderStatus, orderDate, totalPrice, totalCount);
+    public static OrdersRegisterInfoResult of(Long ordersId, OrderStatus orderStatus, LocalDateTime orderDate, BigDecimal totalPrice, int totalCount) {
+        validate(ordersId, orderStatus, orderDate, totalPrice, totalCount);
 
-        return new OrdersRegisterInfoResult(orderStatus, orderDate, totalPrice, totalCount);
+        return new OrdersRegisterInfoResult(ordersId, orderStatus, orderDate, totalPrice, totalCount);
     }
 
-    private static void validate(OrderStatus orderStatus, LocalDateTime orderDate, BigDecimal totalPrice, int totalCount) {
+    private static void validate(Long ordersId, OrderStatus orderStatus, LocalDateTime orderDate, BigDecimal totalPrice, int totalCount) {
+        if (ordersId == null || ordersId <= 0) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "유효한 주문 ID가 필요합니다.");
+        }
         if (orderStatus == null) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "주문 상태는 필수입니다.");
         }

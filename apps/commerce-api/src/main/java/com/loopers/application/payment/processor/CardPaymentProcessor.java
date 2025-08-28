@@ -1,9 +1,11 @@
 package com.loopers.application.payment.processor;
 
 import com.loopers.application.couponmember.CouponMemberService;
+import com.loopers.application.orders.service.OrdersService;
 import com.loopers.application.payment.PaymentContext;
 import com.loopers.application.payment.PaymentGatewayPort;
 import com.loopers.application.payment.PaymentService;
+import com.loopers.domain.orders.Orders;
 import com.loopers.domain.payment.Payment;
 import com.loopers.domain.payment.PaymentStatus;
 import com.loopers.domain.payment.PaymentType;
@@ -23,6 +25,7 @@ public class CardPaymentProcessor implements PaymentProcessor {
     private final PaymentGatewayPort paymentGatewayPort;
     private final PaymentService paymentService;
     private final CouponMemberService couponMemberService;
+    private final OrdersService ordersService;
 
     @Override
     public PaymentType supports() {
@@ -35,7 +38,7 @@ public class CardPaymentProcessor implements PaymentProcessor {
                 paymentContext.orderKey(),
                 paymentContext.cardType(),
                 paymentContext.cardNo(),
-                paymentContext.amount(),
+                paymentContext.amount().longValue(),
                 paymentContext.memberId()
         );
 
@@ -46,6 +49,8 @@ public class CardPaymentProcessor implements PaymentProcessor {
             log.error("PG 결제 실패 | orderKey={}, memberId={}, error={}, message={}",
                     paymentContext.orderKey(), paymentContext.memberId(), pgPaymentResponse.data().reason(), pgPaymentResponse.meta().message());
 
+            Orders orders = ordersService.findById(payment.getOrderId());
+            orders.updateOrdersFailed();
             // 실패 상태 + 사유 업데이트
             payment.updateStatus(PaymentStatus.FAILED, pgPaymentResponse.meta().message());
 

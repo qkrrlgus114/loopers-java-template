@@ -115,6 +115,7 @@ public class OrdersFacade {
         ));
 
         return OrdersRegisterInfoResult.of(
+                orders.getId(),
                 orders.getOrderStatus(),
                 LocalDateTime.from(orders.getCreatedAt()),
                 orders.getTotalPrice(),

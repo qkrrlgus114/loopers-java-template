@@ -1,6 +1,8 @@
 package com.loopers.application.orders.listener;
 
 import com.loopers.application.orderItem.service.OrderItemService;
+import com.loopers.application.orders.service.OrderFailService;
+import com.loopers.application.orders.service.OrdersService;
 import com.loopers.application.stock.service.StockService;
 import com.loopers.domain.orderItem.OrderItem;
 import com.loopers.domain.orders.event.CouponProcessedEvent;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -21,21 +24,29 @@ import java.util.List;
 public class StockEventListener {
 
     private final StockService stockService;
+    private final OrderFailService orderFailService;
     private final OrderItemService orderItemService;
+    private final OrdersService ordersService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Async
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(CouponProcessedEvent event) {
-        List<OrderItem> orderItems = orderItemService.findAllByOrdersId(event.ordersId());
+        try {
+            List<OrderItem> orderItems = orderItemService.findAllByOrdersId(event.ordersId());
 
-        for (OrderItem item : orderItems) {
-            Stock stock = stockService.findStockByProductIdWithLock(item.getProductId());
+            for (OrderItem item : orderItems) {
+                Stock stock = stockService.findStockByProductIdWithLock(item.getProductId());
 
-            stock.decreaseQuantity(item.getQuantity());
+                stock.decreaseQuantity(item.getQuantity());
+            }
+
+            eventPublisher.publishEvent(StockDecrementedEvent.from(event));
+        } catch (Exception e) {
+            orderFailService.markFailed(event.ordersId());
+            throw e;
         }
-            
-        eventPublisher.publishEvent(StockDecrementedEvent.from(event));
     }
+
 }

@@ -27,7 +27,7 @@ public class PaymentGatewayRestPort implements PaymentGatewayPort {
     public PgPaymentResponse requestPayment(String orderKey,
                                             CardType cardType,
                                             String cardNo,
-                                            BigDecimal amount,
+                                            Long amount,
                                             Long memberId) {
 
         HttpHeaders headers = new HttpHeaders();

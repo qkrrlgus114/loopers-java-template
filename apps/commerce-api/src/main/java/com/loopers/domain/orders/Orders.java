@@ -89,4 +89,8 @@ public class Orders extends BaseEntity {
     public void fail() {
         this.orderStatus = OrderStatus.FAILED;
     }
+
+    public void updateOrdersFailed() {
+        this.orderStatus = OrderStatus.FAILED;
+    }
 }
