@@ -10,8 +10,11 @@ import com.loopers.application.productlike.service.ProductLikeService;
 import com.loopers.domain.member.Member;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.productlike.ProductLike;
+import com.loopers.domain.productlike.event.ProductLikedEvent;
+import com.loopers.domain.productlike.event.ProductUnlikedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,7 @@ public class ProductLikeFacade {
     private final ProductLikeService productLikeService;
     private final ProductService productService;
     private final MemberService memberService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /*
      * 상품 좋아요 처리
@@ -39,19 +43,15 @@ public class ProductLikeFacade {
      * */
     @Transactional
     public ProductLikeResult registerProductLike(ProductLikeCommand command) {
-        Product product = productService.findProductByIdWithLock(command.getProductId());
-
+        Product product = productService.findProductById(command.getProductId());
         Member member = memberService.findMemberById(command.getMemberId());
 
         Optional<ProductLike> optionalProductLike = productLikeService.findProductLikeByMemberAndProduct(product, member);
 
         if (optionalProductLike.isEmpty()) {
-            ProductLike productLikeModel = ProductLike.create(product.getId(), member.getId());
-            productLikeService.registerProductLike(productLikeModel);
-
-            product.increaseLikeCount();
-
-            return ProductLikeResult.of(product.getId(), true, product.getLikeCount(), true);
+            productLikeService.registerProductLike(ProductLike.create(product.getId(), member.getId()));
+            eventPublisher.publishEvent(ProductLikedEvent.of(command.getProductId(), command.getMemberId()));
+            return ProductLikeResult.of(product.getId(), true, product.getLikeCount() + 1, true);
         } else {
             return ProductLikeResult.of(product.getId(), true, product.getLikeCount(), false);
         }
@@ -63,17 +63,14 @@ public class ProductLikeFacade {
     @Transactional
     public ProductLikeResult cancelProductLike(ProductLikeCommand command) {
         Product product = productService.findProductById(command.getProductId());
-
         Member member = memberService.findMemberById(command.getMemberId());
 
         Optional<ProductLike> optionalProductLike = productLikeService.findProductLikeByMemberAndProduct(product, member);
 
         if (optionalProductLike.isPresent()) {
-            ProductLike productLike = optionalProductLike.get();
-            productLikeService.cancelProductLike(productLike);
-            product.decreaseLikeCount();
-
-            return ProductLikeResult.of(product.getId(), false, product.getLikeCount(), true);
+            productLikeService.cancelProductLike(optionalProductLike.get());
+            eventPublisher.publishEvent(ProductUnlikedEvent.of(command.getProductId(), command.getMemberId()));
+            return ProductLikeResult.of(product.getId(), false, product.getLikeCount() - 1, true);
         } else {
             return ProductLikeResult.of(product.getId(), false, product.getLikeCount(), false);
         }

@@ -25,4 +25,10 @@ public class OrderItemService {
         return orderItemRepository.findByOrdersId(orderId)
                 .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "주문 아이템을 찾을 수 없습니다. orderId: " + orderId));
     }
+
+    public List<OrderItem> findAllByOrdersId(Long ordersId) {
+        return orderItemRepository.findByOrdersId(ordersId)
+                .map(List::of)
+                .orElseThrow(() -> new CoreException(CommonErrorType.NOT_FOUND, "주문 아이템을 찾을 수 없습니다. orderId: " + ordersId));
+    }
 }

@@ -10,4 +10,6 @@ public interface CouponMemberRepository {
     CouponMember save(CouponMember couponMember);
 
     Optional<CouponMember> findByCouponIdAndMemberId(Long couponId, Long memberId);
+
+    Optional<CouponMember> findByCouponIdAndMemberIdIsUsedWithLock(Long memberId, Long couponId);
 }

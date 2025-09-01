@@ -6,9 +6,11 @@ import lombok.Getter;
 public enum OrderStatus {
     PENDING("주문 대기"),
     PROCESSING("주문 처리 중"),
+    CONFIRMED("주문 확정"),
     SHIPPED("배송 중"),
     DELIVERED("배송 완료"),
-    CANCELED("주문 취소");
+    CANCELED("주문 취소"),
+    FAILED("주문 실패");
 
     private final String description;
 
