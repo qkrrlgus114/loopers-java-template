@@ -1,10 +1,10 @@
-package com.loopers.commercestreamer;
+package com.loopers.commerceconsumer;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CommerceStreamerApplicationTests {
+class CommerceConsumerApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -1,13 +1,13 @@
-package com.loopers.commercestreamer;
+package com.loopers.commerceconsumer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CommerceStreamerApplication {
+public class CommerceConsumerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CommerceStreamerApplication.class, args);
+		SpringApplication.run(CommerceConsumerApplication.class, args);
 	}
 
 }

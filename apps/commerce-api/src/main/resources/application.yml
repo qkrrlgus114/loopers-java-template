@@ -65,6 +65,11 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+kafka:
+  topics:
+    catalog-events: catalog-events
+    order-events: order-events
+
 ---
 spring:
   config:
