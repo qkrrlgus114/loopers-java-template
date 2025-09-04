@@ -1,10 +1,12 @@
-rootProject.name = "loopers-java-spring-template"
+rootProject.name = "maiorem-loopers-l2-commerce"
 
 include(
     ":apps:commerce-api",
+    ":apps:commerce-streamer",
     ":apps:pg-simulator",
     ":modules:jpa",
     ":modules:redis",
+    ":modules:kafka",
     ":supports:jackson",
     ":supports:logging",
     ":supports:monitoring",

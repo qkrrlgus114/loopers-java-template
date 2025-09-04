@@ -2,7 +2,6 @@ package com.loopers.application.productlike;
 
 import com.loopers.application.productlike.facade.ProductLikeFacade;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,8 +11,8 @@ public class ProductLikeSchedule {
     private final ProductLikeFacade productLikeFacade;
 
     // 1분마다 실행
-    @Scheduled(fixedRate = 60 * 1000)
-    public void updateProductLikeCount() {
-        productLikeFacade.updateAllProductLikeCount();
-    }
+//    @Scheduled(fixedRate = 60 * 1000)
+//    public void updateProductLikeCount() {
+//        productLikeFacade.updateAllProductLikeCount();
+//    }
 }
