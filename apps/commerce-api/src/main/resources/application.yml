@@ -23,6 +23,15 @@ spring:
       - redis.yml
       - logging.yml
       - monitoring.yml
+      - kafka.yml
+  kafka:
+    topic:
+      user-signals:
+        version: 1.0.0
+        topic: user-signals
+      payment:
+        version: 1.0.0
+        topic: payment
 
 resilience4j:
   retry:

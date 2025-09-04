@@ -3,6 +3,7 @@ package com.loopers.application.productlike.facade;
 import com.loopers.application.member.service.MemberService;
 import com.loopers.application.product.service.ProductService;
 import com.loopers.application.productlike.command.ProductLikeCommand;
+import com.loopers.application.productlike.producer.ProductLikeProducer;
 import com.loopers.application.productlike.query.ProductLikeGroup;
 import com.loopers.application.productlike.result.ProductLikeResult;
 import com.loopers.application.productlike.result.ProductLikeView;
@@ -33,6 +34,7 @@ public class ProductLikeFacade {
     private final ProductService productService;
     private final MemberService memberService;
     private final ApplicationEventPublisher eventPublisher;
+    private final ProductLikeProducer productLikeProducer;
 
     /*
      * 상품 좋아요 처리
@@ -50,7 +52,8 @@ public class ProductLikeFacade {
 
         if (optionalProductLike.isEmpty()) {
             productLikeService.registerProductLike(ProductLike.create(product.getId(), member.getId()));
-            eventPublisher.publishEvent(ProductLikedEvent.of(command.getProductId(), command.getMemberId()));
+
+            productLikeProducer.sendProductLikedEvent(ProductLikedEvent.of(command.getProductId(), command.getMemberId()));
             return ProductLikeResult.of(product.getId(), true, product.getLikeCount() + 1, true);
         } else {
             return ProductLikeResult.of(product.getId(), true, product.getLikeCount(), false);
