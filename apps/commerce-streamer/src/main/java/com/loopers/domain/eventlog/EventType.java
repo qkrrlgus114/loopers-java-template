@@ -1,4 +1,4 @@
-package com.loopers.domain.log;
+package com.loopers.domain.eventlog;
 
 public enum EventType {
     PRODUCT_ORDER,

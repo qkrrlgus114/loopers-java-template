@@ -72,7 +72,8 @@ public class ProductLikeFacade {
 
         if (optionalProductLike.isPresent()) {
             productLikeService.cancelProductLike(optionalProductLike.get());
-            eventPublisher.publishEvent(ProductUnlikedEvent.of(command.getProductId(), command.getMemberId()));
+
+            productLikeProducer.sendProdcutUnlikedEvent(ProductUnlikedEvent.of(command.getProductId(), command.getMemberId()));
             return ProductLikeResult.of(product.getId(), false, product.getLikeCount() - 1, true);
         } else {
             return ProductLikeResult.of(product.getId(), false, product.getLikeCount(), false);

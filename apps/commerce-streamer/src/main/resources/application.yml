@@ -25,9 +25,13 @@ spring:
       - kafka.yml
       - logging.yml
 
-demo-kafka:
-  test:
-    topic-name: demo.internal.topic-v1
+loopers:
+  kafka:
+    topics:
+      product-like: product-like-topic
+      product-unlike: product-unlike-topic
+
+
 
 ---
 spring:
