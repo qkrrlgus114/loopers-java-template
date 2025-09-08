@@ -45,10 +45,11 @@ public class Outbox extends BaseEntity {
     @Version
     private Long version;
 
+
     public enum OutboxStatus {
-        PENDING, // 처리 대기
-        PROCESSED, // 처리 완료
-        FAILED // 처리 실패
+        PENDING, // 발행 대기
+        PUBLISHED, // 발행 완료
+        FAILED // 발행 실패
     }
 
     public static Outbox create(String aggregateId, String eventType,
@@ -60,6 +61,27 @@ public class Outbox extends BaseEntity {
                 .payload(payload)
                 .eventVersion(eventVersion)
                 .build();
+    }
+
+
+    public void markAsPublished() {
+        if (this.status != OutboxStatus.PUBLISHED) {
+            throw new IllegalStateException("이미 발행된 이벤트입니다.");
+        }
+        this.status = OutboxStatus.PUBLISHED;
+        this.processedAt = LocalDateTime.now();
+    }
+
+    public void markAsFailed() {
+        if (this.status == OutboxStatus.FAILED) {
+            throw new IllegalStateException("이미 실패한 이벤트입니다.");
+        }
+        this.status = OutboxStatus.FAILED;
+        this.retryCount += 1;
+    }
+
+    public boolean canRetry() {
+        return this.status == OutboxStatus.FAILED && this.retryCount < 3;
     }
 
 }
