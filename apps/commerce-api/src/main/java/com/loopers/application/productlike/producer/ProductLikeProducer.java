@@ -1,7 +1,7 @@
 package com.loopers.application.productlike.producer;
 
-import com.loopers.domain.productlike.event.ProductLikedEvent;
-import com.loopers.domain.productlike.event.ProductUnlikedEvent;
+import com.loopers.application.event.productlike.ProductLikedEvent;
+import com.loopers.application.event.productlike.ProductUnlikedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;

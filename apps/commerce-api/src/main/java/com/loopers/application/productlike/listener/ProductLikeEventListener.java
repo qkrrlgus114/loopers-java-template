@@ -1,9 +1,9 @@
 package com.loopers.application.productlike.listener;
 
+import com.loopers.application.event.productlike.ProductLikedEvent;
+import com.loopers.application.event.productlike.ProductUnlikedEvent;
 import com.loopers.application.product.service.ProductService;
 import com.loopers.domain.product.Product;
-import com.loopers.domain.productlike.event.ProductLikedEvent;
-import com.loopers.domain.productlike.event.ProductUnlikedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
