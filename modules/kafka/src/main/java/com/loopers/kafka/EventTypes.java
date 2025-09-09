@@ -2,8 +2,8 @@ package com.loopers.kafka;
 
 public class EventTypes {
     // 좋아요 이벤트
-    public static final String LIKE_ADDED = "Added";
-    public static final String LIKE_REMOVED = "Removed";
+    public static final String PRODUCT_LIKED_EVENT = "ProductLikedEvent";
+    public static final String PRODUCT_UNLIKED_EVENT = "ProductUnlikedEvent";
 
     // 재고 이벤트
     public static final String STOCK_CHANGED = "Changed";

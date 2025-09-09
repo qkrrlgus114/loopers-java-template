@@ -98,8 +98,8 @@ public class MetricsConsumer {
 
                 // 3. 이벤트 처리
                 switch (message.getEventType()) {
-                    case EventTypes.LIKE_ADDED -> handleLikeAdded(message);
-                    case EventTypes.LIKE_REMOVED -> handleLikeRemoved(message);
+                    case EventTypes.PRODUCT_LIKED_EVENT -> handleLikeAdded(message);
+                    case EventTypes.PRODUCT_UNLIKED_EVENT -> handleLikeRemoved(message);
 //                    case EventTypes.ORDER_CREATED -> handleOrderCreated(message);
                     case EventTypes.ORDER_CONFIRMED -> handleOrderConfirmed(message);
                     case EventTypes.ORDER_CANCELLED -> handleOrderCancelled(message);

@@ -86,8 +86,8 @@ public class CacheEvictionConsumer {
             boolean cacheEvicted = false;
 
             switch (message.getEventType()) {
-                case EventTypes.LIKE_ADDED,
-                     EventTypes.LIKE_REMOVED -> {
+                case EventTypes.PRODUCT_LIKED_EVENT,
+                     EventTypes.PRODUCT_UNLIKED_EVENT -> {
                     evictProductCache(message);
                     cacheEvicted = true;
                 }
