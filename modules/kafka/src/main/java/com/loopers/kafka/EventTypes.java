@@ -17,6 +17,9 @@ public class EventTypes {
     public static final String PAYMENT_COMPLETED = "Completed";
     public static final String PAYMENT_FAILED = "Failed";
 
+    // 상세 페이지 조회
+    public static final String PRODUCT_DETAIL_VIEWED_EVENT = "ProductDetailViewedEvent";
+
     private EventTypes() {
         throw new IllegalStateException("Constants class");
     }

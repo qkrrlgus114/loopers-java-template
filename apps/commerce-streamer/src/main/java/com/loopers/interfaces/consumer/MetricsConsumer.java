@@ -100,7 +100,7 @@ public class MetricsConsumer {
                 switch (message.getEventType()) {
                     case EventTypes.PRODUCT_LIKED_EVENT -> handleLikeAdded(message);
                     case EventTypes.PRODUCT_UNLIKED_EVENT -> handleLikeRemoved(message);
-//                    case EventTypes.ORDER_CREATED -> handleOrderCreated(message);
+                    case EventTypes.PRODUCT_DETAIL_VIEWED_EVENT -> handleProductDetailViewed(message);
                     case EventTypes.ORDER_CONFIRMED -> handleOrderConfirmed(message);
                     case EventTypes.ORDER_CANCELLED -> handleOrderCancelled(message);
                     case EventTypes.PAYMENT_COMPLETED -> handlePaymentCompleted(message);
@@ -194,6 +194,36 @@ public class MetricsConsumer {
         productMetricsRepository.save(metrics);
         log.info("좋아요 메트릭 감소 - productId: {}, likeCount: {}",
                 productId, metrics.getLikeCount());
+    }
+
+    /**
+     * 상품 상세 조회 처리
+     */
+    private void handleProductDetailViewed(KafkaEventMessage<?> message) {
+        CatalogEventPayload.ProductDetailViewed payload =
+                objectMapper.convertValue(message.getPayload(), CatalogEventPayload.ProductDetailViewed.class);
+
+        Long productId = payload.getProductId();
+        LocalDate today = LocalDate.now();
+
+        // 오늘 날짜의 메트릭 조회 or 생성
+        ProductMetrics metrics = productMetricsRepository
+                .findByProductIdAndMetricDate(productId, today)
+                .orElse(ProductMetrics.builder()
+                        .productId(productId)
+                        .metricDate(today)
+                        .likeCount(0L)
+                        .orderCount(0L)
+                        .salesQuantity(0L)
+                        .viewCount(0L)
+                        .build());
+
+        // 조회 수 증가
+        metrics.addView();
+
+        productMetricsRepository.save(metrics);
+        log.info("상품 조회 메트릭 업데이트 - productId: {}, viewCount: {}",
+                productId, metrics.getViewCount());
     }
 //
 //    /**

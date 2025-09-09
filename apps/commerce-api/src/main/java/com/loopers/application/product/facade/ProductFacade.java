@@ -1,6 +1,8 @@
 package com.loopers.application.product.facade;
 
 import com.loopers.application.brand.service.BrandService;
+import com.loopers.application.event.EventPublisher;
+import com.loopers.application.event.product.ProductDetailViewedEvent;
 import com.loopers.application.product.command.ProductDetailCommand;
 import com.loopers.application.product.result.ProductDetailResult;
 import com.loopers.application.product.result.ProductListResult;
@@ -31,6 +33,7 @@ public class ProductFacade {
     private final BrandService brandService;
     private final ProductLikeService productLikeService;
     private final ProductCache productCache;
+    private final EventPublisher eventPublisher;
 
     /*
      * 상품 상세 정보 조회
@@ -39,29 +42,38 @@ public class ProductFacade {
      * 2. 브랜드 정보
      * 3. 상품 좋아요 정보
      * */
-    @Transactional(readOnly = true)
+    @Transactional
     public ProductDetailResult getProductDetail(ProductDetailCommand command) {
         // 캐시 키 생성 (좋아요 정보는 사용자별로 다르므로 memberId 포함)
-        String cacheKey = String.format("product:detail:productId=%d:memberId=%d", 
+        String cacheKey = String.format("product:detail:productId=%d:memberId=%d",
                 command.productId(), command.memberId());
-        
+
         // 캐시에서 조회
         ProductDetailResult cached = productCache.getDetail(cacheKey);
         if (cached != null) {
             log.info("상품 상세 정보 캐시 히트: {}", cacheKey);
+            // 상품 상세조회 이벤트 발행
+            ProductDetailViewedEvent event = ProductDetailViewedEvent.from(command.productId(), command.memberId());
+            eventPublisher.publish(event);
+
             return cached;
         }
-        
+
         // 캐시 미스 시 DB에서 조회
         Product product = productService.getProductDetailById(command.productId());
         Brand brand = brandService.getBrandDetail(product.getBrandId());
         boolean likedByMember = productLikeService.isLikedByMember(command.productId(), command.memberId());
 
         ProductDetailResult result = ProductDetailResult.of(product, brand, likedByMember);
-        
+
         // 캐시에 저장 (10분)
         productCache.putDetail(cacheKey, result, 10 * 60 * 1000);
-        
+
+        // 상품 상세조회 이벤트 발행
+        ProductDetailViewedEvent event = ProductDetailViewedEvent.from(command.productId(), command.memberId());
+        eventPublisher.publish(event);
+        log.debug("상품 상세조회 이벤트 발행 - productId: {}, memberId: {}", command.productId(), command.memberId());
+
         return result;
     }
 

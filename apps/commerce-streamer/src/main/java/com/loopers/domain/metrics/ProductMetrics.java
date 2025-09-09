@@ -50,6 +50,10 @@ public class ProductMetrics {
     @Builder.Default
     private Long salesQuantity = 0L;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Long viewCount = 0L;
+
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
@@ -68,5 +72,9 @@ public class ProductMetrics {
     public void addOrder(Long quantity) {
         this.orderCount++;
         this.salesQuantity += quantity;
+    }
+
+    public void addView() {
+        this.viewCount++;
     }
 }
