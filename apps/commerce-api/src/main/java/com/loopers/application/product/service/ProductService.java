@@ -83,7 +83,7 @@ public class ProductService {
             List<Product> products = productRepository.searchProducts(sort, page, minPrice, maxPrice, brands);
             List<ProductListResult> results = products.stream().map(ProductListResult::of).toList();
 
-            productCache.putList(key, ProductListPage.of(results), 5 * 60);
+            productCache.putList(key, ProductListPage.of(results), 5 * 60 * 1000);
             return results;
         }
 

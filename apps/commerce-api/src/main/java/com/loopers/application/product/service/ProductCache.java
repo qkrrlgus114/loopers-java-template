@@ -1,9 +1,11 @@
 package com.loopers.application.product.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.loopers.application.product.result.ProductDetailResult;
 import com.loopers.application.product.result.ProductListPage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -11,9 +13,10 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
-class ProductCache {
+@Slf4j
+public class ProductCache {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
     private final ObjectMapper om;
 
     // 기본 TTL(밀리초) + ±20% 지터
@@ -23,16 +26,42 @@ class ProductCache {
     }
 
     public void putList(String key, ProductListPage value, long baseTtlMillis) {
-        redisTemplate
-                .opsForValue()
-                .set(key, value, ttlWithJitter(baseTtlMillis), TimeUnit.MILLISECONDS);
+        try {
+            String json = om.writeValueAsString(value);
+            stringRedisTemplate.opsForValue()
+                    .set(key, json, ttlWithJitter(baseTtlMillis), TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            log.error("Redis에 데이터 저장 실패: key={}", key, e);
+        }
     }
 
-    @SuppressWarnings("unchecked")
     public ProductListPage getList(String key) {
-        Object raw = redisTemplate.opsForValue().get(key);
-        if (raw == null) return null;
-        // Map/LinkedHashMap -> ProductListPage 로 변환
-        return om.convertValue(raw, ProductListPage.class);
+        try {
+            String json = stringRedisTemplate.opsForValue().get(key);
+            return json != null ? om.readValue(json, ProductListPage.class) : null;
+        } catch (Exception e) {
+            log.error("Redis에서 데이터 조회 실패: key={}", key, e);
+            return null;
+        }
+    }
+
+    public void putDetail(String key, ProductDetailResult value, long baseTtlMillis) {
+        try {
+            String json = om.writeValueAsString(value);
+            stringRedisTemplate.opsForValue()
+                    .set(key, json, ttlWithJitter(baseTtlMillis), TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            log.error("Redis에 상품 상세 데이터 저장 실패: key={}", key, e);
+        }
+    }
+
+    public ProductDetailResult getDetail(String key) {
+        try {
+            String json = stringRedisTemplate.opsForValue().get(key);
+            return json != null ? om.readValue(json, ProductDetailResult.class) : null;
+        } catch (Exception e) {
+            log.error("Redis에서 상품 상세 데이터 조회 실패: key={}", key, e);
+            return null;
+        }
     }
 }

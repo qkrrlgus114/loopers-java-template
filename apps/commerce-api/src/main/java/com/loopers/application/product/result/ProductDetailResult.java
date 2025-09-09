@@ -2,6 +2,7 @@ package com.loopers.application.product.result;
 
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.Product;
+import com.loopers.domain.product.ProductStatus;
 
 import java.math.BigDecimal;
 
@@ -13,6 +14,7 @@ public record ProductDetailResult(
         Long memberId,
         Long brandId,
         String brandName,
+        ProductStatus status,
         int likeCount,
         Boolean isLiked
 ) {
@@ -26,6 +28,7 @@ public record ProductDetailResult(
                 product.getMemberId(),
                 product.getBrandId(),
                 brand.getName(),
+                product.getStatus(),
                 product.getLikeCount(),
                 likedByMember
         );

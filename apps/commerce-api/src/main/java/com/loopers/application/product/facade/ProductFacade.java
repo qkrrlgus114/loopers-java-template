@@ -5,6 +5,7 @@ import com.loopers.application.product.command.ProductDetailCommand;
 import com.loopers.application.product.result.ProductDetailResult;
 import com.loopers.application.product.result.ProductListResult;
 import com.loopers.application.product.result.ProductRegisterResult;
+import com.loopers.application.product.service.ProductCache;
 import com.loopers.application.product.service.ProductService;
 import com.loopers.application.productlike.service.ProductLikeService;
 import com.loopers.application.stock.service.StockService;
@@ -29,6 +30,7 @@ public class ProductFacade {
     private final StockService stockService;
     private final BrandService brandService;
     private final ProductLikeService productLikeService;
+    private final ProductCache productCache;
 
     /*
      * 상품 상세 정보 조회
@@ -39,12 +41,28 @@ public class ProductFacade {
      * */
     @Transactional(readOnly = true)
     public ProductDetailResult getProductDetail(ProductDetailCommand command) {
+        // 캐시 키 생성 (좋아요 정보는 사용자별로 다르므로 memberId 포함)
+        String cacheKey = String.format("product:detail:productId=%d:memberId=%d", 
+                command.productId(), command.memberId());
+        
+        // 캐시에서 조회
+        ProductDetailResult cached = productCache.getDetail(cacheKey);
+        if (cached != null) {
+            log.info("상품 상세 정보 캐시 히트: {}", cacheKey);
+            return cached;
+        }
+        
+        // 캐시 미스 시 DB에서 조회
         Product product = productService.getProductDetailById(command.productId());
         Brand brand = brandService.getBrandDetail(product.getBrandId());
         boolean likedByMember = productLikeService.isLikedByMember(command.productId(), command.memberId());
 
-
-        return ProductDetailResult.of(product, brand, likedByMember);
+        ProductDetailResult result = ProductDetailResult.of(product, brand, likedByMember);
+        
+        // 캐시에 저장 (10분)
+        productCache.putDetail(cacheKey, result, 10 * 60 * 1000);
+        
+        return result;
     }
 
     /*
