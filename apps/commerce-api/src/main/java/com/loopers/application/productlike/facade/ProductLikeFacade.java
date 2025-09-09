@@ -55,7 +55,9 @@ public class ProductLikeFacade {
             ProductLikedEvent productLikedEvent = ProductLikedEvent.from(command.getMemberId(), command.getProductId());
 
             eventPublisher.publish(productLikedEvent);
-            return ProductLikeResult.of(product.getId(), true, product.getLikeCount() + 1, true);
+
+            product.increaseLikeCount();
+            return ProductLikeResult.of(product.getId(), true, product.getLikeCount(), true);
         } else {
             return ProductLikeResult.of(product.getId(), true, product.getLikeCount(), false);
         }
@@ -77,7 +79,9 @@ public class ProductLikeFacade {
             ProductUnlikedEvent productUnlikedEvent = ProductUnlikedEvent.from(command.getProductId(), command.getMemberId());
 
             eventPublisher.publish(productUnlikedEvent);
-            return ProductLikeResult.of(product.getId(), false, product.getLikeCount() - 1, true);
+
+            product.decreaseLikeCount();
+            return ProductLikeResult.of(product.getId(), false, product.getLikeCount(), true);
         } else {
             return ProductLikeResult.of(product.getId(), false, product.getLikeCount(), false);
         }

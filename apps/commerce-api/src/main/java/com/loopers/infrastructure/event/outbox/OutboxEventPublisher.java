@@ -23,7 +23,7 @@ public class OutboxEventPublisher implements EventPublisher {
     @Transactional
     public void publish(Event event) {
         try {
-// 1. 토픽 결정
+            // 1. 토픽 결정
             String topic = resolveTopicFor(event.getEventType());
 
             // 2. 이벤트를 JSON으로 변환

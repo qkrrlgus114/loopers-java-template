@@ -56,12 +56,38 @@ public class OutboxPublisherScheduler {
         }
     }
 
+    /**
+     * 실패한 이벤트 재처리 (1분마다 실행)
+     */
+    @Scheduled(fixedDelay = 60000)
+    @Transactional
+    public void retryFailedEvents() {
+        try {
+            // 재시도 횟수가 3회 미만인 실패 이벤트 조회
+            List<Outbox> failedEvents = outboxRepository
+                    .findFailedEventsForRetry(3, PageRequest.of(0, 50));
+
+            if (failedEvents.isEmpty()) {
+                return;
+            }
+
+            for (Outbox outbox : failedEvents) {
+                if (outbox.canRetry()) {
+                    processEvent(outbox);
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("실패 이벤트 재처리 중 오류", e);
+        }
+    }
+
     public void processEvent(Outbox outbox) {
         try {
             Object payload = objectMapper.readValue(outbox.getPayload(), Object.class);
 
             // 카프카 메시지 생성
-            KafkaEventMessage<Object> message = KafkaEventMessage.<Object>builder()
+            KafkaEventMessage<Object> message = KafkaEventMessage.builder()
                     .eventId(UUID.randomUUID().toString())
                     .eventType(outbox.getEventType())
                     .aggregateId(outbox.getAggregateId())
@@ -89,7 +115,7 @@ public class OutboxPublisherScheduler {
 
             // 재시도 가능 여부 확인
             if (!outbox.canRetry()) {
-
+                moveToDeadLetter(outbox, e.getMessage());
             }
         }
     }

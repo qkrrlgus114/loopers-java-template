@@ -65,7 +65,7 @@ public class Outbox extends BaseEntity {
 
 
     public void markAsPublished() {
-        if (this.status != OutboxStatus.PUBLISHED) {
+        if (this.status == OutboxStatus.PUBLISHED) {
             throw new IllegalStateException("이미 발행된 이벤트입니다.");
         }
         this.status = OutboxStatus.PUBLISHED;
