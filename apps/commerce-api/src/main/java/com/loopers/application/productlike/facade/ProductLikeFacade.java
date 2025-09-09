@@ -4,6 +4,7 @@ import com.loopers.application.event.EventPublisher;
 import com.loopers.application.event.productlike.ProductLikedEvent;
 import com.loopers.application.event.productlike.ProductUnlikedEvent;
 import com.loopers.application.member.service.MemberService;
+import com.loopers.application.product.service.ProductCache;
 import com.loopers.application.product.service.ProductService;
 import com.loopers.application.productlike.command.ProductLikeCommand;
 import com.loopers.application.productlike.query.ProductLikeGroup;
@@ -33,6 +34,7 @@ public class ProductLikeFacade {
     private final ProductService productService;
     private final MemberService memberService;
     private final EventPublisher eventPublisher;
+    private final ProductCache productCache;
 
     /*
      * 상품 좋아요 처리
@@ -57,7 +59,11 @@ public class ProductLikeFacade {
             eventPublisher.publish(productLikedEvent);
 
             product.increaseLikeCount();
-            return ProductLikeResult.of(product.getId(), true, product.getLikeCount(), true);
+            
+            // 상품 상세 캐시 무효화
+            productCache.invalidateProductDetailCache(product.getId());
+            
+            return ProductLikeResult.of(product.getId(), true, product.getLikeCount() + 1, true);
         } else {
             return ProductLikeResult.of(product.getId(), true, product.getLikeCount(), false);
         }
@@ -81,6 +87,10 @@ public class ProductLikeFacade {
             eventPublisher.publish(productUnlikedEvent);
 
             product.decreaseLikeCount();
+            
+            // 상품 상세 캐시 무효화
+            productCache.invalidateProductDetailCache(product.getId());
+            
             return ProductLikeResult.of(product.getId(), false, product.getLikeCount(), true);
         } else {
             return ProductLikeResult.of(product.getId(), false, product.getLikeCount(), false);

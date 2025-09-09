@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
@@ -62,6 +63,21 @@ public class ProductCache {
         } catch (Exception e) {
             log.error("Redis에서 상품 상세 데이터 조회 실패: key={}", key, e);
             return null;
+        }
+    }
+
+    public void invalidateProductDetailCache(Long productId) {
+        try {
+            // productId에 해당하는 모든 캐시 키를 찾아서 삭제
+            String pattern = String.format("product:detail:productId=%d:memberId=*", productId);
+            Set<String> keys = stringRedisTemplate.keys(pattern);
+            
+            if (keys != null && !keys.isEmpty()) {
+                stringRedisTemplate.delete(keys);
+                log.info("상품 상세 캐시 무효화 완료: productId={}, 삭제된 캐시 수={}", productId, keys.size());
+            }
+        } catch (Exception e) {
+            log.error("상품 상세 캐시 무효화 실패: productId={}", productId, e);
         }
     }
 }
