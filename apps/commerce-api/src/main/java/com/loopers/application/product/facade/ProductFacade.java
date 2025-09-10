@@ -4,10 +4,12 @@ import com.loopers.application.brand.service.BrandService;
 import com.loopers.application.event.EventPublisher;
 import com.loopers.application.event.product.ProductDetailViewedEvent;
 import com.loopers.application.product.command.ProductDetailCommand;
+import com.loopers.application.product.result.PopularProductResult;
 import com.loopers.application.product.result.ProductDetailResult;
 import com.loopers.application.product.result.ProductListResult;
 import com.loopers.application.product.result.ProductRegisterResult;
 import com.loopers.application.product.service.ProductCache;
+import com.loopers.application.product.service.ProductRankingService;
 import com.loopers.application.product.service.ProductService;
 import com.loopers.application.productlike.service.ProductLikeService;
 import com.loopers.application.stock.service.StockService;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,6 +36,7 @@ public class ProductFacade {
     private final BrandService brandService;
     private final ProductLikeService productLikeService;
     private final ProductCache productCache;
+    private final ProductRankingService productRankingService;
     private final EventPublisher eventPublisher;
 
     /*
@@ -96,5 +100,45 @@ public class ProductFacade {
         stockService.registerStock(productRegisterResult.productId(), reqDTO.stock());
 
         return productRegisterResult;
+    }
+
+    /*
+     * 오늘의 인기상품 조회 (랭킹 기반)
+     */
+    @Transactional(readOnly = true)
+    public List<PopularProductResult> getTodayPopularProducts(int limit) {
+        // Redis ZSET에서 상위 랭킹 상품 ID 조회
+        List<Long> topProductIds = productRankingService.getTodayTopProductIds(limit);
+        
+        if (topProductIds.isEmpty()) {
+            log.info("오늘의 인기상품이 없습니다.");
+            return List.of();
+        }
+
+        // 상품 정보 조회
+        List<Product> products = productService.findProductListByProductId(topProductIds);
+        
+        // 순위 정보와 함께 결과 생성
+        List<PopularProductResult> results = new ArrayList<>();
+        
+        for (int i = 0; i < topProductIds.size(); i++) {
+            Long productId = topProductIds.get(i);
+            
+            // 해당 상품 찾기
+            Product product = products.stream()
+                    .filter(p -> p.getId().equals(productId))
+                    .findFirst()
+                    .orElse(null);
+                    
+            if (product != null) {
+                Double score = productRankingService.getTodayScore(productId);
+                Long rank = (long) (i + 1); // 순위는 조회 순서대로
+                
+                results.add(PopularProductResult.of(product, score, rank));
+            }
+        }
+        
+        log.info("오늘의 인기상품 조회 완료 - 요청: {}, 결과: {} 건", limit, results.size());
+        return results;
     }
 }

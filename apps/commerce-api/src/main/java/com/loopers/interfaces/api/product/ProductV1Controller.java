@@ -1,11 +1,13 @@
 package com.loopers.interfaces.api.product;
 
 import com.loopers.application.product.facade.ProductFacade;
+import com.loopers.application.product.result.PopularProductResult;
 import com.loopers.application.product.result.ProductListResult;
 import com.loopers.application.product.command.ProductDetailCommand;
 import com.loopers.application.product.result.ProductDetailResult;
 import com.loopers.application.product.result.ProductRegisterResult;
 import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.interfaces.api.product.dto.PopularProductResponseDto;
 import com.loopers.interfaces.api.product.dto.ProductDetailResponseDto;
 import com.loopers.interfaces.api.product.dto.ProductRegisterReqDTO;
 import com.loopers.interfaces.api.product.dto.ProductRegisterResDTO;
@@ -75,6 +77,23 @@ public class ProductV1Controller {
         );
 
         return ApiResponse.success(productRegisterResDTO);
+    }
+
+    /*
+     * 오늘의 인기상품 조회
+     */
+    @GetMapping("/products/popular")
+    public ApiResponse<List<PopularProductResponseDto>> getTodayPopularProducts(
+            @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        
+        if (limit <= 0 || limit > 100) {
+            limit = 10; // 기본값으로 조정
+        }
+        
+        List<PopularProductResult> popularProducts = productFacade.getTodayPopularProducts(limit);
+        List<PopularProductResponseDto> responseList = PopularProductResponseDto.of(popularProducts);
+        
+        return ApiResponse.success(responseList);
     }
 
 }

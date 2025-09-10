@@ -34,11 +34,11 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       properties:
         enable-auto-commit: false
-        max.poll.records: 100
+        max.poll.records: 500
         max.poll.interval.ms: 300000
         session.timeout.ms: 30000
         fetch.min.bytes: 1024  # 최소 1KB 모이면 가져오기
-        fetch.max.wait.ms: 500  # 최대 500ms 대기
+        fetch.max.wait.ms: 100  # 최대 500ms 대기
 
     listener:
       ack-mode: manual

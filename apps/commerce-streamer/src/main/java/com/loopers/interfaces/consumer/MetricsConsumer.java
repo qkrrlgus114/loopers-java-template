@@ -5,6 +5,7 @@ import com.loopers.domain.event.EventHandled;
 import com.loopers.domain.event.EventHandledRepository;
 import com.loopers.domain.metrics.ProductMetrics;
 import com.loopers.domain.metrics.ProductMetricsRepository;
+import com.loopers.domain.ranking.ProductRankingService;
 import com.loopers.interfaces.consumer.support.DlqPublisher;
 import com.loopers.kafka.CatalogEventPayload;
 import com.loopers.kafka.EventTypes;
@@ -38,6 +39,7 @@ public class MetricsConsumer {
     private final EventHandledRepository eventHandledRepository;
     private final ObjectMapper objectMapper;
     private final DlqPublisher dlqPublisher;
+    private final ProductRankingService productRankingService;
 
     @KafkaListener(
             topics = {KafkaTopics.CATALOG_EVENTS, KafkaTopics.ORDER_EVENTS},
@@ -167,6 +169,9 @@ public class MetricsConsumer {
         productMetricsRepository.save(metrics);
         log.info("좋아요 메트릭 업데이트 - productId: {}, likeCount: {}",
                 productId, metrics.getLikeCount());
+        
+        // Redis ZSET 랭킹 업데이트
+        productRankingService.addLikeScore(productId);
     }
 
     /**
@@ -194,6 +199,9 @@ public class MetricsConsumer {
         productMetricsRepository.save(metrics);
         log.info("좋아요 메트릭 감소 - productId: {}, likeCount: {}",
                 productId, metrics.getLikeCount());
+        
+        // Redis ZSET 랭킹 업데이트
+        productRankingService.removeLikeScore(productId);
     }
 
     /**
@@ -224,6 +232,9 @@ public class MetricsConsumer {
         productMetricsRepository.save(metrics);
         log.info("상품 조회 메트릭 업데이트 - productId: {}, viewCount: {}",
                 productId, metrics.getViewCount());
+        
+        // Redis ZSET 랭킹 업데이트
+        productRankingService.addViewScore(productId);
     }
 //
 //    /**
