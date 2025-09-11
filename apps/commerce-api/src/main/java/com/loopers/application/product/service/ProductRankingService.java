@@ -1,15 +1,14 @@
 package com.loopers.application.product.service;
 
+import com.loopers.redis.repository.RankingInMemoryRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 상품 랭킹 조회 서비스 (commerce-api)
@@ -19,7 +18,7 @@ import java.util.Set;
 @Slf4j
 public class ProductRankingService {
 
-    private final StringRedisTemplate stringRedisTemplate;
+    private final RankingInMemoryRepo rankingInMemoryRepo;
     
     // 개선된 키 전략
     private static final String KEY_PREFIX = "loopers:rank:v1:product:";
@@ -75,17 +74,14 @@ public class ProductRankingService {
         long start = (long) (page - 1) * limit;
         long end = (long) page * limit - 1;
         
-        Set<String> topProducts = stringRedisTemplate.opsForZSet()
-                .reverseRange(key, start, end);
+        List<String> topProducts = rankingInMemoryRepo.getRangeRanking(key, start, end);
         
         List<Long> productIds = new ArrayList<>();
-        if (topProducts != null) {
-            for (String productId : topProducts) {
-                try {
-                    productIds.add(Long.parseLong(productId));
-                } catch (NumberFormatException e) {
-                    log.warn("잘못된 상품 ID 형식: {}", productId);
-                }
+        for (String productId : topProducts) {
+            try {
+                productIds.add(Long.parseLong(productId));
+            } catch (NumberFormatException e) {
+                log.warn("잘못된 상품 ID 형식: {}", productId);
             }
         }
         
@@ -108,7 +104,7 @@ public class ProductRankingService {
         String key = getTodayRankingKey();
         String member = String.valueOf(productId);
         
-        Double score = stringRedisTemplate.opsForZSet().score(key, member);
+        Double score = rankingInMemoryRepo.getScore(key, member);
         return score != null ? score : 0.0;
     }
 
@@ -119,7 +115,7 @@ public class ProductRankingService {
         String key = getTodayRankingKey();
         String member = String.valueOf(productId);
         
-        Long rank = stringRedisTemplate.opsForZSet().reverseRank(key, member);
+        Long rank = rankingInMemoryRepo.getRank(key, member);
         
         if (rank != null) {
             return rank + 1; // 1부터 시작하도록 조정
@@ -138,17 +134,14 @@ public class ProductRankingService {
         long start = (long) (page - 1) * size;
         long end = (long) page * size - 1;
         
-        Set<String> rankingProducts = stringRedisTemplate.opsForZSet()
-                .reverseRange(key, start, end);
+        List<String> rankingProducts = rankingInMemoryRepo.getRangeRanking(key, start, end);
         
         List<Long> productIds = new ArrayList<>();
-        if (rankingProducts != null) {
-            for (String productId : rankingProducts) {
-                try {
-                    productIds.add(Long.parseLong(productId));
-                } catch (NumberFormatException e) {
-                    log.warn("잘못된 상품 ID 형식: {}", productId);
-                }
+        for (String productId : rankingProducts) {
+            try {
+                productIds.add(Long.parseLong(productId));
+            } catch (NumberFormatException e) {
+                log.warn("잘못된 상품 ID 형식: {}", productId);
             }
         }
         
@@ -164,7 +157,7 @@ public class ProductRankingService {
         String key = getRankingKey(RankingScope.ALL, date);
         String member = String.valueOf(productId);
         
-        Double score = stringRedisTemplate.opsForZSet().score(key, member);
+        Double score = rankingInMemoryRepo.getScore(key, member);
         return score != null ? score : 0.0;
     }
 
@@ -175,7 +168,7 @@ public class ProductRankingService {
         String key = getRankingKey(RankingScope.ALL, date);
         String member = String.valueOf(productId);
         
-        Long rank = stringRedisTemplate.opsForZSet().reverseRank(key, member);
+        Long rank = rankingInMemoryRepo.getRank(key, member);
         
         if (rank != null) {
             return rank + 1; // 1부터 시작하도록 조정
