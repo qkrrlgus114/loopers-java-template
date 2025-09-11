@@ -127,4 +127,60 @@ public class ProductRankingService {
         
         return null; // 랭킹에 없음
     }
+
+    /**
+     * 특정 날짜의 랭킹 상품 ID 조회 (페이징 지원)
+     */
+    public List<Long> getRankingProductIdsByDate(LocalDate date, int page, int size) {
+        String key = getRankingKey(RankingScope.ALL, date);
+        
+        // 페이징 계산: start = (page - 1) * size, end = page * size - 1
+        long start = (long) (page - 1) * size;
+        long end = (long) page * size - 1;
+        
+        Set<String> rankingProducts = stringRedisTemplate.opsForZSet()
+                .reverseRange(key, start, end);
+        
+        List<Long> productIds = new ArrayList<>();
+        if (rankingProducts != null) {
+            for (String productId : rankingProducts) {
+                try {
+                    productIds.add(Long.parseLong(productId));
+                } catch (NumberFormatException e) {
+                    log.warn("잘못된 상품 ID 형식: {}", productId);
+                }
+            }
+        }
+        
+        log.info("특정 날짜 랭킹 상품 ID 조회 - key: {}, date: {}, page: {}, size: {}, start: {}, end: {}, result: {}", 
+                key, date, page, size, start, end, productIds);
+        return productIds;
+    }
+
+    /**
+     * 특정 상품의 특정 날짜 랭킹 점수 조회
+     */
+    public Double getScoreByDate(Long productId, LocalDate date) {
+        String key = getRankingKey(RankingScope.ALL, date);
+        String member = String.valueOf(productId);
+        
+        Double score = stringRedisTemplate.opsForZSet().score(key, member);
+        return score != null ? score : 0.0;
+    }
+
+    /**
+     * 특정 상품의 특정 날짜 순위 조회 (1부터 시작)
+     */
+    public Long getRankByDate(Long productId, LocalDate date) {
+        String key = getRankingKey(RankingScope.ALL, date);
+        String member = String.valueOf(productId);
+        
+        Long rank = stringRedisTemplate.opsForZSet().reverseRank(key, member);
+        
+        if (rank != null) {
+            return rank + 1; // 1부터 시작하도록 조정
+        }
+        
+        return null; // 랭킹에 없음
+    }
 }

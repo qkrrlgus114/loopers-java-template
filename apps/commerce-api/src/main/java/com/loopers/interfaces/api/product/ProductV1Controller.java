@@ -1,17 +1,15 @@
 package com.loopers.interfaces.api.product;
 
+import com.loopers.application.product.command.ProductDetailCommand;
 import com.loopers.application.product.facade.ProductFacade;
 import com.loopers.application.product.result.PopularProductResult;
-import com.loopers.application.product.result.ProductListResult;
-import com.loopers.application.product.command.ProductDetailCommand;
 import com.loopers.application.product.result.ProductDetailResult;
+import com.loopers.application.product.result.ProductListResult;
 import com.loopers.application.product.result.ProductRegisterResult;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.product.dto.PopularProductResponseDto;
-import com.loopers.interfaces.api.product.dto.ProductDetailResponseDto;
-import com.loopers.interfaces.api.product.dto.ProductRegisterReqDTO;
-import com.loopers.interfaces.api.product.dto.ProductRegisterResDTO;
-import com.loopers.interfaces.api.product.dto.ProductSearchResDTO;
+import com.loopers.interfaces.api.product.dto.*;
+import com.loopers.support.error.CommonErrorType;
+import com.loopers.support.error.CoreException;
 import com.loopers.support.sort.ProductSortType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +17,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -86,18 +87,50 @@ public class ProductV1Controller {
     public ApiResponse<List<PopularProductResponseDto>> getTodayPopularProducts(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "limit", defaultValue = "10") int limit) {
-        
+
         if (page <= 0) {
             page = 1; // 기본값으로 조정
         }
-        
+
         if (limit <= 0 || limit > 100) {
             limit = 10; // 기본값으로 조정
         }
-        
+
         List<PopularProductResult> popularProducts = productFacade.getTodayPopularProducts(page, limit);
         List<PopularProductResponseDto> responseList = PopularProductResponseDto.of(popularProducts);
-        
+
+        return ApiResponse.success(responseList);
+    }
+
+    /*
+     * 특정 날짜의 상품 랭킹 조회
+     */
+    @GetMapping("/api/v1/rankings")
+    public ApiResponse<List<PopularProductResponseDto>> getRankings(
+            @RequestParam("date") String dateStr,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size) {
+
+        // 날짜 파라미터 검증
+        LocalDate date;
+        try {
+            date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
+        } catch (DateTimeParseException e) {
+            throw new CoreException(CommonErrorType.BAD_REQUEST, "잘못된 날짜 형식입니다. yyyyMMdd 형식으로 입력해주세요.");
+        }
+
+        // 페이징 파라미터 검증
+        if (page <= 0) {
+            page = 1;
+        }
+
+        if (size <= 0 || size > 100) {
+            size = 20; // 기본값으로 조정
+        }
+
+        List<PopularProductResult> rankingProducts = productFacade.getRankingsByDate(date, page, size);
+        List<PopularProductResponseDto> responseList = PopularProductResponseDto.of(rankingProducts);
+
         return ApiResponse.success(responseList);
     }
 
