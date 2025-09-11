@@ -26,9 +26,8 @@ public class ProductRankingService {
     // 스코프 정의
     public enum RankingScope {
         ALL("all"),           // 전체 상품 랭킹
-        CATEGORY("category"), // 카테고리별 랭킹 (향후 확장)
-        BRAND("brand"),       // 브랜드별 랭킹 (향후 확장)
-        REGION("region");     // 지역별 랭킹 (향후 확장)
+        CATEGORY("category"), // 카테고리별 랭킹
+        BRAND("brand");       // 브랜드별 랭킹
 
         private final String value;
 

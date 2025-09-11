@@ -84,13 +84,18 @@ public class ProductV1Controller {
      */
     @GetMapping("/products/popular")
     public ApiResponse<List<PopularProductResponseDto>> getTodayPopularProducts(
+            @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        
+        if (page <= 0) {
+            page = 1; // 기본값으로 조정
+        }
         
         if (limit <= 0 || limit > 100) {
             limit = 10; // 기본값으로 조정
         }
         
-        List<PopularProductResult> popularProducts = productFacade.getTodayPopularProducts(limit);
+        List<PopularProductResult> popularProducts = productFacade.getTodayPopularProducts(page, limit);
         List<PopularProductResponseDto> responseList = PopularProductResponseDto.of(popularProducts);
         
         return ApiResponse.success(responseList);

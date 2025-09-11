@@ -110,12 +110,12 @@ public class ProductFacade {
      * 오늘의 인기상품 조회 (랭킹 기반)
      */
     @Transactional(readOnly = true)
-    public List<PopularProductResult> getTodayPopularProducts(int limit) {
-        // Redis ZSET에서 상위 랭킹 상품 ID 조회
-        List<Long> topProductIds = productRankingService.getTodayTopProductIds(limit);
+    public List<PopularProductResult> getTodayPopularProducts(int page, int limit) {
+        // Redis ZSET에서 상위 랭킹 상품 ID 조회 (페이징 처리)
+        List<Long> topProductIds = productRankingService.getTodayTopProductIds(page, limit);
         
         if (topProductIds.isEmpty()) {
-            log.info("오늘의 인기상품이 없습니다.");
+            log.info("오늘의 인기상품이 없습니다. - page: {}, limit: {}", page, limit);
             return List.of();
         }
 
@@ -124,6 +124,9 @@ public class ProductFacade {
         
         // 순위 정보와 함께 결과 생성
         List<PopularProductResult> results = new ArrayList<>();
+        
+        // 실제 순위 계산 (페이지를 고려한 순위)
+        int startRank = (page - 1) * limit + 1;
         
         for (int i = 0; i < topProductIds.size(); i++) {
             Long productId = topProductIds.get(i);
@@ -136,13 +139,13 @@ public class ProductFacade {
                     
             if (product != null) {
                 Double score = productRankingService.getTodayScore(productId);
-                Long rank = (long) (i + 1); // 순위는 조회 순서대로
+                Long rank = (long) (startRank + i); // 페이지를 고려한 실제 순위
                 
                 results.add(PopularProductResult.of(product, score, rank));
             }
         }
         
-        log.info("오늘의 인기상품 조회 완료 - 요청: {}, 결과: {} 건", limit, results.size());
+        log.info("오늘의 인기상품 조회 완료 - page: {}, limit: {}, 결과: {} 건", page, limit, results.size());
         return results;
     }
 }

@@ -66,12 +66,17 @@ public class ProductRankingService {
     }
 
     /**
-     * 오늘의 상위 랭킹 상품 ID 조회
+     * 오늘의 상위 랭킹 상품 ID 조회 (페이징 지원)
      */
-    public List<Long> getTodayTopProductIds(int limit) {
+    public List<Long> getTodayTopProductIds(int page, int limit) {
         String key = getTodayRankingKey();
+        
+        // 페이징 계산: start = (page - 1) * limit, end = page * limit - 1
+        long start = (long) (page - 1) * limit;
+        long end = (long) page * limit - 1;
+        
         Set<String> topProducts = stringRedisTemplate.opsForZSet()
-                .reverseRange(key, 0, limit - 1);
+                .reverseRange(key, start, end);
         
         List<Long> productIds = new ArrayList<>();
         if (topProducts != null) {
@@ -84,8 +89,16 @@ public class ProductRankingService {
             }
         }
         
-        log.info("오늘의 상위 랭킹 상품 ID 조회 - key: {}, limit: {}, result: {}", key, limit, productIds);
+        log.info("오늘의 상위 랭킹 상품 ID 조회 - key: {}, page: {}, limit: {}, start: {}, end: {}, result: {}", 
+                key, page, limit, start, end, productIds);
         return productIds;
+    }
+
+    /**
+     * 오늘의 상위 랭킹 상품 ID 조회 (기존 호환성 메서드)
+     */
+    public List<Long> getTodayTopProductIds(int limit) {
+        return getTodayTopProductIds(1, limit);
     }
 
     /**
