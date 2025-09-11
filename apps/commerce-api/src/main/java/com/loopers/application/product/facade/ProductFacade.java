@@ -67,8 +67,11 @@ public class ProductFacade {
         Product product = productService.getProductDetailById(command.productId());
         Brand brand = brandService.getBrandDetail(product.getBrandId());
         boolean likedByMember = productLikeService.isLikedByMember(command.productId(), command.memberId());
+        
+        // 오늘의 랭킹 순위 조회
+        Long rank = productRankingService.getTodayRank(command.productId());
 
-        ProductDetailResult result = ProductDetailResult.of(product, brand, likedByMember);
+        ProductDetailResult result = ProductDetailResult.of(product, brand, likedByMember, rank);
 
         // 캐시에 저장 (10분)
         productCache.putDetail(cacheKey, result, 10 * 60 * 1000);
@@ -76,7 +79,8 @@ public class ProductFacade {
         // 상품 상세조회 이벤트 발행
         ProductDetailViewedEvent event = ProductDetailViewedEvent.from(command.productId(), command.memberId());
         eventPublisher.publish(event);
-        log.debug("상품 상세조회 이벤트 발행 - productId: {}, memberId: {}", command.productId(), command.memberId());
+        log.debug("상품 상세조회 이벤트 발행 - productId: {}, memberId: {}, rank: {}", 
+                command.productId(), command.memberId(), rank);
 
         return result;
     }

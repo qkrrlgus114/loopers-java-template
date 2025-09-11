@@ -16,7 +16,8 @@ public record ProductDetailResult(
         String brandName,
         ProductStatus status,
         int likeCount,
-        Boolean isLiked
+        Boolean isLiked,
+        Long rank
 ) {
 
     public static ProductDetailResult of(Product product, Brand brand, boolean likedByMember) {
@@ -30,7 +31,24 @@ public record ProductDetailResult(
                 brand.getName(),
                 product.getStatus(),
                 product.getLikeCount(),
-                likedByMember
+                likedByMember,
+                null
+        );
+    }
+
+    public static ProductDetailResult of(Product product, Brand brand, boolean likedByMember, Long rank) {
+        return new ProductDetailResult(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getMemberId(),
+                product.getBrandId(),
+                brand.getName(),
+                product.getStatus(),
+                product.getLikeCount(),
+                likedByMember,
+                rank
         );
     }
 
