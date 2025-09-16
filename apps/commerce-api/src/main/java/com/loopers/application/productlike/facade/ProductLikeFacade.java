@@ -1,9 +1,12 @@
 package com.loopers.application.productlike.facade;
 
+import com.loopers.application.event.EventPublisher;
+import com.loopers.application.event.productlike.ProductLikedEvent;
+import com.loopers.application.event.productlike.ProductUnlikedEvent;
 import com.loopers.application.member.service.MemberService;
+import com.loopers.application.product.service.ProductCache;
 import com.loopers.application.product.service.ProductService;
 import com.loopers.application.productlike.command.ProductLikeCommand;
-import com.loopers.application.productlike.producer.ProductLikeProducer;
 import com.loopers.application.productlike.query.ProductLikeGroup;
 import com.loopers.application.productlike.result.ProductLikeResult;
 import com.loopers.application.productlike.result.ProductLikeView;
@@ -11,11 +14,8 @@ import com.loopers.application.productlike.service.ProductLikeService;
 import com.loopers.domain.member.Member;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.productlike.ProductLike;
-import com.loopers.domain.productlike.event.ProductLikedEvent;
-import com.loopers.domain.productlike.event.ProductUnlikedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +33,8 @@ public class ProductLikeFacade {
     private final ProductLikeService productLikeService;
     private final ProductService productService;
     private final MemberService memberService;
-    private final ApplicationEventPublisher eventPublisher;
-    private final ProductLikeProducer productLikeProducer;
+    private final EventPublisher eventPublisher;
+    private final ProductCache productCache;
 
     /*
      * 상품 좋아요 처리
@@ -48,12 +48,21 @@ public class ProductLikeFacade {
         Product product = productService.findProductById(command.getProductId());
         Member member = memberService.findMemberById(command.getMemberId());
 
+        // 이미 좋아요 데이터가 존재하는지 확인하기 위한 용도
         Optional<ProductLike> optionalProductLike = productLikeService.findProductLikeByMemberAndProduct(product, member);
 
         if (optionalProductLike.isEmpty()) {
             productLikeService.registerProductLike(ProductLike.create(product.getId(), member.getId()));
 
-            productLikeProducer.sendProductLikedEvent(ProductLikedEvent.of(command.getProductId(), command.getMemberId()));
+            ProductLikedEvent productLikedEvent = ProductLikedEvent.from(command.getMemberId(), command.getProductId());
+
+            eventPublisher.publish(productLikedEvent);
+
+            product.increaseLikeCount();
+            
+            // 상품 상세 캐시 무효화
+            productCache.invalidateProductDetailCache(product.getId());
+            
             return ProductLikeResult.of(product.getId(), true, product.getLikeCount() + 1, true);
         } else {
             return ProductLikeResult.of(product.getId(), true, product.getLikeCount(), false);
@@ -73,8 +82,16 @@ public class ProductLikeFacade {
         if (optionalProductLike.isPresent()) {
             productLikeService.cancelProductLike(optionalProductLike.get());
 
-            productLikeProducer.sendProdcutUnlikedEvent(ProductUnlikedEvent.of(command.getProductId(), command.getMemberId()));
-            return ProductLikeResult.of(product.getId(), false, product.getLikeCount() - 1, true);
+            ProductUnlikedEvent productUnlikedEvent = ProductUnlikedEvent.from(command.getProductId(), command.getMemberId());
+
+            eventPublisher.publish(productUnlikedEvent);
+
+            product.decreaseLikeCount();
+            
+            // 상품 상세 캐시 무효화
+            productCache.invalidateProductDetailCache(product.getId());
+            
+            return ProductLikeResult.of(product.getId(), false, product.getLikeCount(), true);
         } else {
             return ProductLikeResult.of(product.getId(), false, product.getLikeCount(), false);
         }

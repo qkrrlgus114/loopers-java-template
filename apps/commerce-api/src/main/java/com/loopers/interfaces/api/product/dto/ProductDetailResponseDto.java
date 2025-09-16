@@ -1,5 +1,6 @@
 package com.loopers.interfaces.api.product.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.loopers.application.product.result.ProductDetailResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -36,6 +37,10 @@ public class ProductDetailResponseDto {
     @Schema(description = "사용자 좋아요 여부", example = "true")
     private Boolean isLiked;
 
+    @Schema(description = "오늘의 인기 순위", example = "1")
+    @JsonInclude(JsonInclude.Include.ALWAYS)
+    private Long rank;
+
     public static ProductDetailResponseDto of(ProductDetailResult result) {
         return ProductDetailResponseDto.builder()
                 .id(result.id())
@@ -46,6 +51,7 @@ public class ProductDetailResponseDto {
                 .brandName(result.brandName())
                 .likeCount(result.likeCount())
                 .isLiked(result.isLiked())
+                .rank(result.rank())
                 .build();
     }
 }

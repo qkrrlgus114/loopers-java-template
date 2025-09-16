@@ -54,13 +54,10 @@ public class OrdersFacade {
     public OrdersRegisterInfoResult placeOrder(PlaceOrderCommand command) {
         // 주문 키 생성
         String orderKey = UUIDUtil.generateShortUUID();
-        log.info("[{}] 주문 프로세스 시작. command: {}", orderKey, command);
 
         try {
             // 1. 사용자 조회
-            log.info("[{}] 사용자 조회 시작. memberId: {}", orderKey, command.getMemberId());
             Member member = memberService.findMemberById(command.getMemberId());
-            log.info("[{}] 사용자 조회 완료. memberId: {}", orderKey, member.getId());
 
             BigDecimal totalPrice = BigDecimal.ZERO;
             int quantity = 0;
@@ -69,26 +66,21 @@ public class OrdersFacade {
                 quantity += item.getQuantity();
                 totalPrice = totalPrice.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
             }
-            log.info("[{}] 총 주문 금액 계산 완료. totalPrice: {}, quantity: {}", orderKey, totalPrice, quantity);
 
             // 쿠폰 할인 계산
             BigDecimal finalPrice = totalPrice;
             if (command.getCouponId() != null) {
-                log.info("[{}] 쿠폰 할인 적용 시작. couponId: {}", orderKey, command.getCouponId());
                 Coupon coupon = couponService.getCouponId(command.getCouponId());
                 finalPrice = coupon.calculateDiscount(totalPrice);
-                log.info("[{}] 쿠폰 할인 적용 완료. finalPrice: {}", orderKey, finalPrice);
             }
 
             // 주문 생성
-            log.info("[{}] 주문 생성 시작. memberId: {}, quantity: {}, finalPrice: {}", orderKey, member.getId(), quantity, finalPrice);
             Orders orders = ordersService.register(
                     member.getId(),
                     quantity,
                     finalPrice,
                     orderKey
             );
-            log.info("[{}] 주문 생성 완료. orderId: {}", orderKey, orders.getId());
 
             // 주문 리스트 생성
             List<OrderItem> orderItems = new ArrayList<>();
@@ -102,7 +94,6 @@ public class OrdersFacade {
                 orderItems.add(orderItem);
             }
             orderItemsService.register(orderItems);
-            log.info("[{}] 주문 아이템 생성 완료. count: {}", orderKey, orderItems.size());
 
             // 이벤트 발행
             OrdersCreatedEvent event = OrdersCreatedEvent.of(
@@ -114,9 +105,7 @@ public class OrdersFacade {
                     command.getCardType(),
                     command.getCardNo()
             );
-            log.info("[{}] OrdersCreatedEvent 발행 시작. event: {}", orderKey, event);
             eventPublisher.publishEvent(event);
-            log.info("[{}] OrdersCreatedEvent 발행 완료.", orderKey);
 
 
             OrdersRegisterInfoResult result = OrdersRegisterInfoResult.of(
@@ -126,11 +115,9 @@ public class OrdersFacade {
                     orders.getTotalPrice(),
                     orders.getQuantity()
             );
-            log.info("[{}] 주문 프로세스 성공. result: {}", orderKey, result);
             return result;
 
         } catch (Exception e) {
-            log.error("[{}] 주문 프로세스 실패. command: {}", orderKey, command, e);
             throw e;
         }
     }
