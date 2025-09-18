@@ -25,14 +25,6 @@ spring:
       - kafka.yml
       - logging.yml
 
-loopers:
-  kafka:
-    topics:
-
-
-
-
-
 ---
 spring:
   config:
