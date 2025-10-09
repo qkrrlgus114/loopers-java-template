@@ -4,11 +4,13 @@ import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CommonErrorType;
 import com.loopers.support.error.CoreException;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "product")
+@Getter
 public class Product extends BaseEntity {
 
     @Column(length = 20, nullable = false)
@@ -31,7 +33,7 @@ public class Product extends BaseEntity {
     private ProductStatus status;
 
     @Column(nullable = false)
-    private Integer likeCount;
+    private int likeCount;
 
     protected Product() {
     }
@@ -68,35 +70,6 @@ public class Product extends BaseEntity {
         if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
             throw new CoreException(CommonErrorType.BAD_REQUEST, "상품 가격은 0보다 큰 값이어야 합니다.");
         }
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Long getBrandId() {
-        return brandId;
-    }
-
-    public Long getMemberId() {
-        return memberId;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public ProductStatus getStatus() {
-        return status;
-    }
-
-    public Integer getLikeCount() {
-        return likeCount;
     }
 
     public void increaseLikeCount() {
