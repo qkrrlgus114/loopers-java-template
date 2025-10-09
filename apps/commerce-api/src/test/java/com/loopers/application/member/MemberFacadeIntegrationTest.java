@@ -4,6 +4,10 @@ import com.loopers.application.member.command.MemberRegisterCommand;
 import com.loopers.application.member.result.MemberRegisterResult;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.MemberErrorType;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
@@ -21,6 +26,9 @@ public class MemberFacadeIntegrationTest {
 
     @Autowired
     private MemberFacade memberFacade;
+
+    @Autowired
+    private DatabaseCleanUp databaseCleanUp;
 
     @Autowired
     private PointRepository pointRepository;
@@ -37,6 +45,11 @@ public class MemberFacadeIntegrationTest {
                 "1997-12-04",
                 "M"
         );
+    }
+
+    @AfterEach
+    void tearDown() {
+        databaseCleanUp.truncateAllTables();
     }
 
     @Test
@@ -59,5 +72,27 @@ public class MemberFacadeIntegrationTest {
                 () -> assertThat(point.getMemberId()).isEqualTo(memberRegisterResult.id()),
                 () -> assertThat(point.getAmount()).isEqualByComparingTo(BigDecimal.ZERO)
         );
+    }
+
+    @Test
+    @DisplayName("이미 가입된 회원 ID로 재가입 시도 시 실패한다.")
+    void fail_whenRegisterWithDuplicateLoginId() {
+        // given: 첫 번째 회원가입 성공
+        memberFacade.registerMember(command);
+
+        // when & then: 동일한 loginId로 재가입 시도
+        MemberRegisterCommand duplicateCommand = MemberRegisterCommand.of(
+                "test",  // 동일한 loginId
+                "test2",
+                "test2@naver.com",
+                "김철수",
+                "1995-05-15",
+                "M"
+        );
+
+        assertThatThrownBy(() -> memberFacade.registerMember(duplicateCommand))
+                .isInstanceOf(CoreException.class)
+                .hasFieldOrPropertyWithValue("errorType", MemberErrorType.FAIL_REGISTER)
+                .hasMessageContaining("회원가입에 실패했습니다");
     }
 }
